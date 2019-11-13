@@ -1,11 +1,10 @@
 {
   "required": true,
-  "package": "net.fabricmc.example.mixin",
+  "package": "com._13rac1.erosion.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [
-  ],
+  "mixins": [],
   "client": [
-    "ExampleMixin"
+    "FluidBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,16 +1,11 @@
-# Fabric Example Mod
-
-## Setup
-
-1. Edit build.gradle and mod.json to suit your needs.
-    * The "mixins" object can be removed from mod.json if you do not need to use mixins.
-    * Please replace all occurences of "modid" with your own mod ID - sometimes, a different string may also suffice.
-2. Run the following command:
-
-```
-./gradlew idea
-```
+# Water Erosion for Minecraft
 
 ## License
 
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
+### Water Erosion Mod for Minecraft
+
+Copyright 2019 by Brad Erickson. Licensed GPL.
+
+### Fabric Template
+
+Copyright 2019 by the Fabric Minecraft Modding Toolchain authors. Licensed CC0.
