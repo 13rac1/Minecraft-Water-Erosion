@@ -14,8 +14,10 @@ public class ErodableBlocks {
   private static final Integer SAND_RESISTANCE = 5;
   private static final Integer WOOL_RESISTANCE = 10;
   private static final Integer GRAVEL_RESISTANCE = 20;
+  private static final Integer CLAY_RESISTANCE = 20;
   private static final Integer DIRT_RESISTANCE = 30;
   private static final Integer GRASS_RESISTANCE = 40;
+  private static final Integer COBBLESTONE_RESISTANCE = 95;
 
   // Warning: Blocks.SAND is null during startup, only run after start.
   private static HashMap<Block, Integer> blocks;
@@ -23,13 +25,24 @@ public class ErodableBlocks {
   private static HashMap<Block, Integer> getList() {
     if (blocks == null) {
       blocks = new HashMap<Block, Integer>();
+      blocks.put(Blocks.RED_SAND, SAND_RESISTANCE);
       blocks.put(Blocks.SAND, SAND_RESISTANCE);
       blocks.put(Blocks.GRAVEL, GRAVEL_RESISTANCE);
+      blocks.put(Blocks.CLAY, CLAY_RESISTANCE);
       blocks.put(Blocks.FARMLAND, DIRT_RESISTANCE);
       blocks.put(Blocks.DIRT, DIRT_RESISTANCE);
+      blocks.put(Blocks.PODZOL, DIRT_RESISTANCE);
       blocks.put(Blocks.GRASS_PATH, GRASS_RESISTANCE);
       blocks.put(Blocks.GRASS_BLOCK, GRASS_RESISTANCE);
       blocks.put(Blocks.GRASS, GRASS_RESISTANCE);
+      blocks.put(Blocks.COBBLESTONE, COBBLESTONE_RESISTANCE);
+      blocks.put(Blocks.COBBLESTONE_SLAB, COBBLESTONE_RESISTANCE);
+      blocks.put(Blocks.COBBLESTONE_STAIRS, COBBLESTONE_RESISTANCE);
+      blocks.put(Blocks.COBBLESTONE_WALL, COBBLESTONE_RESISTANCE);
+      blocks.put(Blocks.MOSSY_COBBLESTONE, COBBLESTONE_RESISTANCE);
+      blocks.put(Blocks.MOSSY_COBBLESTONE_SLAB, COBBLESTONE_RESISTANCE);
+      blocks.put(Blocks.MOSSY_COBBLESTONE_STAIRS, COBBLESTONE_RESISTANCE);
+      blocks.put(Blocks.MOSSY_COBBLESTONE_WALL, COBBLESTONE_RESISTANCE);
     }
     return blocks;
   }
