@@ -18,12 +18,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com._13rac1.erosion.ErodableBlocks;
 
+// Reference:
+// https://github.com/vktec/butterfly/blob/e8411285/src/main/java/uk/org/vktec/butterfly/mixin/FluidBlockMixin.java
+
+// TODO: Turn upper edge blocks of pools to sand or add a mud block?
+// TODO: Water flowing into a wall should erode that wall.
+// TODO: Above sea level, source blocks can sometimes erode a near by block. This will cause far more waterfalls.
+// TODO: Flowing water should an extremely low chance of eroding cobblestone.
+// TODO: Add Menu to allow disable of some features: https://www.curseforge.com/minecraft/mc-mods/modmenu
+
 @Mixin(FluidBlock.class)
 public class FluidBlockMixin extends Block {
-	// https://github.com/vktec/butterfly/blob/e8411285/src/main/java/uk/org/vktec/butterfly/mixin/FluidBlockMixin.java
 	public FluidBlockMixin(Settings settings) {
 		super(settings);
-
 	}
 
 	@Override
@@ -71,7 +78,9 @@ public class FluidBlockMixin extends Block {
 		// System.out.println("pos x:" + pos.getX() + " y:" + pos.getY() + " z:" +
 		// pos.getZ() + " water level: " + level);
 		System.out.println("Removing block: " + underBlock.getName().asFormattedString());
-		world.setBlockState(underPos, Blocks.AIR.getDefaultState(), 3);
+		// TODO: What is the ideal integer flag value?
+		Integer underBlocklevel = level < 15 ? level + 1 : 15;
+		world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(FluidBlock.LEVEL, underBlocklevel), 3);
 
 		// Don't delete source blocks
 		if (state.get(FluidBlock.LEVEL) == 0) {
@@ -79,7 +88,7 @@ public class FluidBlockMixin extends Block {
 		}
 
 		// Delete the water block
-		// TODO: What is the ideal integer flag value?
+		// TODO: Maybe the water block itself shouldn't be deleted?
 		world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
 
 		// Delete upwards until there's no water or a water source is found. The
