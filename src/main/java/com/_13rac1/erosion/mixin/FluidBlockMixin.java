@@ -1,12 +1,16 @@
 package com._13rac1.erosion.mixin;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.FluidBlock;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -22,10 +26,14 @@ import com._13rac1.erosion.ErodableBlocks;
 // https://github.com/vktec/butterfly/blob/e8411285/src/main/java/uk/org/vktec/butterfly/mixin/FluidBlockMixin.java
 
 // TODO: Turn upper edge blocks of pools to sand or add a mud block?
-// TODO: Water flowing into a wall should erode that wall.
-// TODO: Above sea level, source blocks can sometimes erode a near by block. This will cause far more waterfalls.
-// TODO: Flowing water should an extremely low chance of eroding cobblestone.
-// TODO: Add Menu to allow disable of some features: https://www.curseforge.com/minecraft/mc-mods/modmenu
+
+// TODO: Flowing water should have an extremely low chance of eroding cobblestone.
+
+// TODO: Add Menu to allow disable of some features:
+// https://www.curseforge.com/minecraft/mc-mods/modmenu
+
+// TODO: Change Lake generation to create more water sources on hills
+// https://fabricmc.net/wiki/tutorial:fluids
 
 @Mixin(FluidBlock.class)
 public class FluidBlockMixin extends Block {
@@ -35,21 +43,25 @@ public class FluidBlockMixin extends Block {
 
 	@Override
 	public boolean hasRandomTicks(BlockState state) {
-		return true;
+		// Water only, not Lava.
+		return state.getBlock() == Blocks.WATER;
 	}
 
-	// TODO: Use Inject or Override?
-	// @Override
+	// TODO: Use Inject or Override? @Override
 	@Inject(method = "onRandomTick", at = @At("HEAD"), require = 1)
 	private void onRandomTick(BlockState state, World world, BlockPos pos, Random rand, CallbackInfo info) {
-		// Water only, not Lava.
-		if (state.getBlock() != Blocks.WATER) {
+
+		Integer level = state.get(FluidBlock.LEVEL);
+
+		maybeSourceBreak(state, world, pos, rand, level);
+
+		// Skip source blocks, only flowing water.
+		if (level == 0) {
 			return;
 		}
 
-		// Skip source blocks, only flowing water.
-		Integer level = state.get(FluidBlock.LEVEL);
-		if (level == 0) {
+		if (maybeFlowingWall(state, world, pos, rand, level)) {
+			// Return if the flow breaks a wall.
 			return;
 		}
 
@@ -69,8 +81,8 @@ public class FluidBlockMixin extends Block {
 			return;
 		}
 
-		// Return if we are not a water edge block and not level 7. Level 7, the last
-		// one, is allowed to dig down to extend the water flow.
+		// Return if we are not a water edge block and not level 7. Level 7, the
+		// last one, is allowed to dig down to extend the water flow.
 		if (!this.isEdge(world, pos) && level != 7) {
 			return;
 		}
@@ -88,6 +100,7 @@ public class FluidBlockMixin extends Block {
 		}
 
 		// Delete the water block
+
 		// TODO: Maybe the water block itself shouldn't be deleted?
 		world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
 
@@ -99,7 +112,8 @@ public class FluidBlockMixin extends Block {
 			if (world.getBlockState(posUp).get(FluidBlock.LEVEL) == 0) {
 				break;
 			}
-			// System.out.println("Removing block above");
+			// TODO: Go up until finding the last water block and delete that. The
+			// rest are fine.
 			world.setBlockState(posUp, Blocks.AIR.getDefaultState(), 3);
 			posUp = posUp.up();
 		}
@@ -123,7 +137,176 @@ public class FluidBlockMixin extends Block {
 
 			return true;
 		}
-
 		return false;
+	}
+
+	private boolean maybeFlowingWall(BlockState state, World world, BlockPos pos, Random rand, Integer level) {
+		if (level < 1 && level > 6) {
+			// level 7 goes down not to the side.
+			return false;
+		}
+
+		FluidBlock block = (FluidBlock) state.getBlock();
+		FluidState fluidState = block.getFluidState(state);
+		// Note: fluidState.method_20785() -> float getLevel().
+
+		// Find flow direction: Velocity is a 3D vector normalized to 1 pointing the
+		// direction the water is flowing.
+		Vec3d velocity = fluidState.getVelocity(world, pos);
+
+		if (Math.abs(velocity.x) < 1 && Math.abs(velocity.z) < 1) {
+			// Skip 45 degree flows.
+			//
+			// The velocity vector is normalized, therefore 45 degree flows are
+			// represented by two floats of +/- 0.707.
+			return false;
+		}
+
+		// Find the position of the block in the flow direction.
+		BlockPos flowPos = pos.add(new Vec3i(velocity.x, velocity.y, velocity.z));
+		// TODO: Block above cannot be wood, keep trees standing.
+		BlockState flowState = world.getBlockState(flowPos);
+		Integer flowResistance = ErodableBlocks.getErosionResistance(flowState.getBlock());
+		if (flowResistance == ErodableBlocks.MAX_RESISTANCE) {
+			// Skip unbreakable blocks
+			return false;
+		}
+
+		// TODO: The block behind must have the same flow direction.
+
+		// flowResistance into percent chance of removal.
+		if (rand.nextInt(ErodableBlocks.MAX_RESISTANCE) >= ErodableBlocks.MAX_RESISTANCE - flowResistance) {
+			return false;
+		}
+
+		System.out.println("Removing block to side:" + flowState.getBlock().getName().asFormattedString());
+		world.setBlockState(flowPos, Blocks.AIR.getDefaultState(), 3);
+		return true;
+	}
+
+	private static final int SOURCE_BREAKS_ABOVE_SEA_LEVEL = 3;
+
+	private void maybeSourceBreak(BlockState state, World world, BlockPos pos, Random rand, Integer level) {
+		// Source blocks only.
+		if (level != 0) {
+			return;
+		}
+		// TODO: Break when there's less than three blocks to air
+
+		// Skip blocks less than sea level+.
+		if (pos.getY() < world.getSeaLevel() + SOURCE_BREAKS_ABOVE_SEA_LEVEL) {
+			// System.out.println("Too Low" + pos.getY() + "sea:" +
+			// world.getSeaLevel());
+			return;
+		}
+
+		// Skip blocks without air above.
+		Block upBlock = world.getBlockState(pos.up()).getBlock();
+		if (upBlock != Blocks.AIR && upBlock != Blocks.CAVE_AIR) {
+			// System.out.println("Not Surface Water:" +
+			// world.getBlockState(pos.up()).getBlock().getName().asFormattedString());
+			// System.out.println("Y:" + pos.getY() + "sea:" + world.getSeaLevel());
+			return;
+		}
+
+		// Skip blocks already flowing
+		FluidState posFluidState = state.getFluidState();
+		Vec3d velocity = posFluidState.getVelocity(world, pos);
+		if (velocity.length() > 0) {
+			return;
+		}
+		// System.out.println("length:" + velocity.length());
+
+		// Blocks near an erodable surface only.
+		List<Vec3i> listDirection = Arrays.asList(new Vec3i(1, 0, 0), new Vec3i(-1, 0, 0), new Vec3i(0, 0, 1),
+				new Vec3i(0, 0, -1));
+		// Randomize the list each run.
+		Collections.shuffle(listDirection);
+
+		for (Vec3i dir : listDirection) {
+			BlockPos sidePos = pos.add(dir);
+
+			Block sideBlock = world.getBlockState(sidePos).getBlock();
+			if (sideBlock == Blocks.WATER) {
+				// Short circuit water blocks. Should save CPU as this will be the most
+				// common result.
+				continue;
+			}
+
+			Integer sideResistance = ErodableBlocks.getErosionResistance(sideBlock);
+			if (sideResistance == ErodableBlocks.MAX_RESISTANCE) {
+				// Skip unbreakable.
+				continue;
+			}
+			// Found a breakable block in the direction.
+
+			// Check forward 7, 14, etc for air. Check a level lower each seventh
+			// block, to be sure the flow can make it to the selected block, rather
+			// than just make a 7 block creek.
+			boolean foundAir = true;
+			int yDeeper = 0;
+			// TODO: Should the odds of breakage increase when block 21 is clear?
+			// TODO: Should all blocks in the potential route be checked?
+			for (int airMultipler : Arrays.asList(7, 14)) {
+				Vec3i airDirection = new Vec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
+				// System.out.println("maybeairdir:" + airDirection);
+				yDeeper++;
+				BlockPos maybeAirPos = pos.add(airDirection);
+				BlockState maybeAirState = world.getBlockState(maybeAirPos);
+				// if (!maybeAirState.isAir()) {
+				Block maybeAirBlock = maybeAirState.getBlock();
+				if (maybeAirBlock != Blocks.AIR && maybeAirBlock != Blocks.CAVE_AIR) {
+					foundAir = false;
+					break;
+				}
+			}
+			if (!foundAir) {
+				// Skip if air was not found.
+				continue;
+			}
+
+			// Check behind. Is there enough "pressure" to break a wall? More blocks
+			// increases the odds, but there must be at least two in a row to avoid
+			// breaking generated farms.
+			int waterFound = 0;
+			for (int waterMultipler : Arrays.asList(1, 2, 3)) {
+				Vec3i waterDirection = new Vec3i(-dir.getX() * waterMultipler, dir.getY(), -dir.getZ() * waterMultipler);
+				// System.out.println("maybewaterdir:" + waterDirection);
+				BlockPos maybeWaterPos = pos.add(waterDirection);
+				BlockState maybeWaterState = world.getBlockState(maybeWaterPos);
+				// System.out.println("maybe water:" +
+				// maybeWaterState.getBlock().getName().asFormattedString());
+				if (maybeWaterState.getBlock() != Blocks.WATER) {
+					// TODO: Must be source water block
+					break;
+				}
+				waterFound++;
+			}
+			if (waterFound < 1) {
+				// Skip if not enough sequential water blocks found behind.
+				// System.out.println("not enough water");
+				continue;
+			}
+			// TODO: Better odds for waterFound > 1.
+			// BUG: waterFound must be greater than 3 for cobblestone to avoid breaking
+			// stock village wells.
+			// TODO: Make cobblestone breaking a specific option.
+
+			// TODO: Check depth. Greater depth increases odds of a wall breakthrough.
+
+			// flowResistance into percent chance of removal.
+			if (rand.nextInt(ErodableBlocks.MAX_RESISTANCE) >= ErodableBlocks.MAX_RESISTANCE - sideResistance) {
+				// Stop looking completely if flow fails.
+
+				// TODO: Should this chance check occur earlier?
+				return;
+			}
+			System.out.println(
+					"Removing block to source side:" + world.getBlockState(sidePos).getBlock().getName().asFormattedString());
+			world.setBlockState(sidePos, Blocks.AIR.getDefaultState(), 3);
+
+			// Only process the first erodable side found.
+			return;
+		}
 	}
 }
