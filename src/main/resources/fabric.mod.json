@@ -1,15 +1,15 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "water-erosion",
   "version": "${version}",
   "name": "Water Erosion",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "Erosion brings water to life in Minecraft. Worlds evolve with creeks, streams, and waterfalls as time progresses. Water flows may change direction or even stop as the water erodes to stone.",
   "authors": [
-    "Me!"
+    "13rac1"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://github.com/13rac1/minecraft-water-erosion/",
+    "sources": "https://github.com/13rac1/minecraft-water-erosion/"
   },
   "license": "GPL",
   "icon": "assets/erosion/icon.png",
@@ -20,7 +20,7 @@
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "erosion.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.4.0",
