@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com._13rac1.erosion.ErodableBlocks;
+import com._13rac1.erosion.FluidLevel;
 
 // Reference:
 // https://github.com/vktec/butterfly/blob/e8411285/src/main/java/uk/org/vktec/butterfly/mixin/FluidBlockMixin.java
@@ -56,7 +57,7 @@ public class FluidBlockMixin extends Block {
 		maybeSourceBreak(state, world, pos, rand, level);
 
 		// Skip source blocks, only flowing water.
-		if (level == 0) {
+		if (level == FluidLevel.SOURCE) {
 			return;
 		}
 
@@ -83,7 +84,7 @@ public class FluidBlockMixin extends Block {
 
 		// Return if we are not a water edge block and not level 7. Level 7, the
 		// last one, is allowed to dig down to extend the water flow.
-		if (!this.isEdge(world, pos) && level != 7) {
+		if (!this.isEdge(world, pos) && level != FluidLevel.FLOW7) {
 			return;
 		}
 
@@ -91,11 +92,11 @@ public class FluidBlockMixin extends Block {
 		// pos.getZ() + " water level: " + level);
 		System.out.println("Removing block: " + underBlock.getName().asFormattedString());
 		// TODO: What is the ideal integer flag value?
-		Integer underBlocklevel = level < 15 ? level + 1 : 15;
+		Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
 		world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(FluidBlock.LEVEL, underBlocklevel), 3);
 
 		// Don't delete source blocks
-		if (state.get(FluidBlock.LEVEL) == 0) {
+		if (state.get(FluidBlock.LEVEL) == FluidLevel.SOURCE) {
 			return;
 		}
 
@@ -109,7 +110,7 @@ public class FluidBlockMixin extends Block {
 		// entire stream/creek/river.
 		BlockPos posUp = pos.up();
 		while (world.getBlockState(posUp).getBlock() instanceof FluidBlock) {
-			if (world.getBlockState(posUp).get(FluidBlock.LEVEL) == 0) {
+			if (world.getBlockState(posUp).get(FluidBlock.LEVEL) == FluidLevel.SOURCE) {
 				break;
 			}
 			// TODO: Go up until finding the last water block and delete that. The
@@ -141,8 +142,8 @@ public class FluidBlockMixin extends Block {
 	}
 
 	private boolean maybeFlowingWall(BlockState state, World world, BlockPos pos, Random rand, Integer level) {
-		if (level < 1 && level > 6) {
-			// level 7 goes down not to the side.
+		if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW6) {
+			// level Flow7 goes down, never to the side.
 			return false;
 		}
 
@@ -184,11 +185,11 @@ public class FluidBlockMixin extends Block {
 		return true;
 	}
 
-	private static final int SOURCE_BREAKS_ABOVE_SEA_LEVEL = 3;
+	private static final int SOURCE_BREAKS_ABOVE_SEA_LEVEL = 2;
 
 	private void maybeSourceBreak(BlockState state, World world, BlockPos pos, Random rand, Integer level) {
 		// Source blocks only.
-		if (level != 0) {
+		if (level != FluidLevel.SOURCE) {
 			return;
 		}
 		// TODO: Break when there's less than three blocks to air
