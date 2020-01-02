@@ -7,7 +7,7 @@ import java.util.Random;
 
 import net.minecraft.block.FluidBlock;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.world.World;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.Vec3d;
@@ -49,8 +49,8 @@ public class FluidBlockMixin extends Block {
 	}
 
 	// TODO: Use Inject or Override? @Override
-	@Inject(method = "onRandomTick", at = @At("HEAD"), require = 1)
-	private void onRandomTick(BlockState state, World world, BlockPos pos, Random rand, CallbackInfo info) {
+	@Inject(method = "randomTick", at = @At("HEAD"), require = 1)
+	private void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random rand, CallbackInfo info) {
 
 		Integer level = state.get(FluidBlock.LEVEL);
 
@@ -121,7 +121,7 @@ public class FluidBlockMixin extends Block {
 		// TODO: Anything further to do since we are deleting ourself?
 	}
 
-	private boolean isEdge(World world, BlockPos pos) {
+	private boolean isEdge(ServerWorld world, BlockPos pos) {
 		List<BlockPos> listSidePos = Arrays.asList(pos.north(), pos.south(), pos.east(), pos.west());
 
 		for (BlockPos sidePos : listSidePos) {
@@ -141,7 +141,7 @@ public class FluidBlockMixin extends Block {
 		return false;
 	}
 
-	private boolean maybeFlowingWall(BlockState state, World world, BlockPos pos, Random rand, Integer level) {
+	private boolean maybeFlowingWall(BlockState state, ServerWorld world, BlockPos pos, Random rand, Integer level) {
 		if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW6) {
 			// level Flow7 goes down, never to the side.
 			return false;
@@ -187,7 +187,7 @@ public class FluidBlockMixin extends Block {
 
 	private static final int SOURCE_BREAKS_ABOVE_SEA_LEVEL = 2;
 
-	private void maybeSourceBreak(BlockState state, World world, BlockPos pos, Random rand, Integer level) {
+	private void maybeSourceBreak(BlockState state, ServerWorld world, BlockPos pos, Random rand, Integer level) {
 		// Source blocks only.
 		if (level != FluidLevel.SOURCE) {
 			return;

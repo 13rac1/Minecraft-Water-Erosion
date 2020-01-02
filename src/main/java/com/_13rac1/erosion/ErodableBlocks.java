@@ -62,8 +62,14 @@ public class ErodableBlocks {
       return LEAF_RESISTANCE;
     } else if (BlockTags.SAND.contains(block)) {
       return SAND_RESISTANCE;
-    } else if (BlockTags.DIRT_LIKE.contains(block)) {
-      return DIRT_RESISTANCE;
+      // FIXME: DIRT_LIKE is missing?
+      // error: cannot find symbol
+      // } else if (BlockTags.DIRT_LIKE.contains(block)) {
+      // symbol: variable DIRT_LIKE
+      // location: class BlockTags
+      // 1 error
+      // } else if (BlockTags.DIRT_LIKE.contains(block)) {
+      // return DIRT_RESISTANCE;
     } else if (BlockTags.WOOL.contains(block)) {
       return WOOL_RESISTANCE;
     }
