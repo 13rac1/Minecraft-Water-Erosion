@@ -8,6 +8,7 @@ import java.util.Random;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.Vec3d;
@@ -35,6 +36,8 @@ import com._13rac1.erosion.FluidLevel;
 
 // TODO: Change Lake generation to create more water sources on hills
 // https://fabricmc.net/wiki/tutorial:fluids
+
+// TODO: Avoid carving channels in sand since it is affected by gravity.
 
 @Mixin(FluidBlock.class)
 public class FluidBlockMixin extends Block {
@@ -165,7 +168,19 @@ public class FluidBlockMixin extends Block {
 
 		// Find the position of the block in the flow direction.
 		BlockPos flowPos = pos.add(new Vec3i(velocity.x, velocity.y, velocity.z));
-		// TODO: Block above cannot be wood, keep trees standing.
+
+		// Block above cannot be wood, keep trees standing on dirt.
+		// TODO: Look more than one block up for wood.
+		BlockPos aboveFlowPos = flowPos.up();
+		BlockState aboveFlowState = world.getBlockState(aboveFlowPos);
+		Block aboveFlowBlock = aboveFlowState.getBlock();
+		if (BlockTags.LOGS.contains(aboveFlowBlock)) {
+			return false;
+		}
+		// TODO: Do not remove an erodable block if the stack above is unsupported.
+		// Search around the stack to confirm a block other than air and water is
+		// touching it.
+
 		BlockState flowState = world.getBlockState(flowPos);
 		Integer flowResistance = ErodableBlocks.getErosionResistance(flowState.getBlock());
 		if (flowResistance == ErodableBlocks.MAX_RESISTANCE) {
