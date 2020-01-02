@@ -69,6 +69,10 @@ public class FluidBlockMixin extends Block {
 			return;
 		}
 
+		maybeErodeEdge(state, world, pos, rand, level);
+	}
+
+	private void maybeErodeEdge(BlockState state, ServerWorld world, BlockPos pos, Random rand, Integer level) {
 		// Get the block under us.
 		BlockPos underPos = pos.down();
 		BlockState underState = world.getBlockState(underPos);
