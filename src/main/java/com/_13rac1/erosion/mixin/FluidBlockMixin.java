@@ -39,6 +39,8 @@ import com._13rac1.erosion.FluidLevel;
 
 // TODO: Avoid carving channels in sand since it is affected by gravity.
 
+// TODO: Should destroyed blocks drop items?
+
 @Mixin(FluidBlock.class)
 public class FluidBlockMixin extends Block {
 	public FluidBlockMixin(Settings settings) {
@@ -108,7 +110,6 @@ public class FluidBlockMixin extends Block {
 		}
 
 		// Delete the water block
-
 		// TODO: Maybe the water block itself shouldn't be deleted?
 		world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
 
@@ -258,6 +259,10 @@ public class FluidBlockMixin extends Block {
 				// Skip unbreakable.
 				continue;
 			}
+			if (!ErodableBlocks.canSourceBreak(sideBlock)) {
+				// Skip stronger blocks.
+				continue;
+			}
 			// Found a breakable block in the direction.
 
 			// Check forward 7, 14, etc for air. Check a level lower each seventh
@@ -269,11 +274,11 @@ public class FluidBlockMixin extends Block {
 			// TODO: Should all blocks in the potential route be checked?
 			for (int airMultipler : Arrays.asList(7, 14)) {
 				Vec3i airDirection = new Vec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
-				// System.out.println("maybeairdir:" + airDirection);
+
 				yDeeper++;
 				BlockPos maybeAirPos = pos.add(airDirection);
 				BlockState maybeAirState = world.getBlockState(maybeAirPos);
-				// if (!maybeAirState.isAir()) {
+
 				Block maybeAirBlock = maybeAirState.getBlock();
 				if (maybeAirBlock != Blocks.AIR && maybeAirBlock != Blocks.CAVE_AIR) {
 					foundAir = false;
@@ -308,9 +313,6 @@ public class FluidBlockMixin extends Block {
 				continue;
 			}
 			// TODO: Better odds for waterFound > 1.
-			// BUG: waterFound must be greater than 3 for cobblestone to avoid breaking
-			// stock village wells.
-			// TODO: Make cobblestone breaking a specific option.
 
 			// TODO: Check depth. Greater depth increases odds of a wall breakthrough.
 

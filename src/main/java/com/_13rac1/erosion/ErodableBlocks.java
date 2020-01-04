@@ -10,6 +10,7 @@ import net.minecraft.block.Block;
 // leaves < sand < gravel < dirt < grass
 public class ErodableBlocks {
   public static final Integer MAX_RESISTANCE = 100;
+  public static final Integer SOURCE_BREAK_RESISTANCE = 90;
   private static final Integer LEAF_RESISTANCE = 5;
   private static final Integer SAND_RESISTANCE = 5;
   private static final Integer WOOL_RESISTANCE = 10;
@@ -31,6 +32,7 @@ public class ErodableBlocks {
       blocks.put(Blocks.CLAY, CLAY_RESISTANCE);
       blocks.put(Blocks.FARMLAND, DIRT_RESISTANCE);
       blocks.put(Blocks.DIRT, DIRT_RESISTANCE);
+      blocks.put(Blocks.COARSE_DIRT, DIRT_RESISTANCE);
       blocks.put(Blocks.PODZOL, DIRT_RESISTANCE);
       blocks.put(Blocks.GRASS_PATH, GRASS_RESISTANCE);
       blocks.put(Blocks.GRASS_BLOCK, GRASS_RESISTANCE);
@@ -75,5 +77,12 @@ public class ErodableBlocks {
     }
 
     return MAX_RESISTANCE;
+  }
+
+  // TODO: This is simple method to block the breakage of cobblestone by source
+  // blocks, but ideally it would still be allowed if there is enough "pressure"
+  // behind the current source block.
+  public static boolean canSourceBreak(Block block) {
+    return getErosionResistance(block) < SOURCE_BREAK_RESISTANCE;
   }
 }
