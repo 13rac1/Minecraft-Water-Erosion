@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com._13rac1.erosion.BlockFlag;
 import com._13rac1.erosion.ErodableBlocks;
 import com._13rac1.erosion.FluidLevel;
 
@@ -43,6 +44,10 @@ import com._13rac1.erosion.FluidLevel;
 
 @Mixin(FluidBlock.class)
 public class FluidBlockMixin extends Block {
+	// blockFlags is used with world.setBlockState() when blocks are replaced with
+	// air.
+	private final Integer blockFlags = BlockFlag.PROPAGATE_CHANGE | BlockFlag.NOTIFY_LISTENERS;
+
 	public FluidBlockMixin(Settings settings) {
 		super(settings);
 	}
@@ -100,9 +105,9 @@ public class FluidBlockMixin extends Block {
 		// System.out.println("pos x:" + pos.getX() + " y:" + pos.getY() + " z:" +
 		// pos.getZ() + " water level: " + level);
 		System.out.println("Removing block: " + underBlock.getName().asFormattedString());
-		// TODO: What is the ideal integer flag value?
+
 		Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
-		world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(FluidBlock.LEVEL, underBlocklevel), 3);
+		world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(FluidBlock.LEVEL, underBlocklevel), blockFlags);
 
 		// Don't delete source blocks
 		if (state.get(FluidBlock.LEVEL) == FluidLevel.SOURCE) {
@@ -111,7 +116,7 @@ public class FluidBlockMixin extends Block {
 
 		// Delete the water block
 		// TODO: Maybe the water block itself shouldn't be deleted?
-		world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
+		world.setBlockState(pos, Blocks.AIR.getDefaultState(), blockFlags);
 
 		// Delete upwards until there's no water or a water source is found. The
 		// goal is to lower the water level naturally without having to reflow the
@@ -123,7 +128,7 @@ public class FluidBlockMixin extends Block {
 			}
 			// TODO: Go up until finding the last water block and delete that. The
 			// rest are fine.
-			world.setBlockState(posUp, Blocks.AIR.getDefaultState(), 3);
+			world.setBlockState(posUp, Blocks.AIR.getDefaultState(), blockFlags);
 			posUp = posUp.up();
 		}
 		// TODO: Anything further to do since we are deleting ourself?
@@ -201,7 +206,7 @@ public class FluidBlockMixin extends Block {
 		}
 
 		System.out.println("Removing block to side:" + flowState.getBlock().getName().asFormattedString());
-		world.setBlockState(flowPos, Blocks.AIR.getDefaultState(), 3);
+		world.setBlockState(flowPos, Blocks.AIR.getDefaultState(), blockFlags);
 		return true;
 	}
 
@@ -325,7 +330,7 @@ public class FluidBlockMixin extends Block {
 			}
 			System.out.println(
 					"Removing block to source side:" + world.getBlockState(sidePos).getBlock().getName().asFormattedString());
-			world.setBlockState(sidePos, Blocks.AIR.getDefaultState(), 3);
+			world.setBlockState(sidePos, Blocks.AIR.getDefaultState(), blockFlags);
 
 			// Only process the first erodable side found.
 			return;
