@@ -42,6 +42,19 @@ import com._13rac1.erosion.FluidLevel;
 
 // TODO: Should destroyed blocks drop items?
 
+// TODO: How to make eroded ponds/lakes turn into source blocks?
+
+// TODO: Count leaves as air for source break calculations.
+
+// TODO: Flows touching sea level turn to source blocks! Wait. No. Because then
+// water will flow forever until it gets to the sea. Should it?
+
+// TODO: Flows INTO a source block wall should turn into a source block
+
+// TODO: Level7 flows delete the block under, they should delete block in the
+// flow direction too. There are odd cases where a downward dig will not go
+// forward.
+
 @Mixin(FluidBlock.class)
 public class FluidBlockMixin extends Block {
 	// blockFlags is used with world.setBlockState() when blocks are replaced with
@@ -206,7 +219,7 @@ public class FluidBlockMixin extends Block {
 		return true;
 	}
 
-	private static final int SOURCE_BREAKS_ABOVE_SEA_LEVEL = 2;
+	private static final int SOURCE_BREAKS_ABOVE_SEA_LEVEL = 0;
 
 	private void maybeSourceBreak(BlockState state, ServerWorld world, BlockPos pos, Random rand, Integer level) {
 		// Source blocks only.
@@ -215,8 +228,8 @@ public class FluidBlockMixin extends Block {
 		}
 		// TODO: Break when there's less than three blocks to air
 
-		// Skip blocks less than sea level+.
-		if (pos.getY() < world.getSeaLevel() + SOURCE_BREAKS_ABOVE_SEA_LEVEL) {
+		// Skip blocks less than sea level+, because there are a lot of them.
+		if (pos.getY() <= world.getSeaLevel() + SOURCE_BREAKS_ABOVE_SEA_LEVEL) {
 			// System.out.println("Too Low" + pos.getY() + "sea:" +
 			// world.getSeaLevel());
 			return;
