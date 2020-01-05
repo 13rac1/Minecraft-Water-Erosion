@@ -116,7 +116,8 @@ public class FluidBlockMixin extends Block {
 
 		// System.out.println("pos x:" + pos.getX() + " y:" + pos.getY() + " z:" +
 		// pos.getZ() + " water level: " + level);
-		System.out.println("Removing block: " + underBlock.getName().asFormattedString());
+		// System.out.println("Removing block: " +
+		// underBlock.getName().asFormattedString());
 
 		Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
 		world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(FluidBlock.LEVEL, underBlocklevel), blockFlags);
@@ -214,7 +215,8 @@ public class FluidBlockMixin extends Block {
 		}
 		// TODO: The block behind must have the same flow direction.
 
-		System.out.println("Removing block to side:" + flowState.getBlock().getName().asFormattedString());
+		// System.out.println("Removing block to side:" +
+		// flowState.getBlock().getName().asFormattedString());
 		world.setBlockState(flowPos, Blocks.AIR.getDefaultState(), blockFlags);
 		return true;
 	}
@@ -337,8 +339,9 @@ public class FluidBlockMixin extends Block {
 				return;
 			}
 
-			System.out.println(
-					"Removing block to source side:" + world.getBlockState(sidePos).getBlock().getName().asFormattedString());
+			// System.out.println(
+			// "Removing block to source side:" +
+			// world.getBlockState(sidePos).getBlock().getName().asFormattedString());
 			world.setBlockState(sidePos, Blocks.AIR.getDefaultState(), blockFlags);
 
 			// Only process the first erodable side found.
