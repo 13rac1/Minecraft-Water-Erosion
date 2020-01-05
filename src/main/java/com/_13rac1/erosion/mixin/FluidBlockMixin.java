@@ -86,13 +86,12 @@ public class FluidBlockMixin extends Block {
 		Block underBlock = underState.getBlock();
 
 		// Return if the block below us is not erodable.
-		Integer underResistance = ErodableBlocks.getErosionResistance(underBlock);
-		if (underResistance == ErodableBlocks.MAX_RESISTANCE) {
+		// TODO: Technically this call is redundant now.
+		if (!ErodableBlocks.canErode(underBlock)) {
 			// System.out.println(underBlock.getName().asFormattedString());
 			return;
 		}
-		// underResistance into percent chance of removal.
-		if (rand.nextInt(ErodableBlocks.MAX_RESISTANCE) >= ErodableBlocks.MAX_RESISTANCE - underResistance) {
+		if (!ErodableBlocks.maybeErode(rand, underBlock)) {
 			return;
 		}
 
@@ -131,7 +130,8 @@ public class FluidBlockMixin extends Block {
 			world.setBlockState(posUp, Blocks.AIR.getDefaultState(), blockFlags);
 			posUp = posUp.up();
 		}
-		// TODO: Anything further to do since we are deleting ourself?
+		// TODO: Anything further to do since we are deleting ourself? Cancel the
+		// callback?
 	}
 
 	private boolean isEdge(ServerWorld world, BlockPos pos) {
@@ -192,18 +192,14 @@ public class FluidBlockMixin extends Block {
 		// touching it.
 
 		BlockState flowState = world.getBlockState(flowPos);
-		Integer flowResistance = ErodableBlocks.getErosionResistance(flowState.getBlock());
-		if (flowResistance == ErodableBlocks.MAX_RESISTANCE) {
-			// Skip unbreakable blocks
+
+		if (!ErodableBlocks.canErode(flowState.getBlock())) {
 			return false;
 		}
-
+		if (!ErodableBlocks.maybeErode(rand, flowState.getBlock())) {
+			return false;
+		}
 		// TODO: The block behind must have the same flow direction.
-
-		// flowResistance into percent chance of removal.
-		if (rand.nextInt(ErodableBlocks.MAX_RESISTANCE) >= ErodableBlocks.MAX_RESISTANCE - flowResistance) {
-			return false;
-		}
 
 		System.out.println("Removing block to side:" + flowState.getBlock().getName().asFormattedString());
 		world.setBlockState(flowPos, Blocks.AIR.getDefaultState(), blockFlags);
@@ -259,8 +255,7 @@ public class FluidBlockMixin extends Block {
 				continue;
 			}
 
-			Integer sideResistance = ErodableBlocks.getErosionResistance(sideBlock);
-			if (sideResistance == ErodableBlocks.MAX_RESISTANCE) {
+			if (!ErodableBlocks.canErode(sideBlock)) {
 				// Skip unbreakable.
 				continue;
 			}
@@ -276,7 +271,10 @@ public class FluidBlockMixin extends Block {
 			boolean foundAir = true;
 			int yDeeper = 0;
 			// TODO: Should the odds of breakage increase when block 21 is clear?
-			// TODO: Should all blocks in the potential route be checked?
+			// TODO: Should all blocks in the potential route be checked? May find
+			// smaller gaps and crevasses.
+			// TODO: If 14 is clear, but 7 isn't the break should happen anyway,
+			// because then water will flow underground a ways before exiting.
 			for (int airMultipler : Arrays.asList(7, 14)) {
 				Vec3i airDirection = new Vec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
 
@@ -321,13 +319,11 @@ public class FluidBlockMixin extends Block {
 
 			// TODO: Check depth. Greater depth increases odds of a wall breakthrough.
 
-			// flowResistance into percent chance of removal.
-			if (rand.nextInt(ErodableBlocks.MAX_RESISTANCE) >= ErodableBlocks.MAX_RESISTANCE - sideResistance) {
-				// Stop looking completely if flow fails.
-
+			if (!ErodableBlocks.maybeErode(rand, sideBlock)) {
 				// TODO: Should this chance check occur earlier?
 				return;
 			}
+
 			System.out.println(
 					"Removing block to source side:" + world.getBlockState(sidePos).getBlock().getName().asFormattedString());
 			world.setBlockState(sidePos, Blocks.AIR.getDefaultState(), blockFlags);
