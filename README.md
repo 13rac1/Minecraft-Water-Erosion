@@ -34,8 +34,8 @@ This "core mod" adds code to the Water block `randomTick()` functions using the
 [Mixin framework][MixinFramework]. The code and functionality is structured to
 use the least possible system CPU, but a CPU increase may still be noticed.
 
-[MixinFramework]:(https://github.com/SpongePowered/Mixin)
-[SpongeForge2019-12]:(https://forums.spongepowered.org/t/sponge-status-update-12th-december-2019/34368)
+[MixinFramework]: https://github.com/SpongePowered/Mixin
+[SpongeForge2019-12]: https://forums.spongepowered.org/t/sponge-status-update-12th-december-2019/34368
 
 ## Test Areas
 
@@ -58,6 +58,25 @@ Tested on Minecraft 1.15.1
   create a waterfall.
 * `1309 89 753` - A Savanna source block flows through tunnel, then creates a
   small steam through trees to a pond.
+
+### Seed 837828468367153798
+
+Tested on Minecraft 1.15.1
+
+* `683 92 163` - A Giant Tree Tiaga hilltop lake creates multiple creeks
+  around a Pillager Outpost.
+* `1424 89 7` - A Giant Tree Tiaga hilltop lake flows into an underground lake and to seaside wetlands.
+* `1973 93 634` - A Mountain lake creates a 30 block tall set of waterfalls into a cave and a forest.
+* `4378 70 2779` - A Tiaga underground lake flows out of both sides of a hill creating three waterfalls.
+* `4470 75 2071` - A large Mountain arch waterfall digs a pond. BUG: Shouldn't remove the entire water column, just the top.
+* `3908 79 3276` - A Forest lake creates a 40 block creek to a river. BUG: May get blocked when a level7 block doesn't dig down in front.
+* `4300 77 3511` - Three Plains lakes create a short river of rapids.
+
+### Seed -103432684796306269
+
+Tested on Minecraft 1.14.4
+
+* `178 63 -22` - Creeks run through a dense Dark Forest
 
 ## Build
 

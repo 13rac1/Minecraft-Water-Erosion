@@ -30,8 +30,6 @@ import com._13rac1.erosion.FluidLevel;
 
 // TODO: Turn upper edge blocks of pools to sand or add a mud block?
 
-// TODO: Flowing water should have an extremely low chance of eroding cobblestone.
-
 // TODO: Add Menu to allow disable of some features:
 // https://www.curseforge.com/minecraft/mc-mods/modmenu
 
@@ -49,7 +47,7 @@ import com._13rac1.erosion.FluidLevel;
 // TODO: Flows touching sea level turn to source blocks! Wait. No. Because then
 // water will flow forever until it gets to the sea. Should it?
 
-// TODO: Flows INTO a source block wall should turn into a source block
+// IDEA: Flows INTO a source block wall should turn into a source block
 
 // TODO: Level7 flows delete the block under, they should delete block in the
 // flow direction too. There are odd cases where a downward dig will not go
@@ -184,6 +182,7 @@ public class FluidBlockMixin extends Block {
 
 		if (Math.abs(velocity.x) < 1 && Math.abs(velocity.z) < 1) {
 			// Skip 45 degree flows.
+			// TODO: Should the flow randomly go one of the ways?
 			//
 			// The velocity vector is normalized, therefore 45 degree flows are
 			// represented by two floats of +/- 0.707.
