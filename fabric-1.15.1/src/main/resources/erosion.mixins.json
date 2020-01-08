@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "com._13rac1.erosion.mixin",
+  "package": "com._13rac1.erosion.fabric.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "FluidBlockMixin"

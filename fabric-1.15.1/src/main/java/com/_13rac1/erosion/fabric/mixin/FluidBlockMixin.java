@@ -1,4 +1,4 @@
-package com._13rac1.erosion.mixin;
+package com._13rac1.erosion.fabric.mixin;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,9 +21,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com._13rac1.erosion.BlockFlag;
-import com._13rac1.erosion.ErodableBlocks;
-import com._13rac1.erosion.FluidLevel;
+import com._13rac1.erosion.fabric.BlockFlag;
+import com._13rac1.erosion.fabric.ErodableBlocks;
+import com._13rac1.erosion.fabric.FluidLevel;
 
 // Reference:
 // https://github.com/vktec/butterfly/blob/e8411285/src/main/java/uk/org/vktec/butterfly/mixin/FluidBlockMixin.java

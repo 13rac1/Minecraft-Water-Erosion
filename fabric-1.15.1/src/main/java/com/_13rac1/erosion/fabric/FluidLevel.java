@@ -1,4 +1,4 @@
-package com._13rac1.erosion;
+package com._13rac1.erosion.fabric;
 
 // https://minecraft.gamepedia.com/Water#Block_states
 public class FluidLevel {
