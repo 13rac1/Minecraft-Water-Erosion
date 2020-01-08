@@ -1,4 +1,4 @@
-package com._13rac1.erosion.fabric;
+package com._13rac1.erosion.common;
 
 import java.util.HashMap;
 

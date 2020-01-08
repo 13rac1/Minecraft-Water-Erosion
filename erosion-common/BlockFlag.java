@@ -1,4 +1,4 @@
-package com._13rac1.erosion.fabric;
+package com._13rac1.erosion.common;
 
 // https://github.com/FabricMC/yarn/blob/8f3f55e2/mappings/net/minecraft/world/ModifiableWorld.mapping
 public class BlockFlag {
