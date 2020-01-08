@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.FluidBlock;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
@@ -46,7 +44,7 @@ public class Tasks {
   // air.
   private static final Integer blockFlags = BlockFlag.PROPAGATE_CHANGE | BlockFlag.NOTIFY_LISTENERS;
 
-  public static void maybeErodeEdge(BlockState state, ServerWorld world, BlockPos pos, Random rand, Integer level) {
+  public static void maybeErodeEdge(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
     // Get the block under us.
     BlockPos underPos = pos.down();
     BlockState underState = world.getBlockState(underPos);
@@ -102,7 +100,7 @@ public class Tasks {
     // callback?
   }
 
-  public static boolean isEdge(ServerWorld world, BlockPos pos) {
+  public static boolean isEdge(ErosionWorld world, BlockPos pos) {
     List<BlockPos> listSidePos = Arrays.asList(pos.north(), pos.south(), pos.east(), pos.west());
 
     for (BlockPos sidePos : listSidePos) {
@@ -122,20 +120,16 @@ public class Tasks {
     return false;
   }
 
-  public static boolean maybeFlowingWall(BlockState state, ServerWorld world, BlockPos pos, Random rand,
+  public static boolean maybeFlowingWall(BlockState state, ErosionWorld world, BlockPos pos, Random rand,
       Integer level) {
     if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW6) {
       // level Flow7 goes down, never to the side.
       return false;
     }
 
-    FluidBlock block = (FluidBlock) state.getBlock();
-    FluidState fluidState = block.getFluidState(state);
-    // Note: fluidState.method_20785() -> float getLevel().
-
     // Find flow direction: Velocity is a 3D vector normalized to 1 pointing the
     // direction the water is flowing.
-    Vec3d velocity = fluidState.getVelocity(world, pos);
+    Vec3d velocity = world.getFlowVelocity(state, pos);
 
     if (Math.abs(velocity.x) < 1 && Math.abs(velocity.z) < 1) {
       // Skip 45 degree flows.
@@ -179,7 +173,7 @@ public class Tasks {
 
   private static final int SOURCE_BREAKS_ABOVE_SEA_LEVEL = 0;
 
-  public static void maybeSourceBreak(BlockState state, ServerWorld world, BlockPos pos, Random rand, Integer level) {
+  public static void maybeSourceBreak(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
     // Source blocks only.
     if (level != FluidLevel.SOURCE) {
       return;
@@ -203,8 +197,7 @@ public class Tasks {
     }
 
     // Skip blocks already flowing
-    FluidState posFluidState = state.getFluidState();
-    Vec3d velocity = posFluidState.getVelocity(world, pos);
+    Vec3d velocity = world.getFlowVelocity(state, pos);
     if (velocity.length() > 0) {
       return;
     }
