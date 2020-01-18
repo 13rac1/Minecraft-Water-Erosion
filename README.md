@@ -15,6 +15,11 @@ flows may change direction or even stop as the water erodes to stone.
 * Erodable blocks include sand, gravel, clay, farmland, dirt, grass, and,
   rarely, cobblestone.
 
+## Videos
+
+* [Taiga Forest Creeks](https://www.youtube.com/watch?v=N29mWO8NTOU)
+* [Three Savanna Waterfalls](https://www.youtube.com/watch?v=Gi73OZ0hbqE)
+
 ## Limitations
 
 This is currently only a Fabric mod, because SpongeForge [does not support
