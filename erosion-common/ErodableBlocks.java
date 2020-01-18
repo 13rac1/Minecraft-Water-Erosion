@@ -13,15 +13,15 @@ import java.util.Random;
 public class ErodableBlocks {
   private static final Integer MAX_RESISTANCE_ODDS = 0; // 1/0 = never
   // Odds over the source resistance will never be broken by a source block.
-  private static final Integer SOURCE_BREAK_RESISTANCE_ODDS = 15;
-  private static final Integer LEAF_RESISTANCE_ODDS = 2;
-  private static final Integer SAND_RESISTANCE_ODDS = 2;
-  private static final Integer WOOL_RESISTANCE_ODDS = 3;
-  private static final Integer GRAVEL_RESISTANCE_ODDS = 3;
-  private static final Integer CLAY_RESISTANCE_ODDS = 4;
-  private static final Integer DIRT_RESISTANCE_ODDS = 4;
-  private static final Integer GRASS_RESISTANCE_ODDS = 5;
-  private static final Integer COBBLESTONE_RESISTANCE_ODDS = 20;
+  private static final Integer SOURCE_BREAK_RESISTANCE_ODDS = 8;
+  private static final Integer LEAF_RESISTANCE_ODDS = 1;
+  private static final Integer SAND_RESISTANCE_ODDS = 1;
+  private static final Integer WOOL_RESISTANCE_ODDS = 1;
+  private static final Integer GRAVEL_RESISTANCE_ODDS = 1;
+  private static final Integer CLAY_RESISTANCE_ODDS = 2;
+  private static final Integer DIRT_RESISTANCE_ODDS = 2;
+  private static final Integer GRASS_RESISTANCE_ODDS = 3;
+  private static final Integer COBBLESTONE_RESISTANCE_ODDS = 10;
 
   // Warning: Blocks.SAND is null during startup, only run after start.
   private static HashMap<Block, Integer> blocks;
@@ -87,7 +87,7 @@ public class ErodableBlocks {
   }
 
   public static boolean maybeErode(Random rand, Block block) {
-    return rand.nextInt(getErosionResistance(block)) == 1;
+    return rand.nextInt(getErosionResistance(block)) == 0;
   }
 
   // TODO: This is simple method to block the breakage of cobblestone by source

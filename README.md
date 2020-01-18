@@ -15,18 +15,23 @@ flows may change direction or even stop as the water erodes to stone.
 * Erodable blocks include sand, gravel, clay, farmland, dirt, grass, and,
   rarely, cobblestone.
 
-## Open Questions
-
-* Should eroded/dissolved blocks drop items?
-* Should odds be adjusted for balancing?
-
 ## Limitations
 
 This is currently only a Fabric mod, because SpongeForge [does not support
 1.14.x or newer][SpongeForge2019-12] yet. Forge support will be added when
 possible, but functionality will not be backported to Minecraft 1.12.x.
 
-Water blocks at or below the world sea level are ignored to reduce CPU use.
+[SpongeForge2019-12]: https://forums.spongepowered.org/t/sponge-status-update-12th-december-2019/34368
+
+## Open Questions
+
+* Should eroded/dissolved blocks drop items?
+* Should blocks sometimes erode to lesser blocks before disappearing such as
+  Dirt->Sand, Cobblestone->Gravel, Sand->Clay?
+
+## TODO features
+
+* Configurable Erosion odds
 
 ## Technical Notes
 
@@ -34,8 +39,13 @@ This "core mod" adds code to the Water block `randomTick()` functions using the
 [Mixin framework][MixinFramework]. The code and functionality is structured to
 use the least possible system CPU, but a CPU increase may still be noticed.
 
+`randomTick()` is only called by the Minecraft runtime for a 128 block radius
+around the player, so the odds of erosion occuring are set fairly high. The odds
+should be reduced if random tick distance or speed is increased.
+
+Source water blocks at or below the world sea level are ignored to reduce CPU use.
+
 [MixinFramework]: https://github.com/SpongePowered/Mixin
-[SpongeForge2019-12]: https://forums.spongepowered.org/t/sponge-status-update-12th-december-2019/34368
 
 ## Test Areas
 
@@ -77,6 +87,12 @@ Tested on Minecraft 1.15.1
 Tested on Minecraft 1.14.4
 
 * `178 63 -22` - Creeks run through a dense Dark Forest
+
+### Seed -4513252684046391402
+
+Tested on Minecraft 1.15.1
+
+* `1243 96 -520` - A naturally generated Savanna/Desert village spread across a sand dune and the top of a mountain full of monsters is surrounded by waterfalls
 
 ## Build
 
