@@ -14,30 +14,30 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 
-// TODO: Turn upper edge blocks of pools to sand or add a mud block?
-
 // TODO: Add Menu to allow disable of some features:
 // https://www.curseforge.com/minecraft/mc-mods/modmenu
 
-// TODO: Change Lake generation to create more water sources on hills
+// IDEA: Change Lake generation to create more water sources on hills
 // https://fabricmc.net/wiki/tutorial:fluids
 
-// IDEA: Avoid carving channels in sand since it is affected by gravity.
-
-// TODO: Should destroyed blocks drop items?
-
-// IDEA: Eroded ponds/lakes turn into source blocks?
-
-// TODO: Count leaves as air for source break calculations.
+// IDEA: Can eroded ponds/lakes turn into source blocks? Can they fill up?
 
 // IDEA: Flows touching sea level turn to source blocks! Wait. No. Because then
 // water will flow forever until it gets to the sea. Should it?
 
 // IDEA: Flows INTO a source block wall should turn into a source block
 
-// TODO: Level7 flows delete the block under, they should delete block in the
-// flow direction too. There are odd cases where a downward dig will not go
-// forward.
+// TODO: Level7 flows delete the block under. If the block below is water, they
+// should delete block in the flow direction too. There are odd cases where a
+// downward dig will not go forward.
+
+// IDEA: Turn upper edge blocks of pools to sand or add a mud block?
+
+// IDEA: Wall breaking should check for air one block down in a flow reachable
+// radius to seek downhill rather than always going straight.
+
+// IDEA: Avoid carving channels in sand/gravel since it is affected by gravity.
+// Perhaps better better if seeking downhill.
 
 public class Tasks {
   // blockFlags is used with world.setBlockState() when blocks are replaced with
@@ -178,7 +178,8 @@ public class Tasks {
     if (level != FluidLevel.SOURCE) {
       return;
     }
-    // TODO: Break when there's less than three blocks to air
+    // TODO: Break when there's less than three blocks to air. This will create
+    // more crevasse waterfalls.
 
     // Skip blocks less than sea level+, because there are a lot of them.
     if (pos.getY() <= world.getSeaLevel() + SOURCE_BREAKS_ABOVE_SEA_LEVEL) {
@@ -247,7 +248,8 @@ public class Tasks {
         BlockState maybeAirState = world.getBlockState(maybeAirPos);
 
         Block maybeAirBlock = maybeAirState.getBlock();
-        if (maybeAirBlock != Blocks.AIR && maybeAirBlock != Blocks.CAVE_AIR) {
+        if (maybeAirBlock != Blocks.AIR && maybeAirBlock != Blocks.CAVE_AIR
+            && !BlockTags.LEAVES.contains(maybeAirBlock)) {
           foundAir = false;
           break;
         }
