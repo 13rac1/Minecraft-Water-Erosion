@@ -20,13 +20,22 @@ flows may change direction or even stop as the water erodes to stone.
 * [Taiga Forest Creeks](https://www.youtube.com/watch?v=N29mWO8NTOU)
 * [Three Savanna Waterfalls](https://www.youtube.com/watch?v=Gi73OZ0hbqE)
 
-## Limitations
+## Installation
 
-This is currently only a Fabric mod, because SpongeForge [does not support
-1.14.x or newer][SpongeForge2019-12] yet. Forge support will be added when
-possible, but functionality will not be backported to Minecraft 1.12.x.
+### Fabric versions
 
-[SpongeForge2019-12]: https://forums.spongepowered.org/t/sponge-status-update-12th-december-2019/34368
+Download the current release `water-erosion-x.x.x-fabric-x.x.x.jar` and add to
+your installation.
+
+### Forge versions
+
+The Forge version requires [MixinBootstrap][MixinBootstrap]. Download the
+current release `water-erosion-x.x.x-forge-x.x.x.jar`, then download the
+[`MixinBootstrap-1.0.0.jar`][MixinBootstrapJar]. Put both files in your
+MinecraftForge Mod folder.
+
+[MixinBootstrap]: https://github.com/LXGaming/MixinBootstrap
+[MixinBootstrapJar]: https://github.com/LXGaming/MixinBootstrap/releases/download/v1.0.0/MixinBootstrap-1.0.0.jar
 
 ## Open Questions
 
@@ -102,15 +111,7 @@ Tested on Minecraft 1.15.1
 ## Build
 
 ```bash
-./gradlew build
-```
-
-## Notes
-
-Forge build (not yet supported) will require Java 8:
-
-```bash
-export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+make # Builds all supported versions.
 ```
 
 ## License
