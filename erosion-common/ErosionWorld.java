@@ -2,6 +2,7 @@ package com._13rac1.erosion.common;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 
 public interface ErosionWorld {
@@ -12,4 +13,6 @@ public interface ErosionWorld {
   int getSeaLevel();
 
   Vec3d getFlowVelocity(BlockState state, BlockPos pos);
+
+  Boolean isFluidBlock(Block block);
 }

@@ -87,7 +87,7 @@ public class Tasks {
     // goal is to lower the water level naturally without having to reflow the
     // entire stream/creek/river.
     BlockPos posUp = pos.up();
-    while (world.getBlockState(posUp).getBlock() instanceof FluidBlock) {
+    while (world.isFluidBlock(world.getBlockState(posUp).getBlock())) {
       if (world.getBlockState(posUp).get(FluidBlock.LEVEL) == FluidLevel.SOURCE) {
         break;
       }
@@ -108,7 +108,7 @@ public class Tasks {
       BlockState underState = world.getBlockState(underPos);
       Block underBlock = underState.getBlock();
 
-      if (!(underBlock instanceof FluidBlock)) {
+      if (!world.isFluidBlock(underBlock)) {
         // System.out.println("Did not find side under water block: " +
         // underBlock.getClass().getName());
         continue;
