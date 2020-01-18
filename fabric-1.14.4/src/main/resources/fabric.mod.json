@@ -8,11 +8,11 @@
     "13rac1"
   ],
   "contact": {
-    "homepage": "https://github.com/13rac1/minecraft-water-erosion/",
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/water-erosion",
     "sources": "https://github.com/13rac1/minecraft-water-erosion/"
   },
-  "license": "GPL",
-  "icon": "assets/erosion/icon.png",
+  "license": "AllRightsReserved",
+  "icon": "assets/erosion/WaterErosionLogo.jpg",
   "environment": "*",
   "entrypoints": {
     "main": [

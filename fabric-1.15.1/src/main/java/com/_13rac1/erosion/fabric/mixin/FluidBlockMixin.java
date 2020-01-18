@@ -50,6 +50,10 @@ public class FluidBlockMixin extends Block {
 			FluidState fluidState = state.getFluidState();
 			return fluidState.getVelocity(this.world, pos);
 		}
+
+		public Boolean isFluidBlock(Block block) {
+			return block instanceof FluidBlock;
+		}
 	}
 
 	@Override
