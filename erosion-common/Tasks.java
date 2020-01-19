@@ -25,7 +25,9 @@ import net.minecraft.block.BlockState;
 // IDEA: Flows touching sea level turn to source blocks! Wait. No. Because then
 // water will flow forever until it gets to the sea. Should it?
 
-// IDEA: Flows INTO a source block wall should turn into a source block
+// IDEA: Flows INTO a source block wall should turn into a source block. That
+// never happens though, because the source block will have a flow itself. What
+// if flows towards each other become source blocks?
 
 // TODO: Level7 flows delete the block under. If the block below is water, they
 // should delete block in the flow direction too. There are odd cases where a
@@ -39,12 +41,34 @@ import net.minecraft.block.BlockState;
 // IDEA: Avoid carving channels in sand/gravel since it is affected by gravity.
 // Perhaps better better if seeking downhill.
 
+// IDEA: IRL streams have rocks. Minecraft world gen doesn't place these rocks.
+// Can they be added to world gen? Could large flows find/place stones?
+
 public class Tasks {
   // blockFlags is used with world.setBlockState() when blocks are replaced with
   // air.
   private static final Integer blockFlags = BlockFlag.PROPAGATE_CHANGE | BlockFlag.NOTIFY_LISTENERS;
 
-  public static void maybeErodeEdge(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+  public static void run(BlockState state, ErosionWorld world, BlockPos pos, Random rand) {
+
+    Integer level = state.get(FluidBlock.LEVEL);
+
+    maybeSourceBreak(state, world, pos, rand, level);
+
+    // Skip source blocks, only flowing water.
+    if (level == FluidLevel.SOURCE) {
+      return;
+    }
+
+    if (maybeFlowingWall(state, world, pos, rand, level)) {
+      // Return if the flow breaks a wall.
+      return;
+    }
+
+    maybeErodeEdge(state, world, pos, rand, level);
+  }
+
+  private static void maybeErodeEdge(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
     // Get the block under us.
     BlockPos underPos = pos.down();
     BlockState underState = world.getBlockState(underPos);
@@ -100,7 +124,7 @@ public class Tasks {
     // callback?
   }
 
-  public static boolean isEdge(ErosionWorld world, BlockPos pos) {
+  private static boolean isEdge(ErosionWorld world, BlockPos pos) {
     List<BlockPos> listSidePos = Arrays.asList(pos.north(), pos.south(), pos.east(), pos.west());
 
     for (BlockPos sidePos : listSidePos) {
@@ -120,9 +144,13 @@ public class Tasks {
     return false;
   }
 
-  public static boolean maybeFlowingWall(BlockState state, ErosionWorld world, BlockPos pos, Random rand,
+  private static List<Integer> wallBreakers = Arrays.asList(FluidLevel.FLOW1, FluidLevel.FLOW2, FluidLevel.FLOW3,
+      FluidLevel.FLOW4, FluidLevel.FLOW5, FluidLevel.FLOW6);
+
+  private static boolean maybeFlowingWall(BlockState state, ErosionWorld world, BlockPos pos, Random rand,
       Integer level) {
-    if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW6) {
+
+    if (!wallBreakers.contains(level)) {
       // level Flow7 goes down, never to the side.
       return false;
     }
@@ -173,7 +201,7 @@ public class Tasks {
 
   private static final int SOURCE_BREAKS_ABOVE_SEA_LEVEL = 0;
 
-  public static void maybeSourceBreak(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+  private static void maybeSourceBreak(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
     // Source blocks only.
     if (level != FluidLevel.SOURCE) {
       return;

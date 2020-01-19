@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com._13rac1.erosion.common.ErosionWorld;
-import com._13rac1.erosion.common.FluidLevel;
 import com._13rac1.erosion.common.Tasks;
 
 @Mixin(FluidBlock.class)
@@ -66,21 +65,6 @@ public class FluidBlockMixin extends Block {
 	private void onRandomTick(BlockState state, World world, BlockPos pos, Random rand, CallbackInfo info) {
 		FabricWorld fabricWorld = new FabricWorld(world);
 
-		Integer level = state.get(FluidBlock.LEVEL);
-
-		Tasks.maybeSourceBreak(state, fabricWorld, pos, rand, level);
-
-		// Skip source blocks, only flowing water.
-		if (level == FluidLevel.SOURCE) {
-			return;
-		}
-
-		if (Tasks.maybeFlowingWall(state, fabricWorld, pos, rand, level)) {
-			// Return if the flow breaks a wall.
-			return;
-		}
-
-		Tasks.maybeErodeEdge(state, fabricWorld, pos, rand, level);
+		Tasks.run(state, fabricWorld, pos, rand);
 	}
-
 }

@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com._13rac1.erosion.common.ErosionWorld;
-import com._13rac1.erosion.common.FluidLevel;
 import com._13rac1.erosion.common.Tasks;
 
 @Mixin(FlowingFluidBlock.class)
@@ -28,6 +27,7 @@ public class FluidBlockMixin extends Block {
     super(builder);
   }
 
+  // Implement the ErosionWorld interface for the Forge API.
   class ForgeWorld implements ErosionWorld {
     private World world;
 
@@ -68,21 +68,6 @@ public class FluidBlockMixin extends Block {
   private void randomTick(BlockState state, World world, BlockPos pos, Random rand, CallbackInfo info) {
     ForgeWorld forgeWorld = new ForgeWorld(world);
 
-    Integer level = state.get(FlowingFluidBlock.LEVEL);
-
-    Tasks.maybeSourceBreak(state, forgeWorld, pos, rand, level);
-
-    // Skip source blocks, only flowing water.
-    if (level == FluidLevel.SOURCE) {
-      return;
-    }
-
-    if (Tasks.maybeFlowingWall(state, forgeWorld, pos, rand, level)) {
-      // Return if the flow breaks a wall.
-      return;
-    }
-
-    Tasks.maybeErodeEdge(state, forgeWorld, pos, rand, level);
+    Tasks.run(state, forgeWorld, pos, rand);
   }
-
 }
