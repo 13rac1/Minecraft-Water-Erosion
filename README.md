@@ -1,9 +1,12 @@
 # Water Erosion for Minecraft
 
-Erosion brings water to life in Minecraft.
+**Water Erosion makes the world evolve with streams and waterfalls.**
 
-Worlds evolve with creeks, streams, and waterfalls as time progresses. Water
-flows may change direction or even stop as the water erodes to stone.
+Find Forest brooks and Mountain creeks during your explorations. Dirt and sand
+wash away to deepen the stream bed and cut banks into the environment. The
+landscapes become more diverse and unique. Pass through a dry Desert valley one
+day and find it flooded the next. A stream may even change direction to dry up
+the original flow.
 
 ## Features
 
@@ -14,6 +17,8 @@ flows may change direction or even stop as the water erodes to stone.
 * Water Sources dissolve blocks to the sides in the direction of air spaces.
 * Erodable blocks include sand, gravel, clay, farmland, dirt, grass, and,
   rarely, cobblestone.
+* Erodable blocks have differing resistances to erosion depending on their
+  density, but all erode over time.
 
 ## Videos
 
@@ -67,8 +72,8 @@ Create each world, teleport to the specified location, and, optionally, change
 the `randomTickSpeed` setting to speed up the process.
 
 ```script
-/teleport <X><Y><Z>
-/gamerule randomTickSpeed <INT> # Suggest 100
+/teleport X Y Z
+/gamerule randomTickSpeed NUMBER # Suggest 100
 ```
 
 ### Seed -1988839586448825536
@@ -109,6 +114,10 @@ Tested on Minecraft 1.15.1
 * `1243 96 -520` - A naturally generated Savanna/Desert village spread across a sand dune and the top of a mountain full of monsters is surrounded by waterfalls
 
 ## Build
+
+This monorepo builds all supported Fabric and Forge versions. The important
+"business rules" are abstracted into a separate library which is symlinked into
+each project.
 
 ```bash
 make # Builds all supported versions.
