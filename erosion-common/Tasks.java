@@ -107,11 +107,18 @@ public class Tasks {
     // TODO: Maybe the water block itself shouldn't be deleted?
     world.setBlockState(pos, Blocks.AIR.getDefaultState(), blockFlags);
 
-    // Delete upwards until there's no water or a water source is found. The
-    // goal is to lower the water level naturally without having to reflow the
-    // entire stream/creek/river.
+    // Delete upwards until there's no water, a water source is found, or three
+    // water blocks have been removed. The goal is to lower the water level
+    // naturally without having to reflow the entire stream/creek/river. and
+    // delete enough to fix water rapids, but not disrupt the flow of
+    // waterfalls which results in incorrect
+    Integer upDeleteCount = 0;
     BlockPos posUp = pos.up();
     while (world.isFluidBlock(world.getBlockState(posUp).getBlock())) {
+      upDeleteCount++;
+      if (upDeleteCount > 3) {
+        break;
+      }
       if (world.getBlockState(posUp).get(FluidBlock.LEVEL) == FluidLevel.SOURCE) {
         break;
       }

@@ -97,7 +97,7 @@ Tested on Minecraft 1.15.1
 * `1424 89 7` - A Giant Tree Tiaga hilltop lake flows into an underground lake and to seaside wetlands.
 * `1973 93 634` - A Mountain lake creates a 30 block tall set of waterfalls into a cave and a forest.
 * `4378 70 2779` - A Tiaga underground lake flows out of both sides of a hill creating three waterfalls.
-* `4470 75 2071` - A large Mountain arch waterfall digs a pond. BUG: Shouldn't remove the entire water column, just the top.
+* `4406 75 2105` - Multiple Mountain arch waterfalls flow to the river.
 * `3908 79 3276` - A Forest lake creates a 40 block creek to a river. BUG: May get blocked when a level7 block doesn't dig down in front.
 * `4300 77 3511` - Three Plains lakes create a short river of rapids.
 
@@ -111,7 +111,9 @@ Tested on Minecraft 1.14.4
 
 Tested on Minecraft 1.15.1
 
-* `1243 96 -520` - A naturally generated Savanna/Desert village spread across a sand dune and the top of a mountain full of monsters is surrounded by waterfalls
+* `1243 96 -520` - A naturally generated Savanna/Desert village spread across a
+  sand dune and the top of a mountain full of monsters is surrounded by
+  waterfalls
 
 ## Build
 
