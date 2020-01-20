@@ -152,7 +152,7 @@ public class Tasks {
   }
 
   private static List<Integer> wallBreakers = Arrays.asList(FluidLevel.FLOW1, FluidLevel.FLOW2, FluidLevel.FLOW3,
-      FluidLevel.FLOW4, FluidLevel.FLOW5, FluidLevel.FLOW6);
+      FluidLevel.FLOW4, FluidLevel.FLOW5, FluidLevel.FLOW6, FluidLevel.FLOW7);
 
   private static boolean maybeFlowingWall(BlockState state, ErosionWorld world, BlockPos pos, Random rand,
       Integer level) {
@@ -174,9 +174,18 @@ public class Tasks {
       // represented by two floats of +/- 0.707.
       return false;
     }
+    Integer Flow7Adjust = 0;
+    if (level == FluidLevel.FLOW7) {
+      // Level7 must dig down one block
+      Flow7Adjust = 1;
+    }
 
     // Find the position of the block in the flow direction.
-    BlockPos flowPos = pos.add(new Vec3i(velocity.x, velocity.y, velocity.z));
+    BlockPos flowPos = pos.add(new Vec3i(velocity.x, velocity.y - Flow7Adjust, velocity.z));
+    // TODO: Search left/right from straight for "downhill" and break in that
+    // direction. Downhill is the direction of air. This will keep streams going
+    // further downhill rather than going straight when there is a cliff one
+    // block to the side.
 
     // Block above cannot be wood, keep trees standing on dirt.
     // TODO: Look more than one block up for wood.
@@ -202,6 +211,7 @@ public class Tasks {
 
     // System.out.println("Removing block to side:" +
     // flowState.getBlock().getName().asFormattedString());
+
     world.setBlockState(flowPos, Blocks.AIR.getDefaultState(), blockFlags);
     return true;
   }
