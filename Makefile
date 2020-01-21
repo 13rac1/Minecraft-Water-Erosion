@@ -3,7 +3,7 @@ export JAVA_HOME
 
 build:
 	cd fabric-1.14.4;./gradlew build
-	cd fabric-1.15.1;./gradlew build
+	cd fabric-1.15.2;./gradlew build
 	cd forge-1.14.4;./gradlew build
 	mkdir -p dist
 	cp fabric-*/build/libs/water-erosion-*-fabric-[0-9].[0-9].[0-9].jar dist/
@@ -11,7 +11,7 @@ build:
 
 clean:
 	cd fabric-1.14.4;./gradlew clean
-	cd fabric-1.15.1;./gradlew clean
+	cd fabric-1.15.2;./gradlew clean
 	cd forge-1.14.4;./gradlew clean
 	rm -rf dist
 

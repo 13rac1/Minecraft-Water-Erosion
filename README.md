@@ -8,6 +8,11 @@ landscapes become more diverse and unique. Pass through a dry Desert valley one
 day and find it flooded the next. A stream may even change direction to dry up
 the original flow.
 
+## Goal
+
+Implement Erosion as though it were a regular Minecraft feature making the world
+more dynamic. It should not break existing gameplay or enable cheating.
+
 ## Features
 
 * Water flowing over edges erode blocks below.
@@ -22,10 +27,17 @@ the original flow.
 
 ## Videos
 
-* [Taiga Forest Creeks](https://www.youtube.com/watch?v=N29mWO8NTOU)
-* [Three Savanna Waterfalls](https://www.youtube.com/watch?v=Gi73OZ0hbqE)
+* [Taiga Forest Creeks - High Speed Erosion](https://www.youtube.com/watch?v=N29mWO8NTOU)
+* [Tour of Three Savanna Waterfalls - Erosion Complete](https://www.youtube.com/watch?v=Gi73OZ0hbqE)
 
 ## Installation
+
+Supported versions are always the latest point release:
+
+* Fabric 1.14.4
+* Fabric 1.15.2
+* Forge 1.14.4
+* Forge 1.15.1 - Coming soon
 
 ### Fabric versions
 
