@@ -16,7 +16,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0.0-beta1'
+version = '1.0.1'
 group = 'com._13rac1.erosion' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'water-erosion-1.14.4-forge'
 
