@@ -8,7 +8,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod("watererosion")
+@Mod("water-erosion")
 public class WaterErosionMod {
   private static final Logger LOGGER = LogManager.getLogger();
 

@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com._13rac1.erosion.common.ErosionWorld;
-import com._13rac1.erosion.common.FluidLevel;
 import com._13rac1.erosion.common.Tasks;
 
 @Mixin(FlowingFluidBlock.class)
@@ -64,7 +63,7 @@ public class FluidBlockMixin extends Block {
     return state.getBlock() == Blocks.WATER;
   }
 
-  @Inject(method = "func_225542_b_", at = @At("HEAD"), require = 1)
+  @Inject(method = "randomTick", at = @At("HEAD"), require = 1)
   private void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random rand, CallbackInfo info) {
     ForgeWorld forgeWorld = new ForgeWorld(world);
 

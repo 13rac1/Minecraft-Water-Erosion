@@ -70,7 +70,7 @@ public class Tasks {
 
   private static void maybeErodeEdge(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
     // Get the block under us.
-    BlockPos underPos = pos.func_177977_b();
+    BlockPos underPos = pos.down();
 
     BlockState underState = world.getBlockState(underPos);
     Block underBlock = underState.getBlock();
@@ -136,7 +136,7 @@ public class Tasks {
     List<BlockPos> listSidePos = Arrays.asList(pos.north(), pos.south(), pos.east(), pos.west());
 
     for (BlockPos sidePos : listSidePos) {
-      BlockPos underPos = sidePos.func_177977_b();
+      BlockPos underPos = sidePos.down();
       BlockState underState = world.getBlockState(underPos);
       Block underBlock = underState.getBlock();
 
@@ -193,7 +193,7 @@ public class Tasks {
     BlockPos aboveFlowPos = flowPos.up();
     BlockState aboveFlowState = world.getBlockState(aboveFlowPos);
     Block aboveFlowBlock = aboveFlowState.getBlock();
-    if (BlockTags.LOGS.func_199685_a_(aboveFlowBlock)) {
+    if (BlockTags.LOGS.contains(aboveFlowBlock)) {
       return false;
     }
     // TODO: Do not remove an erodable block if the stack above is unsupported.
@@ -295,7 +295,7 @@ public class Tasks {
 
         Block maybeAirBlock = maybeAirState.getBlock();
         if (maybeAirBlock != Blocks.AIR && maybeAirBlock != Blocks.CAVE_AIR
-            && !BlockTags.LEAVES.func_199685_a_(maybeAirBlock)) {
+            && !BlockTags.LEAVES.contains(maybeAirBlock)) {
           foundAir = false;
           break;
         }

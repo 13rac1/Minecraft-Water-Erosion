@@ -63,9 +63,9 @@ public class ErodableBlocks {
 
     // Check block tags to erode leaves, wool, and mod-provided blocks.
     // TODO: Less CPU to fill the hashmap with all values once.
-    if (BlockTags.LEAVES.func_199685_a_(block)) {
+    if (BlockTags.LEAVES.contains(block)) {
       return LEAF_RESISTANCE_ODDS;
-    } else if (BlockTags.SAND.func_199685_a_(block)) {
+    } else if (BlockTags.SAND.contains(block)) {
       return SAND_RESISTANCE_ODDS;
       // FIXME: DIRT_LIKE is missing?
       // error: cannot find symbol
@@ -75,7 +75,7 @@ public class ErodableBlocks {
       // 1 error
       // } else if (BlockTags.DIRT_LIKE.contains(block)) {
       // return DIRT_RESISTANCE;
-    } else if (BlockTags.WOOL.func_199685_a_(block)) {
+    } else if (BlockTags.WOOL.contains(block)) {
       return WOOL_RESISTANCE_ODDS;
     }
 
