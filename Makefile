@@ -6,6 +6,7 @@ build:
 	cd fabric-1.15.2;./gradlew build
 	cd forge-1.14.4;./gradlew build
 	cd forge-1.15.1;./gradlew build
+	cd forge-1.15.2;./gradlew build
 	rm -rf dist
 	mkdir -p dist
 	cp fabric-*/build/libs/*.jar dist/
@@ -23,5 +24,6 @@ clean:
 	cd fabric-1.15.2;./gradlew clean
 	cd forge-1.14.4;./gradlew clean
 	cd forge-1.15.1;./gradlew clean
+	cd forge-1.15.2;./gradlew clean
 	rm -rf dist
 
