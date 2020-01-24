@@ -37,7 +37,7 @@ Supported versions are always the latest point release:
 * Fabric 1.14.4
 * Fabric 1.15.2
 * Forge 1.14.4
-* Forge 1.15.1 - Coming soon
+* Forge 1.15.2
 
 ### Fabric versions
 
