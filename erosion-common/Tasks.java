@@ -96,11 +96,19 @@ public class Tasks {
     // System.out.println("Removing block: " +
     // underBlock.getName().asFormattedString());
 
-    Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
-    world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(FluidBlock.LEVEL, underBlocklevel), blockFlags);
-
+    Block decayBlock = ErodableBlocks.maybeDecay(rand, underBlock);
+    if (decayBlock == Blocks.AIR) {
+      // Removing the block under the water block.
+      Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
+      world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(FluidBlock.LEVEL, underBlocklevel), blockFlags);
+    } else {
+      // Decay the block and do nothing else.
+      world.setBlockState(underPos, decayBlock.getDefaultState(), blockFlags);
+      return;
+    }
     // Don't delete source blocks
     if (state.get(FluidBlock.LEVEL) == FluidLevel.SOURCE) {
+      // Technically this should never happen.
       return;
     }
 
@@ -201,11 +209,11 @@ public class Tasks {
     // touching it.
 
     BlockState flowState = world.getBlockState(flowPos);
-
-    if (!ErodableBlocks.canErode(flowState.getBlock())) {
+    Block wallBlock = flowState.getBlock();
+    if (!ErodableBlocks.canErode(wallBlock)) {
       return false;
     }
-    if (!ErodableBlocks.maybeErode(rand, flowState.getBlock())) {
+    if (!ErodableBlocks.maybeErode(rand, wallBlock)) {
       return false;
     }
     // TODO: The block behind must have the same flow direction.
@@ -213,6 +221,11 @@ public class Tasks {
     // System.out.println("Removing block to side:" +
     // flowState.getBlock().getName().asFormattedString());
 
+    // TODO: decay walls
+    // Block decayBlock = ErodableBlocks.maybeDecay(rand, wallBlock);
+    // world.setBlockState(flowPos, decayBlock.getDefaultState(), blockFlags);
+    // TODO: Consider placing a water block with correct level instead of assuming
+    // it will flow.
     world.setBlockState(flowPos, Blocks.AIR.getDefaultState(), blockFlags);
     return true;
   }
