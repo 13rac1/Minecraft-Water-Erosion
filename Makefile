@@ -4,6 +4,7 @@ export JAVA_HOME
 build:
 	cd fabric-1.14.4;./gradlew build
 	cd fabric-1.15.2;./gradlew build
+	cd fabric-1.16.x;./gradlew build
 	cd forge-1.14.4;./gradlew build
 	cd forge-1.15.2;./gradlew build
 	rm -rf dist
@@ -22,6 +23,7 @@ screenshots:
 clean:
 	cd fabric-1.14.4;./gradlew clean
 	cd fabric-1.15.2;./gradlew clean
+	cd fabric-1.16.x;./gradlew clean
 	cd forge-1.14.4;./gradlew clean
 	cd forge-1.15.2;./gradlew clean
 	rm -rf dist
