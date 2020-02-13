@@ -127,6 +127,10 @@ Tested on Minecraft 1.15.1
   sand dune and the top of a mountain full of monsters is surrounded by
   waterfalls
 
+## Inspiration
+
+Aquarela - Russian documentary about water
+
 ## Build
 
 This monorepo builds all supported Fabric and Forge versions. The important

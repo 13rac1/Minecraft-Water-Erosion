@@ -66,6 +66,7 @@ public class Tasks {
     }
 
     maybeErodeEdge(state, world, pos, rand, level);
+    maybeDecayUnder(state, world, pos, rand, level);
   }
 
   private static void maybeErodeEdge(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
@@ -357,5 +358,60 @@ public class Tasks {
       // Only process the first erodable side found.
       return;
     }
+  }
+
+  // TODO: Increase odds. This should happen any time all of the checks pass.
+  private static void maybeDecayUnder(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+    // return if water is source or falling or FLOW7
+    if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW7) {
+      return;
+    }
+    // Get the block under us.
+    BlockPos underPos = pos.down();
+    BlockState underState = world.getBlockState(underPos);
+    Block underBlock = underState.getBlock();
+
+    if (!ErodableBlocks.canErode(underBlock)) {
+      return;
+    }
+    // TODO: return if is edge?
+
+    // calculate decayto for block below
+    Block decayTo = ErodableBlocks.decayTo(underBlock);
+    if (decayTo == Blocks.AIR) {
+      // Nothing to do if block will become air.
+      return;
+    }
+
+    // Find flow direction: Velocity is a 3D vector normalized to 1 pointing the
+    // direction the water is flowing.
+    Vec3d velocity = world.getFlowVelocity(state, pos);
+
+    if (Math.abs(velocity.x) < 1 && Math.abs(velocity.z) < 1) {
+      // Skip 45 degree flows.
+      //
+      // The velocity vector is normalized, therefore 45 degree flows are
+      // represented by two floats of +/- 0.707.
+      return;
+    }
+
+    // Find the position of the block in the flow direction.
+    BlockPos flowPos = underPos.add(new Vec3i(velocity.x, velocity.y, velocity.z));
+    BlockState flowState = world.getBlockState(flowPos);
+    Block flowBlock = flowState.getBlock();
+
+    // decay if decayto is same as block in flow direction.
+    if (flowBlock == decayTo) {
+      world.setBlockState(underPos, decayTo.getDefaultState(), blockFlags);
+      System.out.println("maybeDecayUnder!"); // NOT WORKING?
+    }
+  }
+
+  private static void maybeAddSideMoss(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+    // IDEA: Should source water add moss?
+    // return if water is source or more than FLOW7
+    // return if sides are not cobblestone
+    // calculate odds for sides separately and change to mossy cobblestone
+
   }
 }

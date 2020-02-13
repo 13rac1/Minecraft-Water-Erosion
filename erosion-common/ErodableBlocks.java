@@ -183,6 +183,16 @@ public class ErodableBlocks {
     return Blocks.AIR;
   }
 
+  public static Block decayTo(Block block) {
+
+    HashMap<Block, Erodable> erodables = getErodables();
+
+    if (erodables.containsKey(block)) {
+      return erodables.get(block).decayBlock;
+    }
+    return Blocks.AIR;
+  }
+
   // TODO: This is simple method to block the breakage of cobblestone by source
   // blocks, but ideally it would still be allowed if there is enough "pressure"
   // behind the current source block.
