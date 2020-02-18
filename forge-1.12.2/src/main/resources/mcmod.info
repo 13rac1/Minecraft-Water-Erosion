@@ -1,15 +1,15 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "water-erosion",
+  "name": "Water Erosion",
+  "description": "Erosion brings water to life in Minecraft. Worlds evolve with creeks, streams, and waterfalls as time progresses. Water flows may change direction or even stop as the water erodes to stone.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://www.curseforge.com/minecraft/mc-mods/water-erosion",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
-  "logoFile": "",
+  "authorList": ["13rac1"],
+  "credits": "",
+  "logoFile": "WaterErosionLogo.jpg",
   "screenshots": [],
   "dependencies": []
 }

@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.7.10",
+  "package": "com._13rac1.erosion.forge.mixin",
+  "refmap": "erosion.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "FluidBlockMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

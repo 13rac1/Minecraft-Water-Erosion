@@ -79,15 +79,15 @@ public class ErodableBlocks {
       decayables.put(Blocks.SAND, DECAY_TO_SAND_ODDS);
       decayables.put(Blocks.GRAVEL, DECAY_TO_GRAVEL_ODDS);
       decayables.put(Blocks.DIRT, DECAY_TO_DIRT_ODDS);
-      decayables.put(Blocks.COARSE_DIRT, DECAY_TO_COARSE_DIRT_ODDS);
+      // decayables.put(Blocks.COARSE_DIRT, DECAY_TO_COARSE_DIRT_ODDS);
       decayables.put(Blocks.MOSSY_COBBLESTONE, DECAY_TO_MOSSY_COBBLE_ODDS);
-      decayables.put(Blocks.MOSSY_COBBLESTONE_SLAB, DECAY_TO_MOSSY_COBBLE_ODDS);
-      decayables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, DECAY_TO_MOSSY_COBBLE_ODDS);
-      decayables.put(Blocks.MOSSY_COBBLESTONE_WALL, DECAY_TO_MOSSY_COBBLE_ODDS);
-      decayables.put(Blocks.MOSSY_STONE_BRICKS, DECAY_TO_MOSSY_BRICKS_ODDS);
-      decayables.put(Blocks.MOSSY_STONE_BRICK_SLAB, DECAY_TO_MOSSY_BRICKS_ODDS);
-      decayables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, DECAY_TO_MOSSY_BRICKS_ODDS);
-      decayables.put(Blocks.MOSSY_STONE_BRICK_WALL, DECAY_TO_MOSSY_BRICKS_ODDS);
+      // decayables.put(Blocks.MOSSY_COBBLESTONE_SLAB, DECAY_TO_MOSSY_COBBLE_ODDS);
+      // decayables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, DECAY_TO_MOSSY_COBBLE_ODDS);
+      // decayables.put(Blocks.MOSSY_COBBLESTONE_WALL, DECAY_TO_MOSSY_COBBLE_ODDS);
+      // decayables.put(Blocks.MOSSY_STONE_BRICKS, DECAY_TO_MOSSY_BRICKS_ODDS);
+      // decayables.put(Blocks.MOSSY_STONE_BRICK_SLAB, DECAY_TO_MOSSY_BRICKS_ODDS);
+      // decayables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, DECAY_TO_MOSSY_BRICKS_ODDS);
+      // decayables.put(Blocks.MOSSY_STONE_BRICK_WALL, DECAY_TO_MOSSY_BRICKS_ODDS);
     }
     return decayables;
   }
@@ -103,36 +103,52 @@ public class ErodableBlocks {
       erodables = new HashMap<Block, Erodable>();
       // Ordered weakest to strongest
       erodables.put(Blocks.CLAY, new Erodable(CLAY_RESIST_ODDS, Blocks.AIR));
-      erodables.put(Blocks.RED_SAND, new Erodable(SAND_RESIST_ODDS, Blocks.CLAY));
+      // erodables.put(Blocks.RED_SAND, new Erodable(SAND_RESIST_ODDS, Blocks.CLAY));
       erodables.put(Blocks.SAND, new Erodable(SAND_RESIST_ODDS, Blocks.CLAY));
       erodables.put(Blocks.GRAVEL, new Erodable(GRAVEL_RESIST_ODDS, Blocks.SAND));
-      erodables.put(Blocks.COARSE_DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.GRAVEL));
+
+      // erodables.put(Blocks.COARSE_DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.GRAVEL));
       if (Config.GetErodeFarmLand()) {
         erodables.put(Blocks.FARMLAND, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
       }
       erodables.put(Blocks.DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
-      erodables.put(Blocks.PODZOL, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
-      erodables.put(Blocks.GRASS_BLOCK, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
+      //erodables.put(Blocks.PODZOL, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
+      //erodables.put(Blocks.GRASS_BLOCK, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
       erodables.put(Blocks.GRASS, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
       // Grass Paths grow into Grass
       erodables.put(Blocks.GRASS_PATH, new Erodable(GRASS_RESIST_ODDS, Blocks.GRASS));
       erodables.put(Blocks.MOSSY_COBBLESTONE, new Erodable(COBBLE_RESIST_ODDS, Blocks.GRAVEL));
       // Directly to air because the gravel block is a larger volume than the original
-      erodables.put(Blocks.MOSSY_COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
-      erodables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
-      erodables.put(Blocks.MOSSY_COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
+      // erodables.put(Blocks.MOSSY_COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.AIR));
+      // erodables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, new
+      // Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
+      // erodables.put(Blocks.MOSSY_COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.AIR));
       erodables.put(Blocks.COBBLESTONE, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE));
-      erodables.put(Blocks.COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_SLAB));
-      erodables.put(Blocks.COBBLESTONE_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_STAIRS));
-      erodables.put(Blocks.COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_WALL));
-      erodables.put(Blocks.MOSSY_STONE_BRICKS, new Erodable(BRICK_RESIST_ODDS, Blocks.GRAVEL));
-      erodables.put(Blocks.MOSSY_STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
-      erodables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
-      erodables.put(Blocks.MOSSY_STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
-      erodables.put(Blocks.STONE_BRICKS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICKS));
-      erodables.put(Blocks.STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_SLAB));
-      erodables.put(Blocks.STONE_BRICK_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_STAIRS));
-      erodables.put(Blocks.STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_WALL));
+
+      // erodables.put(Blocks.COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.MOSSY_COBBLESTONE_SLAB));
+      // erodables.put(Blocks.COBBLESTONE_STAIRS, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.MOSSY_COBBLESTONE_STAIRS));
+      // erodables.put(Blocks.COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.MOSSY_COBBLESTONE_WALL));
+      // erodables.put(Blocks.MOSSY_STONE_BRICKS, new Erodable(BRICK_RESIST_ODDS,
+      // Blocks.GRAVEL));
+      // erodables.put(Blocks.MOSSY_STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.AIR));
+      // erodables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, new
+      // Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
+      // erodables.put(Blocks.MOSSY_STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.AIR));
+      // erodables.put(Blocks.STONE_BRICKS, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.MOSSY_STONE_BRICKS));
+      // erodables.put(Blocks.STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.MOSSY_STONE_BRICK_SLAB));
+      // erodables.put(Blocks.STONE_BRICK_STAIRS, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.MOSSY_STONE_BRICK_STAIRS));
+      // erodables.put(Blocks.STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS,
+      // Blocks.MOSSY_STONE_BRICK_WALL));
 
       erodables.forEach((block, erodable) -> {
         Erodable current = erodable;

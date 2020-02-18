@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import com._13rac1.erosion.Translate;
+
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -105,7 +107,7 @@ public class Tasks {
     // Return if the block below us is not erodable.
     // TODO: Technically this call is redundant now.
     if (!ErodableBlocks.canErode(underBlock)) {
-      // System.out.println(underBlock.getName().asFormattedString());
+      // System.out.println("cannot erode " + underBlock.getLocalizedName());
       return;
     }
     if (!ErodableBlocks.maybeErode(rand, underBlock)) {
@@ -127,11 +129,14 @@ public class Tasks {
     if (decayBlock == Blocks.AIR) {
       // Removing the block under the water block.
       Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
-      world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(EFluidBlock.LEVEL, underBlocklevel),
-          blockFlags);
+      BlockState newState = Translate
+          .State(Blocks.WATER.getDefaultState().withProperty(EFluidBlock.LEVEL, underBlocklevel));
+      world.setBlockState(underPos, newState, blockFlags);
+
     } else {
       // Decay the block and do nothing else.
-      world.setBlockState(underPos, decayBlock.getDefaultState(), blockFlags);
+      world.setBlockState(underPos, Translate.State(decayBlock.getDefaultState()), blockFlags);
+      // System.out.println("will decay " + underBlock.getLocalizedName());
       return;
     }
     // Don't delete source blocks
@@ -142,7 +147,7 @@ public class Tasks {
 
     // Delete the water block
     // TODO: Maybe the water block itself shouldn't be deleted?
-    world.setBlockState(pos, Blocks.AIR.getDefaultState(), blockFlags);
+    world.setBlockState(pos, Translate.State(Blocks.AIR.getDefaultState()), blockFlags);
 
     // Delete upwards until there's no water, a water source is found, or three
     // water blocks have been removed. The goal is to lower the water level
@@ -162,7 +167,7 @@ public class Tasks {
       }
       // TODO: Go up until finding the last water block and delete that. The
       // rest are fine.
-      world.setBlockState(posUp, Blocks.AIR.getDefaultState(), blockFlags);
+      world.setBlockState(posUp, Translate.State(Blocks.AIR.getDefaultState()), blockFlags);
       posUp = posUp.up();
     }
     // TODO: Anything further to do since we are deleting ourself? Cancel the
@@ -361,7 +366,7 @@ public class Tasks {
     // world.setBlockState(flowPos, decayBlock.getDefaultState(), blockFlags);
     // TODO: Place a water block with correct level instead of assuming
     // it will flow. Should resolve holes.
-    world.setBlockState(flowPos, Blocks.AIR.getDefaultState(), blockFlags);
+    world.setBlockState(flowPos, Translate.State(Blocks.AIR.getDefaultState()), blockFlags);
     return true;
   }
 
@@ -437,7 +442,7 @@ public class Tasks {
         BlockState maybeWaterState = world.getBlockState(maybeWaterPos);
         // System.out.println("maybe water:" +
         // maybeWaterState.getBlock().getName().asFormattedString());
-        if (maybeWaterState.getBlock() != Blocks.WATER) {
+        if (maybeWaterState.getBlock() != Blocks.WATER && maybeWaterState.getBlock() != Blocks.FLOWING_WATER) {
           // TODO: Must be source water block
           break;
         }
@@ -457,15 +462,16 @@ public class Tasks {
 
       // System.out.println(
       // "Removing block to source side:" +
-      // world.getBlockState(sidePos).getBlock().getName().asFormattedString());
-      world.setBlockState(sidePos, Blocks.AIR.getDefaultState(), blockFlags);
+      // world.getIBlockState(sidePos).getBlock().getName().asFormattedString());
+      world.setBlockState(sidePos, Translate.State(Blocks.AIR.getDefaultState()), blockFlags);
+
       // Only process the first erodable side found.
       return;
     }
   }
 
   private boolean isAir(Block block) {
-    return block == Blocks.AIR || block == Blocks.CAVE_AIR;
+    return block == Blocks.AIR; // || block == Blocks.CAVE_AIR;
   }
 
   // Start from the provided EBlockPos and trace
@@ -581,19 +587,19 @@ public class Tasks {
     if (!ErodableBlocks.getDecayList(underBlock).contains(flowBlock)) {
       return false;
     }
-    world.setBlockState(underPos, decayTo.getDefaultState(), blockFlags);
+    world.setBlockState(underPos, Translate.State(decayTo.getDefaultState()), blockFlags);
     // System.out.println("maybeDecayUnder!");
     return true;
   }
 
   protected boolean isCobbleStone(Block block) {
-    return block == Blocks.COBBLESTONE || block == Blocks.COBBLESTONE_WALL || block == Blocks.COBBLESTONE_STAIRS
-        || block == Blocks.COBBLESTONE_WALL;
+    // || block == Blocks.COBBLESTONE_STAIRS
+    return block == Blocks.COBBLESTONE || block == Blocks.COBBLESTONE_WALL || block == Blocks.COBBLESTONE_WALL;
   }
 
   protected boolean isStoneBricks(Block block) {
-    return block == Blocks.STONE_BRICKS || block == Blocks.STONE_BRICK_WALL || block == Blocks.STONE_BRICK_STAIRS
-        || block == Blocks.STONE_BRICK_WALL;
+    return block == Blocks.STONEBRICK || block == Blocks.STONE_BRICK_STAIRS;
+    // block == Blocks.STONEBRICK_WALL || || block == Blocks.STONE_BRICK_WALL;
   }
 
   // Cobblestone and Stone Bricks grow moss near water, check every block around.
@@ -622,7 +628,7 @@ public class Tasks {
       if (mossBlock == Blocks.AIR) {
         return false; // Stop the loop
       }
-      world.setBlockState(sidePos, mossBlock.getDefaultState(), blockFlags);
+      world.setBlockState(sidePos, Translate.State(mossBlock.getDefaultState()), blockFlags);
       return true; // Stop the loop
     }
     return false;
