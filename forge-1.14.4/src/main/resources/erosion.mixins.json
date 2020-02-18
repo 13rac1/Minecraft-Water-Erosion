@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "com._13rac1.erosion.forge.mixin",
-  "refmap": "main.refmap.json",
+  "refmap": "erosion.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "FluidBlockMixin"
