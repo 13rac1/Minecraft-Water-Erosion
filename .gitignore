@@ -27,3 +27,6 @@ run/
 dist/
 screenshots/
 logs/
+
+# Local Oracle Java 8
+jdk-8u202/

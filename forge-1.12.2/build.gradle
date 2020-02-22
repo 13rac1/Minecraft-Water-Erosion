@@ -120,6 +120,9 @@ jar {
 
 // ShadowJar adds dependencies to the release Jar so the rest of the Sponge mod
 // framework is not required.
+// FIXME: ShadowJar does not include all Sponge Mixin files needed. Not sure what is missing.
+// Everything works correctly if manually add the spongepowered mixin library and META-INF/services to the archive.
+// I'll release 1.1.0-alpha1 with a manual build, then figure out the cause later.
 shadowJar {
     exclude 'dummyThing'
     dependencies {
