@@ -1,12 +1,11 @@
 package com._13rac1.erosion.common;
 
 import java.util.HashMap;
+import java.util.Random;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.tag.BlockTags;
-import net.minecraft.block.Block;
-
-import java.util.Random;
 
 // Differing erosion resistance depending on the type of block.
 // leaves < sand < gravel < dirt < grass
@@ -25,6 +24,7 @@ public class ErodableBlocks {
   private static final Integer DIRT_RESIST_ODDS = 4;
   private static final Integer GRASS_RESIST_ODDS = 6;
   private static final Integer COBBLE_RESIST_ODDS = 20;
+  private static final Integer BRICK_RESIST_ODDS = 25;
 
   // Odds the block type will decay instead of turning into air. Note: Water is
   // not listed on purpose. If needing to change a block to Water check for Air.
@@ -43,8 +43,8 @@ public class ErodableBlocks {
   private static final Integer DECAY_TO_DIRT_ODDS = 1;
   private static final Integer DECAY_TO_COARSE_DIRT_ODDS = 1;
   // Cobblestone gets mossy first.
-  // TODO: Convert cobblestone around the flow to mossy, not just the edge.
   private static final Integer DECAY_TO_MOSSY_COBBLE_ODDS = 0;
+  private static final Integer DECAY_TO_MOSSY_BRICKS_ODDS = 1;
 
   // Erodable describes block metadata which controls the odds of erosion and
   // what block it may decay to.
@@ -77,6 +77,10 @@ public class ErodableBlocks {
       decayables.put(Blocks.MOSSY_COBBLESTONE_SLAB, DECAY_TO_MOSSY_COBBLE_ODDS);
       decayables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, DECAY_TO_MOSSY_COBBLE_ODDS);
       decayables.put(Blocks.MOSSY_COBBLESTONE_WALL, DECAY_TO_MOSSY_COBBLE_ODDS);
+      decayables.put(Blocks.MOSSY_STONE_BRICKS, DECAY_TO_MOSSY_BRICKS_ODDS);
+      decayables.put(Blocks.MOSSY_STONE_BRICK_SLAB, DECAY_TO_MOSSY_BRICKS_ODDS);
+      decayables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, DECAY_TO_MOSSY_BRICKS_ODDS);
+      decayables.put(Blocks.MOSSY_STONE_BRICK_WALL, DECAY_TO_MOSSY_BRICKS_ODDS);
     }
     return decayables;
   }
@@ -104,7 +108,7 @@ public class ErodableBlocks {
       // Grass Paths grow into Grass
       erodables.put(Blocks.GRASS_PATH, new Erodable(GRASS_RESIST_ODDS, Blocks.GRASS));
       erodables.put(Blocks.MOSSY_COBBLESTONE, new Erodable(COBBLE_RESIST_ODDS, Blocks.GRAVEL));
-      // Directly to air because the gravel block is a larger volume.
+      // Directly to air because the gravel block is a larger volume than the original
       erodables.put(Blocks.MOSSY_COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
       erodables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
       erodables.put(Blocks.MOSSY_COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
@@ -112,6 +116,14 @@ public class ErodableBlocks {
       erodables.put(Blocks.COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_SLAB));
       erodables.put(Blocks.COBBLESTONE_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_STAIRS));
       erodables.put(Blocks.COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_WALL));
+      erodables.put(Blocks.MOSSY_STONE_BRICKS, new Erodable(BRICK_RESIST_ODDS, Blocks.GRAVEL));
+      erodables.put(Blocks.MOSSY_STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
+      erodables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
+      erodables.put(Blocks.MOSSY_STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
+      erodables.put(Blocks.STONE_BRICKS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICKS));
+      erodables.put(Blocks.STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_SLAB));
+      erodables.put(Blocks.STONE_BRICK_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_STAIRS));
+      erodables.put(Blocks.STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_WALL));
     }
     return erodables;
   }

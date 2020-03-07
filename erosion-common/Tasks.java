@@ -424,27 +424,34 @@ public class Tasks {
         || block == Blocks.COBBLESTONE_WALL;
   }
 
-  // Cobblestone near water turns mossy, check every block around and up one.
+  private static boolean isStoneBricks(Block block) {
+    return block == Blocks.STONE_BRICKS || block == Blocks.STONE_BRICK_WALL || block == Blocks.STONE_BRICK_STAIRS
+        || block == Blocks.STONE_BRICK_WALL;
+  }
+
+  // Cobblestone and Stone Bricks grow moss near water, check every block around.
   private static void maybeAddMoss(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
     List<Vec3i> listDirection = posEightAround;
+    // TODO: Add one level above the water line
     // listDirection.addAll(posEightAroundUp);
 
     // Randomize the list each run.
+    // TODO: Just pick a random number since everything returns now.
     Collections.shuffle(listDirection);
 
     for (Vec3i dir : listDirection) {
       BlockPos sidePos = pos.add(dir);
       Block sideBlock = world.getBlockState(sidePos).getBlock();
-      // return if side is not cobblestone
-      if (!isCobbleStone(sideBlock)) {
-        // Randomized, means 1:16 odds.
+
+      if (!isCobbleStone(sideBlock) && !isStoneBricks(sideBlock)) {
+        // Stop the loop. Randomized, means 1:16 odds.
         return;
       }
 
-      // change to mossy cobblestone
-      Block mossBlock = ErodableBlocks.decayTo(sideBlock);
+      // Change to mossy
+      Block mossBlock = ErodableBlocks.maybeDecay(rand, sideBlock);
       if (mossBlock == Blocks.AIR) {
-        continue; // Try again
+        return; // Stop the loop
       }
       world.setBlockState(sidePos, mossBlock.getDefaultState(), blockFlags);
       return; // Stop the loop
