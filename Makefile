@@ -17,8 +17,8 @@ build:
 screenshots:
 	# Collect screenshots
 	mkdir -p screenshots
-	cp fabric*/run/screenshots/* screenshots/
-	cp forge*/run/screenshots/* screenshots/
+	mv fabric*/run/screenshots/* screenshots/ || true
+	mv forge*/run/screenshots/* screenshots/ || true
 
 clean:
 	cd fabric-1.14.4;./gradlew clean
