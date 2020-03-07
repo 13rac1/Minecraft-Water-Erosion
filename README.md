@@ -24,6 +24,16 @@ more dynamic. It should not break existing gameplay or enable cheating.
   rarely, cobblestone.
 * Erodable blocks have differing resistances to erosion depending on their
   density, but all erode over time.
+* 1.1.0+ - Blocks decay during erosion to weaker blocks before disappearing.
+* 1.1.0+ - Blocks decay upstream in stream beds.
+* 1.1.0+ - Cobblestone and Stone Bricks grow moss near water.
+
+Decay hierarchy:
+
+* Cobblestone -> Mossy Cobblestone -> Gravel
+* Stone Bricks -> Mossy Stone Bricks -> Gravel
+* Grass Path -> Grass -> Dirt -> Coarse Dirt -> Gravel
+* Gravel -> Sand -> Clay(rarely) -> Air/Water.
 
 ## Videos
 
@@ -32,10 +42,11 @@ more dynamic. It should not break existing gameplay or enable cheating.
 
 ## Installation
 
-Supported versions are always the latest point release:
+Supported versions:
 
 * Fabric 1.14.4
 * Fabric 1.15.2
+* Fabric 1.16.x - latest snapshot
 * Forge 1.14.4
 * Forge 1.15.2
 
@@ -46,23 +57,23 @@ your installation.
 
 ### Forge versions
 
-The Forge version requires [MixinBootstrap][MixinBootstrap]. Download the
-current release `water-erosion-x.x.x-forge-x.x.x.jar`, then download the
+The Forge version for Minecraft 1.12.2 is a Coremod containing an embedded copy
+of the org.spongepowered.asm.launch.MixinTweaker library.
+
+The Forge versions for Minecraft 1.14.4+ require
+[MixinBootstrap][MixinBootstrap]. Download the current release
+`water-erosion-x.x.x-forge-x.x.x.jar`, then download the
 [`MixinBootstrap-1.0.0.jar`][MixinBootstrapJar]. Put both files in your
 MinecraftForge Mod folder.
 
 [MixinBootstrap]: https://github.com/LXGaming/MixinBootstrap
-[MixinBootstrapJar]: https://github.com/LXGaming/MixinBootstrap/releases/download/v1.0.0/MixinBootstrap-1.0.0.jar
-
-## Open Questions
-
-* Should eroded/dissolved blocks drop items?
-* Should blocks sometimes erode to lesser blocks before disappearing such as
-  Dirt->Sand, Cobblestone->Gravel, Sand->Clay?
+[MixinBootstrapJar]: https://github.com/LXGaming/MixinBootstrap/releases/download/v1.0.2/MixinBootstrap-1.0.2.jar
 
 ## TODO features
 
-* Configurable Erosion odds
+* [Optionally drop items of eroded blocks](https://github.com/13rac1/Minecraft-Water-Erosion/issues/3)
+* [Degrade blocks to lesser blocks before disappearing:](https://github.com/13rac1/Minecraft-Water-Erosion/issues/2)
+* [Configurable Erosion odds and types - Slow, Medium(default), Fast, Custom](https://github.com/13rac1/Minecraft-Water-Erosion/issues/1)
 
 ## Technical Notes
 
