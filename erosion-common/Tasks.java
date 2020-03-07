@@ -49,12 +49,24 @@ public class Tasks {
   // air.
   private static final Integer blockFlags = BlockFlag.PROPAGATE_CHANGE | BlockFlag.NOTIFY_LISTENERS;
 
+  private static final List<Vec3i> posFourEdges = Arrays.asList(new Vec3i(1, 0, 0), new Vec3i(0, 0, -1),
+      new Vec3i(-1, 0, 0), new Vec3i(0, 0, 1));
+
+  private static final List<Vec3i> posEightAround = Arrays.asList(new Vec3i(1, 0, 1), new Vec3i(1, 0, 0),
+      new Vec3i(1, 0, -1), new Vec3i(0, 0, -1), new Vec3i(-1, 0, -1), new Vec3i(-1, 0, 0), new Vec3i(-1, 0, 1),
+      new Vec3i(0, 0, 1));
+
+  private static final List<Vec3i> posEightAroundUp = Arrays.asList(new Vec3i(1, 1, 1), new Vec3i(1, 1, 0),
+      new Vec3i(1, 1, -1), new Vec3i(0, 1, -1), new Vec3i(-1, 1, -1), new Vec3i(-1, 1, 0), new Vec3i(-1, 1, 1),
+      new Vec3i(0, 1, 1));
+
   public static void run(BlockState state, ErosionWorld world, BlockPos pos, Random rand) {
 
     Integer level = state.get(FluidBlock.LEVEL);
 
     maybeSourceBreak(state, world, pos, rand, level);
 
+    maybeAddMoss(state, world, pos, rand, level);
     // Skip source blocks, only flowing water.
     if (level == FluidLevel.SOURCE) {
       return;
@@ -403,15 +415,39 @@ public class Tasks {
     // decay if decayto is same as block in flow direction.
     if (flowBlock == decayTo) {
       world.setBlockState(underPos, decayTo.getDefaultState(), blockFlags);
-      System.out.println("maybeDecayUnder!"); // NOT WORKING?
+      // System.out.println("maybeDecayUnder!");
     }
   }
 
-  private static void maybeAddSideMoss(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
-    // IDEA: Should source water add moss?
-    // return if water is source or more than FLOW7
-    // return if sides are not cobblestone
-    // calculate odds for sides separately and change to mossy cobblestone
+  private static boolean isCobbleStone(Block block) {
+    return block == Blocks.COBBLESTONE || block == Blocks.COBBLESTONE_WALL || block == Blocks.COBBLESTONE_STAIRS
+        || block == Blocks.COBBLESTONE_WALL;
+  }
 
+  // Cobblestone near water turns mossy, check every block around and up one.
+  private static void maybeAddMoss(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+    List<Vec3i> listDirection = posEightAround;
+    // listDirection.addAll(posEightAroundUp);
+
+    // Randomize the list each run.
+    Collections.shuffle(listDirection);
+
+    for (Vec3i dir : listDirection) {
+      BlockPos sidePos = pos.add(dir);
+      Block sideBlock = world.getBlockState(sidePos).getBlock();
+      // return if side is not cobblestone
+      if (!isCobbleStone(sideBlock)) {
+        // Randomized, means 1:16 odds.
+        return;
+      }
+
+      // change to mossy cobblestone
+      Block mossBlock = ErodableBlocks.decayTo(sideBlock);
+      if (mossBlock == Blocks.AIR) {
+        continue; // Try again
+      }
+      world.setBlockState(sidePos, mossBlock.getDefaultState(), blockFlags);
+      return; // Stop the loop
+    }
   }
 }
