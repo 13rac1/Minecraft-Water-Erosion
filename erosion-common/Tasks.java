@@ -412,8 +412,9 @@ public class Tasks {
     BlockState flowState = world.getBlockState(flowPos);
     Block flowBlock = flowState.getBlock();
 
-    // decay if decayto is same as block in flow direction.
-    if (flowBlock == decayTo) {
+    // If the block in the flow direction is any of the lesser blocks underBlocks
+    // can become, then decay to the next lesser in the list.
+    if (ErodableBlocks.getDecayList(underBlock).contains(flowBlock)) {
       world.setBlockState(underPos, decayTo.getDefaultState(), blockFlags);
       // System.out.println("maybeDecayUnder!");
     }

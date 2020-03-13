@@ -1,5 +1,6 @@
 package com._13rac1.erosion.common;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -51,10 +52,12 @@ public class ErodableBlocks {
   static class Erodable {
     Integer resistanceOdds;
     Block decayBlock;
+    ArrayList<Block> decayList;
 
     Erodable(Integer resistanceOdds, Block decayBlock) {
       this.resistanceOdds = resistanceOdds;
       this.decayBlock = decayBlock;
+      this.decayList = new ArrayList<>();
     }
   }
 
@@ -124,6 +127,14 @@ public class ErodableBlocks {
       erodables.put(Blocks.STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_SLAB));
       erodables.put(Blocks.STONE_BRICK_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_STAIRS));
       erodables.put(Blocks.STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_WALL));
+
+      erodables.forEach((block, erodable) -> {
+        Erodable current = erodable;
+        while (current.decayBlock != Blocks.AIR) {
+          current.decayList.add(current.decayBlock);
+          current = erodables.get(current.decayBlock);
+        }
+      });
     }
     return erodables;
   }
@@ -211,5 +222,9 @@ public class ErodableBlocks {
   // behind the current source block.
   public static boolean canSourceBreak(Block block) {
     return getResistance(block) < SOURCE_BREAK_RESIST_ODDS;
+  }
+
+  public static ArrayList<Block> getDecayList(Block block) {
+    return getErodables().get(block).decayList;
   }
 }
