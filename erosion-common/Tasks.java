@@ -372,7 +372,6 @@ public class Tasks {
     }
   }
 
-  // TODO: Increase odds. This should happen any time all of the checks pass.
   private static void maybeDecayUnder(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
     // return if water is source or falling or FLOW7
     if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW7) {
