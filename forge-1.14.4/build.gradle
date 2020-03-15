@@ -112,8 +112,24 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    //Mixin
+    // Mixin
     compile 'org.spongepowered:mixin:0.8-SNAPSHOT'
+
+    // Tests
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'
+    //testImplementation 'org.mockito:mockito-inline:2.13.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+    testCompile 'org.junit.jupiter:junit-jupiter-params:5.4.2'
+    //testCompile 'org.mockito:mockito-core:3.+'
+}
+
+test {
+    useJUnitPlatform()
+
+    maxHeapSize = '1G'
+    failFast = false
+    workingDir = './run_tests'
+    mkdir './run_tests'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -160,7 +176,6 @@ repositories {
     mavenCentral()
 
     maven {url='https://dist.creeper.host/Sponge/maven'}
-
 }
 
 apply plugin: 'org.spongepowered.mixin'
