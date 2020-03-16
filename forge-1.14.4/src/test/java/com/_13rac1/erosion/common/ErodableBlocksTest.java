@@ -2,8 +2,10 @@ package com._13rac1.erosion.common;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Random;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import net.minecraft.block.Block;
@@ -22,8 +24,8 @@ public class ErodableBlocksTest {
     field.set(null, newValue);
   }
 
-  @Test
-  void testDecayTo() throws Exception {
+  @BeforeAll
+  static void beforeAll() throws Exception {
     Block.Properties properties = Block.Properties.create(Material.AIR);
     Block block = new Block(properties);
     setFinalStatic(Blocks.class.getField("AIR"), block);
@@ -32,7 +34,16 @@ public class ErodableBlocksTest {
     Block block2 = new Block(properties2);
     setFinalStatic(Blocks.class.getField("CLAY"), block2);
 
-    Assertions.assertEquals(Blocks.AIR, ErodableBlocks.decayTo(Blocks.CLAY));
+  }
 
+  @Test
+  void testMaybeDecay() {
+    Random rand = new Random();
+    Assertions.assertEquals(Blocks.AIR, ErodableBlocks.maybeDecay(rand, Blocks.CLAY));
+  }
+
+  @Test
+  void testDecayTo() {
+    Assertions.assertEquals(Blocks.AIR, ErodableBlocks.decayTo(Blocks.CLAY));
   }
 }
