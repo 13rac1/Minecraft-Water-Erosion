@@ -303,32 +303,8 @@ public class Tasks {
       }
       // Found a breakable block in the direction.
 
-      // Check forward 7, 14, etc for air. Check a level lower each seventh
-      // block, to be sure the flow can make it to the selected block, rather
-      // than just make a 7 block creek.
-      boolean foundAir = true;
-      int yDeeper = 0;
-      // TODO: Should the odds of breakage increase when block 21 is clear?
-      // TODO: Should all blocks in the potential route be checked? May find
-      // smaller gaps and crevasses.
-      // TODO: If 14 is clear, but 7 isn't the break should happen anyway,
-      // because then water will flow underground a ways before exiting.
-      for (int airMultipler : Arrays.asList(7, 14)) {
-        Vec3i airDirection = new Vec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
-
-        yDeeper++;
-        BlockPos maybeAirPos = pos.add(airDirection);
-        BlockState maybeAirState = world.getBlockState(maybeAirPos);
-
-        Block maybeAirBlock = maybeAirState.getBlock();
-        if (maybeAirBlock != Blocks.AIR && maybeAirBlock != Blocks.CAVE_AIR
-            && !BlockTags.LEAVES.contains(maybeAirBlock)) {
-          foundAir = false;
-          break;
-        }
-      }
-      if (!foundAir) {
-        // Skip if air was not found.
+      if (!airInFlowPath(world, pos, dir)) {
+        // Skip if air was not found in the direction of breakage.
         continue;
       }
 
@@ -367,10 +343,34 @@ public class Tasks {
       // "Removing block to source side:" +
       // world.getBlockState(sidePos).getBlock().getName().asFormattedString());
       world.setBlockState(sidePos, Blocks.AIR.getDefaultState(), blockFlags);
-
       // Only process the first erodable side found.
       return;
     }
+  }
+
+  private static boolean isAir(Block block) {
+    return block == Blocks.AIR || block == Blocks.CAVE_AIR;
+  }
+
+  // Start from the provided BlockPos and trace
+  protected static boolean airInFlowPath(ErosionWorld world, BlockPos pos, Vec3i dir) {
+    // TODO: Should all blocks in the potential route be checked? May find
+    // smaller gaps and crevasses. A slow mode.
+    int yDeeper = 0;
+    for (int airMultipler : Arrays.asList(7, 14)) {
+      Vec3i airDirection = new Vec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
+      // Go deeper each iteration
+      yDeeper++;
+      BlockPos maybeAirPos = pos.add(airDirection);
+      BlockState maybeAirState = world.getBlockState(maybeAirPos);
+      Block maybeAirBlock = maybeAirState.getBlock();
+
+      if (isAir(maybeAirBlock) || BlockTags.LEAVES.contains(maybeAirBlock)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private static void maybeDecayUnder(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
