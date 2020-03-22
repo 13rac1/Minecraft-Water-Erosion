@@ -130,8 +130,10 @@ public class ErodableBlocks {
 
       erodables.forEach((block, erodable) -> {
         Erodable current = erodable;
+        // Loop and fill out the decayList, aka the ordered list of what a block will
+        // decay to. Stop when AIR is found.
         while (current.decayBlock != Blocks.AIR) {
-          current.decayList.add(current.decayBlock);
+          erodable.decayList.add(current.decayBlock);
           current = erodables.get(current.decayBlock);
         }
       });
