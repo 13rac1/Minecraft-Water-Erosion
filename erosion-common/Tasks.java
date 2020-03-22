@@ -154,7 +154,7 @@ public class Tasks {
     // callback?
   }
 
-  private static boolean isEdge(ErosionWorld world, BlockPos pos) {
+  protected static boolean isEdge(ErosionWorld world, BlockPos pos) {
     List<BlockPos> listSidePos = Arrays.asList(pos.north(), pos.south(), pos.east(), pos.west());
 
     for (BlockPos sidePos : listSidePos) {
@@ -420,12 +420,12 @@ public class Tasks {
     }
   }
 
-  private static boolean isCobbleStone(Block block) {
+  protected static boolean isCobbleStone(Block block) {
     return block == Blocks.COBBLESTONE || block == Blocks.COBBLESTONE_WALL || block == Blocks.COBBLESTONE_STAIRS
         || block == Blocks.COBBLESTONE_WALL;
   }
 
-  private static boolean isStoneBricks(Block block) {
+  protected static boolean isStoneBricks(Block block) {
     return block == Blocks.STONE_BRICKS || block == Blocks.STONE_BRICK_WALL || block == Blocks.STONE_BRICK_STAIRS
         || block == Blocks.STONE_BRICK_WALL;
   }
