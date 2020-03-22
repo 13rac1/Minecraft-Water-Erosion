@@ -12,7 +12,8 @@ public class BlockFlag {
   // Forces a synchronous redraw on clients.
   public static final Integer REDRAW_ON_MAIN_THREAD = 8;
   // Bypass virtual blockstate changes and forces the passed state to be stored
-  // as-is.
+  // as-is, prevent neighbor reactions (e.g. fences connecting, observers
+  // pulsing.)
   public static final Integer FORCE_STATE = 16;
   // Prevents the previous block (container) from dropping items when destroyed.
   public static final Integer SKIP_DROPS = 32;
