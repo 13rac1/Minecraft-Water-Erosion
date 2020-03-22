@@ -71,6 +71,18 @@ public class ErodableBlocksTest {
   }
 
   @Test
+  void testGetResistance() {
+    Assertions.assertEquals(0, ErodableBlocks.getResistance(Blocks.AIR));
+    Assertions.assertEquals(20, ErodableBlocks.getResistance(Blocks.COBBLESTONE));
+  }
+
+  @Test
+  void testCanErode() {
+    Assertions.assertTrue(ErodableBlocks.canErode(Blocks.DIRT));
+    Assertions.assertFalse(ErodableBlocks.canErode(Blocks.AIR));
+  }
+
+  @Test
   void testMaybeDecay() {
     Random rand = new Random();
     Assertions.assertEquals(Blocks.AIR, ErodableBlocks.maybeDecay(rand, Blocks.CLAY));
@@ -85,6 +97,13 @@ public class ErodableBlocksTest {
     Assertions.assertEquals(Blocks.SAND, ErodableBlocks.decayTo(Blocks.GRAVEL));
     Assertions.assertEquals(Blocks.CLAY, ErodableBlocks.decayTo(Blocks.SAND));
     Assertions.assertEquals(Blocks.AIR, ErodableBlocks.decayTo(Blocks.CLAY));
+  }
+
+  @Test
+  void testCanSourceBreak() {
+    // Test depends on current setting of SOURCE_BREAK_RESIST_ODDS
+    Assertions.assertTrue(ErodableBlocks.canSourceBreak(Blocks.GRASS));
+    Assertions.assertFalse(ErodableBlocks.canSourceBreak(Blocks.COBBLESTONE));
   }
 
   @Test
