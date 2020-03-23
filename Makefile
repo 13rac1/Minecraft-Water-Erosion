@@ -13,6 +13,12 @@ build:
 	cp forge-*/build/libs/*.jar dist/
 	rm dist/*-dev.jar
 
+.PHONY: test
+test:
+	cd forge-1.14.4;./gradlew test jacocoTestReport
+	# Test Coverage Report location:
+	echo ${PWD}/forge-1.14.4/build/reports/jacoco/test/html/index.html
+
 .PHONY: screenshots
 screenshots:
 	# Collect screenshots
@@ -20,6 +26,7 @@ screenshots:
 	mv fabric*/run/screenshots/* screenshots/ || true
 	mv forge*/run/screenshots/* screenshots/ || true
 
+.PHONY: clean
 clean:
 	cd fabric-1.14.4;./gradlew clean
 	cd fabric-1.15.2;./gradlew clean
