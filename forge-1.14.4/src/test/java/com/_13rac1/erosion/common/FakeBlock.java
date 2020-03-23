@@ -15,8 +15,10 @@ public class FakeBlock {
     Field modifiersField = Field.class.getDeclaredField("modifiers");
     modifiersField.setAccessible(true);
     modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-    field.set(null, newValue);
+    if (field.get(null) == null) {
+      // Only set if the field is null, setupFakeBlocks() is called multiple times.
+      field.set(null, newValue);
+    }
   }
 
   // Create a fake block so the Block.class field is not null for that entry.

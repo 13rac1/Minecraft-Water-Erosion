@@ -67,7 +67,10 @@ public class Tasks {
 
     maybeSourceBreak(state, world, pos, rand, level);
 
-    maybeAddMoss(state, world, pos, rand, level);
+    if (maybeAddMoss(state, world, pos, rand)) {
+      // Return if moss is added.
+      return;
+    }
     // Skip source blocks, only flowing water.
     if (level == FluidLevel.SOURCE) {
       return;
@@ -431,7 +434,8 @@ public class Tasks {
   }
 
   // Cobblestone and Stone Bricks grow moss near water, check every block around.
-  private static void maybeAddMoss(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+  // Returns true when a change is made.
+  protected static boolean maybeAddMoss(BlockState state, ErosionWorld world, BlockPos pos, Random rand) {
     List<Vec3i> listDirection = posEightAround;
     // TODO: Add one level above the water line
     // listDirection.addAll(posEightAroundUp);
@@ -446,16 +450,18 @@ public class Tasks {
 
       if (!isCobbleStone(sideBlock) && !isStoneBricks(sideBlock)) {
         // Stop the loop. Randomized, means 1:16 odds.
-        return;
+        return false;
       }
 
-      // Change to mossy
+      // Change to mossy, always happens with current config.
       Block mossBlock = ErodableBlocks.maybeDecay(rand, sideBlock);
+
       if (mossBlock == Blocks.AIR) {
-        return; // Stop the loop
+        return false; // Stop the loop
       }
       world.setBlockState(sidePos, mossBlock.getDefaultState(), blockFlags);
-      return; // Stop the loop
+      return true; // Stop the loop
     }
+    return false;
   }
 }
