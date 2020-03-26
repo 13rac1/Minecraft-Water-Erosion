@@ -15,6 +15,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.state.IProperty;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
 public class TasksTest {
@@ -84,6 +85,39 @@ public class TasksTest {
   }
 
   @Test
+  void testMaybeDecayUnder() {
+    final ErosionWorld world = mock(ErosionWorld.class);
+    final BlockPos pos = new BlockPos(0, 0, 0);
+    final BlockState stateWater = Blocks.WATER.getDefaultState();
+    final Random rand = new Random(); // unused, in tests
+
+    // No decay under source blocks
+    Integer level = FluidLevel.SOURCE;
+    Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+
+    // No decay of water on top of water.
+    level = FluidLevel.FLOW1;
+    when(world.getBlockState(pos.down())).thenReturn(stateWater);
+    Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+
+    // No decay if block will become air.
+    when(world.getBlockState(pos.down())).thenReturn(Blocks.CLAY.getDefaultState());
+    Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+
+    // No decay for 45 degree
+    when(world.getBlockState(pos.down())).thenReturn(Blocks.COBBLESTONE.getDefaultState());
+    when(world.getFlowVelocity(any(BlockState.class), any(BlockPos.class))).thenReturn(new Vec3d(0.707, 0, 0.707));
+    Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+
+    // Decay dirt
+    when(world.getBlockState(pos.down())).thenReturn(Blocks.DIRT.getDefaultState());
+    when(world.getFlowVelocity(any(BlockState.class), any(BlockPos.class))).thenReturn(new Vec3d(0.0, 0, 1)); // south
+    when(world.getBlockState(pos.down().south())).thenReturn(Blocks.SAND.getDefaultState());
+    Assertions.assertTrue(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+
+  }
+
+  @Test
   void testIsBlockType() {
     Assertions.assertTrue(Tasks.isCobbleStone(Blocks.COBBLESTONE));
     Assertions.assertFalse(Tasks.isCobbleStone(Blocks.DIRT));
@@ -98,7 +132,7 @@ public class TasksTest {
     final BlockPos pos = new BlockPos(0, 0, 0);
     final BlockState stateWater = Blocks.WATER.getDefaultState();
     final BlockState stateCobble = Blocks.COBBLESTONE.getDefaultState();
-    final Random rand = new Random(); // unused
+    final Random rand = new Random(); // unused, in tests
 
     // Found water
     when(world.getBlockState(any(BlockPos.class))).thenReturn(stateWater);

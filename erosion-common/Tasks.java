@@ -376,10 +376,12 @@ public class Tasks {
     return false;
   }
 
-  private static void maybeDecayUnder(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+  protected static boolean maybeDecayUnder(BlockState state, ErosionWorld world, BlockPos pos, Random rand,
+      Integer level) {
+    // TODO: Should we be using rand?
     // return if water is source or falling or FLOW7
     if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW7) {
-      return;
+      return false;
     }
     // Get the block under us.
     BlockPos underPos = pos.down();
@@ -387,7 +389,7 @@ public class Tasks {
     Block underBlock = underState.getBlock();
 
     if (!ErodableBlocks.canErode(underBlock)) {
-      return;
+      return false;
     }
     // TODO: return if is edge?
 
@@ -395,7 +397,7 @@ public class Tasks {
     Block decayTo = ErodableBlocks.decayTo(underBlock);
     if (decayTo == Blocks.AIR) {
       // Nothing to do if block will become air.
-      return;
+      return false;
     }
 
     Vec3d velocity = world.getFlowVelocity(state, pos);
@@ -403,7 +405,7 @@ public class Tasks {
     // with a more definitive direction such as 0, 90, or 22.5.
     if (Math.abs(velocity.x) < 0.8 && Math.abs(velocity.z) < 0.8) {
       // Skip 45 degree flows.
-      return;
+      return false;
     }
 
     // Find the position of the block in the flow direction, round to closest 90
@@ -414,10 +416,13 @@ public class Tasks {
 
     // If the block in the flow direction is any of the lesser blocks underBlocks
     // can become, then decay to the next lesser in the list.
-    if (ErodableBlocks.getDecayList(underBlock).contains(flowBlock)) {
-      world.setBlockState(underPos, decayTo.getDefaultState(), blockFlags);
-      // System.out.println("maybeDecayUnder!");
+    if (!ErodableBlocks.getDecayList(underBlock).contains(flowBlock)) {
+      return false;
     }
+    world.setBlockState(underPos, decayTo.getDefaultState(), blockFlags);
+    // System.out.println("maybeDecayUnder!");
+    return true;
+
   }
 
   protected static boolean isCobbleStone(Block block) {
