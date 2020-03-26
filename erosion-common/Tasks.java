@@ -398,20 +398,17 @@ public class Tasks {
       return;
     }
 
-    // Find flow direction: Velocity is a 3D vector normalized to 1 pointing the
-    // direction the water is flowing.
     Vec3d velocity = world.getFlowVelocity(state, pos);
-
-    if (Math.abs(velocity.x) < 1 && Math.abs(velocity.z) < 1) {
+    // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
+    // with a more definitive direction such as 0, 90, or 22.5.
+    if (Math.abs(velocity.x) < 0.8 && Math.abs(velocity.z) < 0.8) {
       // Skip 45 degree flows.
-      //
-      // The velocity vector is normalized, therefore 45 degree flows are
-      // represented by two floats of +/- 0.707.
       return;
     }
 
-    // Find the position of the block in the flow direction.
-    BlockPos flowPos = underPos.add(new Vec3i(velocity.x, velocity.y, velocity.z));
+    // Find the position of the block in the flow direction, round to closest 90
+    // degree angle.
+    BlockPos flowPos = underPos.add(new Vec3i(Math.round(velocity.x), 0, Math.round(velocity.z)));
     BlockState flowState = world.getBlockState(flowPos);
     Block flowBlock = flowState.getBlock();
 
