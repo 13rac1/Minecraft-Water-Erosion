@@ -108,10 +108,17 @@ mixin {
 
 jar {
     manifest.attributes(
+        'Built-By': '13rac1',
+        'Created-By': System.properties['java.vm.version'] + ' (' + System.properties['java.vm.vendor'] + ')',
         'MixinConfigs': 'erosion.mixins.json',
-        'tweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-        // Disabled, because the FMLCorePlugin itself is not a mod.
-        //'FMLCorePluginContainsFMLMod': 'true',
+        'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+        'TweakOrder': 0,
+        // Disabled, because MixinLoader, the FMLCorePlugin, is a CoreMod not a
+        // MainMod. It may be a better practice to combine MixinLoader (CoreMod)
+        // and WaterErosionMod (MainMod), but the mod does not work when
+        // enabled in development: The CoreMod runs, but the MainMod doesn't.
+        // See: https://github.com/13rac1/Minecraft-Water-Erosion/issues/15
+        // FMLCorePluginContainsFMLMod': 'true',
         'FMLCorePlugin': 'com._13rac1.erosion.forge.MixinLoader',
         // ForceLoadAsMod is required to re-initialize coremods as regular mods.
         'ForceLoadAsMod': 'true',
@@ -120,13 +127,32 @@ jar {
 
 // ShadowJar adds dependencies to the release Jar so the rest of the Sponge mod
 // framework is not required.
-// FIXME: ShadowJar does not include all Sponge Mixin files needed. Not sure what is missing.
-// Everything works correctly if manually add the spongepowered mixin library and META-INF/services to the archive.
-// I'll release 1.1.0-alpha1 with a manual build, then figure out the cause later.
 shadowJar {
+
+    dependsOn reobfJar
+    // Remove all files gradle has found so far.
+    mainSpec.sourcePaths.clear()
+
+    afterEvaluate {
+        // Include all files in the obfuscated Jar, required or else the mixin
+        // refmap is missing.
+        from zipTree(reobfJar.jar)
+    }
+
     exclude 'dummyThing'
+    exclude 'LICENSE.txt'
     dependencies {
         include(dependency('org.spongepowered:mixin'))
     }
+    manifest {
+        attributes(
+            // Add to "release" build only.
+            'FMLCorePluginContainsFMLMod': true
+        )
+    }
     classifier = 'full'
+}
+
+artifacts {
+    archives shadowJar
 }
