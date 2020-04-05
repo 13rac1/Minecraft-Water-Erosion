@@ -9,7 +9,7 @@ build:
 	#cd fabric-1.15.2;./gradlew build
 	#cd fabric-1.16.x;./gradlew build
 	#cd fabric-1.17.x;./gradlew build
-	cd forge-1.12.2;./gradlew build shadowJar
+	cd forge-1.12.2;./gradlew build # includes shadowJar
 	#cd forge-1.14.4;./gradlew build
 	#cd forge-1.15.2;./gradlew build
 	#cd forge-1.16.x;./gradlew build
