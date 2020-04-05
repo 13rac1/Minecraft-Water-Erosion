@@ -1,8 +1,8 @@
-#JAVA_HOME ?= /usr/lib/jvm/java-8-openjdk-amd64
+# JAVA_HOME ?= /usr/lib/jvm/java-8-openjdk-amd64
+# Minecraft 1.12.2 requires Oracle Java. Later versions run on OpenJDK.
 JAVA_HOME ?= ${PWD}/jdk-8u202
+
 export JAVA_HOME
-
-
 
 build:
 	#cd fabric-1.14.4;./gradlew build
@@ -24,6 +24,16 @@ test:
 	cd forge-1.14.4;./gradlew test jacocoTestReport
 	# Test Coverage Report location:
 	xdg-open ${PWD}/forge-1.14.4/build/reports/jacoco/test/html/index.html
+
+.PHONY: test-server
+test-server: build
+	rm -rf ${PWD}/forge-1.12.2/tests/server/mods
+	mkdir -p ${PWD}/forge-1.12.2/tests/server/mods
+	cp dist/water-erosion-1.12.2-forge-*-full.jar ${PWD}/forge-1.12.2/tests/server/mods
+	docker rm mc
+	docker run -it -v ${PWD}/forge-1.12.2/tests/server:/data -e VERSION=1.12.2 -e TYPE=FORGE  -p 25565:25565 \
+        -e EULA=TRUE --name mc itzg/minecraft-server
+
 
 deps:
 	# Get final Binary Code Licensed Oracle Java 8. Minecraft 1.12.2 crashes with OpenJDK 8.
