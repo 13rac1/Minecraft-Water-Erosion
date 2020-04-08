@@ -19,9 +19,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
 public class TasksTest {
+  private static Tasks tasks;
 
   @BeforeAll
   static void beforeAll() throws Exception {
+    tasks = new Tasks();
     FakeBlock.setupFakeBlocks();
   }
 
@@ -50,7 +52,7 @@ public class TasksTest {
 
     when(world.getBlock(pos.north().down())).thenReturn(Blocks.WATER);
     when(world.isFluidBlock(Blocks.WATER)).thenReturn(true);
-    Assertions.assertTrue(Tasks.isEdge(world, pos));
+    Assertions.assertTrue(tasks.isEdge(world, pos));
   }
 
   @Test
@@ -65,18 +67,18 @@ public class TasksTest {
     final BlockPos pos14 = pos.add(airDirection14);
 
     when(world.getBlock(pos7)).thenReturn(Blocks.AIR);
-    Assertions.assertTrue(Tasks.airInFlowPath(world, pos, dir));
+    Assertions.assertTrue(tasks.airInFlowPath(world, pos, dir));
     verify(world).getBlock(pos7);
 
     when(world.getBlock(pos7)).thenReturn(Blocks.DIRT);
     when(world.getBlock(pos14)).thenReturn(Blocks.AIR);
-    Assertions.assertTrue(Tasks.airInFlowPath(world, pos, dir));
+    Assertions.assertTrue(tasks.airInFlowPath(world, pos, dir));
     verify(world, times(2)).getBlock(pos7); // Total calls since world create.
     verify(world).getBlock(pos14);
 
     when(world.getBlock(pos7)).thenReturn(Blocks.DIRT);
     when(world.getBlock(pos14)).thenReturn(Blocks.DIRT);
-    Assertions.assertFalse(Tasks.airInFlowPath(world, pos, dir));
+    Assertions.assertFalse(tasks.airInFlowPath(world, pos, dir));
     verify(world, times(3)).getBlock(pos7);
     verify(world, times(2)).getBlock(pos14);
   }
@@ -90,37 +92,37 @@ public class TasksTest {
 
     // No decay under source blocks
     Integer level = FluidLevel.SOURCE;
-    Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+    Assertions.assertFalse(tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
     // No decay of water on top of water.
     level = FluidLevel.FLOW1;
     when(world.getBlock(pos.down())).thenReturn(Blocks.WATER);
-    Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+    Assertions.assertFalse(tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
     // No decay if block will become air.
     when(world.getBlock(pos.down())).thenReturn(Blocks.CLAY);
-    Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+    Assertions.assertFalse(tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
     // No decay for 45 degree
     when(world.getBlock(pos.down())).thenReturn(Blocks.COBBLESTONE);
     when(world.getFlowVelocity(any(BlockState.class), any(BlockPos.class))).thenReturn(new Vec3d(0.707, 0, 0.707));
-    Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+    Assertions.assertFalse(tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
     // Decay dirt
     when(world.getBlock(pos.down())).thenReturn(Blocks.DIRT);
     when(world.getFlowVelocity(any(BlockState.class), any(BlockPos.class))).thenReturn(new Vec3d(0.0, 0, 1)); // south
     when(world.getBlock(pos.down().south())).thenReturn(Blocks.SAND);
-    Assertions.assertTrue(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+    Assertions.assertTrue(tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
   }
 
   @Test
   void testIsBlockType() {
-    Assertions.assertTrue(Tasks.isCobbleStone(Blocks.COBBLESTONE));
-    Assertions.assertFalse(Tasks.isCobbleStone(Blocks.DIRT));
+    Assertions.assertTrue(tasks.isCobbleStone(Blocks.COBBLESTONE));
+    Assertions.assertFalse(tasks.isCobbleStone(Blocks.DIRT));
 
-    Assertions.assertTrue(Tasks.isStoneBricks(Blocks.STONE_BRICKS));
-    Assertions.assertFalse(Tasks.isStoneBricks(Blocks.DIRT));
+    Assertions.assertTrue(tasks.isStoneBricks(Blocks.STONE_BRICKS));
+    Assertions.assertFalse(tasks.isStoneBricks(Blocks.DIRT));
   }
 
   @Test
@@ -133,11 +135,11 @@ public class TasksTest {
 
     // Found water
     when(world.getBlock(any(BlockPos.class))).thenReturn(Blocks.WATER);
-    Assertions.assertFalse(Tasks.maybeAddMoss(stateWater, world, pos, rand));
+    Assertions.assertFalse(tasks.maybeAddMoss(stateWater, world, pos, rand));
 
     // Found cobble, which is DECAY_ALWAYS_ODDS, adds moss
     when(world.getBlock(any(BlockPos.class))).thenReturn(Blocks.COBBLESTONE);
-    Assertions.assertTrue(Tasks.maybeAddMoss(stateWater, world, pos, rand));
+    Assertions.assertTrue(tasks.maybeAddMoss(stateWater, world, pos, rand));
     verify(world).setBlockState(any(BlockPos.class), eq(Blocks.MOSSY_COBBLESTONE.getDefaultState()), anyInt());
   }
 }

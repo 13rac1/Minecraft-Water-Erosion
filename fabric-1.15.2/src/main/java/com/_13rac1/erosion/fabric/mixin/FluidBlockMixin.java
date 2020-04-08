@@ -21,6 +21,7 @@ import com._13rac1.erosion.common.Tasks;
 
 @Mixin(FluidBlock.class)
 public class FluidBlockMixin extends Block {
+	private Tasks tasks = new Tasks();
 
 	public FluidBlockMixin(Settings settings) {
 		super(settings);
@@ -69,6 +70,6 @@ public class FluidBlockMixin extends Block {
 	private void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random rand, CallbackInfo info) {
 		FabricWorld fabricWorld = new FabricWorld(world);
 
-		Tasks.run(state, fabricWorld, pos, rand);
+		tasks.run(state, fabricWorld, pos, rand);
 	}
 }
