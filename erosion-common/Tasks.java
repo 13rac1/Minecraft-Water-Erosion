@@ -7,6 +7,7 @@ import java.util.Random;
 
 import net.minecraft.block.FluidBlock;
 import net.minecraft.tag.BlockTags;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.Vec3d;
@@ -138,7 +139,8 @@ public class Tasks {
     // waterfalls which results in incorrect
     Integer upDeleteCount = 0;
     BlockPos posUp = pos.up();
-    while (world.isFluidBlock(world.getBlockState(posUp).getBlock())) {
+
+    while (world.isFluidBlock(world.getBlock(posUp))) {
       upDeleteCount++;
       if (upDeleteCount > 3) {
         break;
@@ -174,6 +176,16 @@ public class Tasks {
     return false;
   }
 
+  // Rotate a given direction vector to the left: North->West.
+  protected Vec3i dirLeft(Vec3i in) {
+    return in.crossProduct(Direction.DOWN.getDirectionVec());
+  }
+
+  // Rotate a given direction vector to the right: North-East.
+  protected Vec3i dirRight(Vec3i in) {
+    return in.crossProduct(Direction.UP.getDirectionVec());
+  }
+
   private static List<Integer> wallBreakers = Arrays.asList(FluidLevel.FLOW1, FluidLevel.FLOW2, FluidLevel.FLOW3,
       FluidLevel.FLOW4, FluidLevel.FLOW5, FluidLevel.FLOW6, FluidLevel.FLOW7);
 
@@ -202,11 +214,19 @@ public class Tasks {
     }
 
     Vec3i dir = new Vec3i(Math.round(velocity.x), velocity.y + Flow7Adjust, Math.round(velocity.z));
-
+    Vec3i dirStart = dir;
     // TODO: Allow Water
+    // Check forward, left, then right.
     if (!airInFlowPath(world, pos, dir)) {
-      // Skip if air was not found in the direction of breakage.
-      return false;
+      dir = dirLeft(dirStart);
+      if (!airInFlowPath(world, pos, dir)) {
+        dir = dirRight(dirStart);
+        if (!airInFlowPath(world, pos, dir)) {
+          // Skip if air was not found in any of the three allowed break directions.
+          // If North flow, then North, West, East are checked.
+          return false;
+        }
+      }
     }
 
     // Find the position of the block in the flow direction.

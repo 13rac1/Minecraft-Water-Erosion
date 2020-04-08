@@ -14,16 +14,16 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.state.IProperty;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 
 public class TasksTest {
-  private static Tasks tasks;
+  private static Tasks tasks = new Tasks();
 
   @BeforeAll
   static void beforeAll() throws Exception {
-    tasks = new Tasks();
     FakeBlock.setupFakeBlocks();
   }
 
@@ -43,12 +43,33 @@ public class TasksTest {
   }
 
   @Test
+  void testDirLeftRight() {
+    // Verbosely test both the Minecraft libraries and the Task methods work as
+    // expected.
+    BlockPos posStart = new BlockPos(0, 0, 0);
+    Vec3i dirForward = Direction.NORTH.getDirectionVec();
+    BlockPos posForward = posStart.add(dirForward);
+
+    Assertions.assertNotEquals(posStart.south(), posForward);
+    Assertions.assertEquals(posStart.north(), posForward);
+
+    Vec3i dirLeft = dirForward.crossProduct(Direction.DOWN.getDirectionVec());
+    BlockPos posLeft = posStart.add(dirLeft);
+    Assertions.assertEquals(posStart.west(), posLeft);
+    Assertions.assertEquals(dirLeft, tasks.dirLeft(dirForward));
+
+    Vec3i dirRight = dirForward.crossProduct(Direction.UP.getDirectionVec());
+    BlockPos posRight = posStart.add(dirRight);
+    Assertions.assertEquals(posStart.east(), posRight);
+    Assertions.assertEquals(dirRight, tasks.dirRight(dirForward));
+  }
+
+  @Test
   void testIsEdgeNorth() {
     // isEdge() checks north first, so this is just a test of the first return.
     // TODO: Check failure cases.
     final ErosionWorld world = mock(ErosionWorld.class);
     final BlockPos pos = new BlockPos(0, 0, 0);
-    // final BlockState state = new BlockState(Blocks.WATER, ImmutableMap.of());
 
     when(world.getBlock(pos.north().down())).thenReturn(Blocks.WATER);
     when(world.isFluidBlock(Blocks.WATER)).thenReturn(true);
