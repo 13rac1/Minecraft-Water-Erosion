@@ -129,17 +129,15 @@ public class TasksTest {
   void testMaybeAddMoss() {
     final ErosionWorld world = mock(ErosionWorld.class);
     final BlockPos pos = new BlockPos(0, 0, 0);
-    final BlockState stateWater = Blocks.WATER.getDefaultState();
-    final BlockState stateCobble = Blocks.COBBLESTONE.getDefaultState();
     final Random rand = new Random(); // unused, in tests
 
     // Found water
     when(world.getBlock(any(BlockPos.class))).thenReturn(Blocks.WATER);
-    Assertions.assertFalse(tasks.maybeAddMoss(stateWater, world, pos, rand));
+    Assertions.assertFalse(tasks.maybeAddMoss(world, pos, rand));
 
     // Found cobble, which is DECAY_ALWAYS_ODDS, adds moss
     when(world.getBlock(any(BlockPos.class))).thenReturn(Blocks.COBBLESTONE);
-    Assertions.assertTrue(tasks.maybeAddMoss(stateWater, world, pos, rand));
+    Assertions.assertTrue(tasks.maybeAddMoss(world, pos, rand));
     verify(world).setBlockState(any(BlockPos.class), eq(Blocks.MOSSY_COBBLESTONE.getDefaultState()), anyInt());
   }
 }

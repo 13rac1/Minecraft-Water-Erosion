@@ -67,7 +67,7 @@ public class Tasks {
 
     maybeSourceBreak(state, world, pos, rand, level);
 
-    if (maybeAddMoss(state, world, pos, rand)) {
+    if (maybeAddMoss(world, pos, rand)) {
       // Return if moss is added.
       return;
     }
@@ -434,7 +434,7 @@ public class Tasks {
 
   // Cobblestone and Stone Bricks grow moss near water, check every block around.
   // Returns true when a change is made.
-  protected boolean maybeAddMoss(BlockState state, ErosionWorld world, BlockPos pos, Random rand) {
+  protected boolean maybeAddMoss(ErosionWorld world, BlockPos pos, Random rand) {
     List<Vec3i> listDirection = posEightAround;
     // TODO: Add one level above the water line
     // listDirection.addAll(posEightAroundUp);
