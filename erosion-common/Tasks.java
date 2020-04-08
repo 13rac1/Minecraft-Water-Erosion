@@ -88,9 +88,7 @@ public class Tasks {
   private static void maybeErodeEdge(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
     // Get the block under us.
     BlockPos underPos = pos.down();
-
-    BlockState underState = world.getBlockState(underPos);
-    Block underBlock = underState.getBlock();
+    Block underBlock = world.getBlock(underPos);
 
     // Return if the block below us is not erodable.
     // TODO: Technically this call is redundant now.
@@ -162,8 +160,7 @@ public class Tasks {
 
     for (BlockPos sidePos : listSidePos) {
       BlockPos underPos = sidePos.down();
-      BlockState underState = world.getBlockState(underPos);
-      Block underBlock = underState.getBlock();
+      Block underBlock = world.getBlock(underPos);
 
       if (!world.isFluidBlock(underBlock)) {
         // System.out.println("Did not find side under water block: " +
@@ -223,8 +220,7 @@ public class Tasks {
     // Block above cannot be wood, keep trees standing on dirt.
     // TODO: Look more than one block up for wood.
     BlockPos aboveFlowPos = flowPos.up();
-    BlockState aboveFlowState = world.getBlockState(aboveFlowPos);
-    Block aboveFlowBlock = aboveFlowState.getBlock();
+    Block aboveFlowBlock = world.getBlock(aboveFlowPos);
     if (BlockTags.LOGS.contains(aboveFlowBlock)) {
       return false;
     }
@@ -232,8 +228,7 @@ public class Tasks {
     // Search around the stack to confirm a block other than air and water is
     // touching it.
 
-    BlockState flowState = world.getBlockState(flowPos);
-    Block wallBlock = flowState.getBlock();
+    Block wallBlock = world.getBlock(flowPos);
     if (!ErodableBlocks.canErode(wallBlock)) {
       return false;
     }
@@ -296,7 +291,7 @@ public class Tasks {
     for (Vec3i dir : listDirection) {
       BlockPos sidePos = pos.add(dir);
 
-      Block sideBlock = world.getBlockState(sidePos).getBlock();
+      Block sideBlock = world.getBlock(sidePos);
       if (sideBlock == Blocks.WATER) {
         // Short circuit water blocks. Should save CPU as this will be the most
         // common result.
@@ -372,8 +367,7 @@ public class Tasks {
       // Go deeper each iteration
       yDeeper++;
       BlockPos maybeAirPos = pos.add(airDirection);
-      BlockState maybeAirState = world.getBlockState(maybeAirPos);
-      Block maybeAirBlock = maybeAirState.getBlock();
+      Block maybeAirBlock = world.getBlock(maybeAirPos);
 
       if (isAir(maybeAirBlock) || BlockTags.LEAVES.contains(maybeAirBlock)) {
         return true;
@@ -392,8 +386,7 @@ public class Tasks {
     }
     // Get the block under us.
     BlockPos underPos = pos.down();
-    BlockState underState = world.getBlockState(underPos);
-    Block underBlock = underState.getBlock();
+    Block underBlock = world.getBlock(underPos);
 
     if (!ErodableBlocks.canErode(underBlock)) {
       return false;
@@ -420,8 +413,7 @@ public class Tasks {
     // Find the position of the block in the flow direction, round to closest 90
     // degree angle.
     BlockPos flowPos = underPos.add(new Vec3i(Math.round(velocity.x), 0, Math.round(velocity.z)));
-    BlockState flowState = world.getBlockState(flowPos);
-    Block flowBlock = flowState.getBlock();
+    Block flowBlock = world.getBlock(flowPos);
 
     // If the block in the flow direction is any of the lesser blocks underBlocks
     // can become, then decay to the next lesser in the list.
@@ -457,7 +449,7 @@ public class Tasks {
 
     for (Vec3i dir : listDirection) {
       BlockPos sidePos = pos.add(dir);
-      Block sideBlock = world.getBlockState(sidePos).getBlock();
+      Block sideBlock = world.getBlock(sidePos);
 
       if (!isCobbleStone(sideBlock) && !isStoneBricks(sideBlock)) {
         // Stop the loop. Randomized, means 1:16 odds.

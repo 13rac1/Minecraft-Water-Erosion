@@ -46,9 +46,9 @@ public class TasksTest {
     // TODO: Check failure cases.
     final ErosionWorld world = mock(ErosionWorld.class);
     final BlockPos pos = new BlockPos(0, 0, 0);
-    final BlockState state = new BlockState(Blocks.WATER, ImmutableMap.of());
+    // final BlockState state = new BlockState(Blocks.WATER, ImmutableMap.of());
 
-    when(world.getBlockState(pos.north().down())).thenReturn(state);
+    when(world.getBlock(pos.north().down())).thenReturn(Blocks.WATER);
     when(world.isFluidBlock(Blocks.WATER)).thenReturn(true);
     Assertions.assertTrue(Tasks.isEdge(world, pos));
   }
@@ -64,24 +64,21 @@ public class TasksTest {
     final BlockPos pos7 = pos.add(airDirection7);
     final BlockPos pos14 = pos.add(airDirection14);
 
-    final BlockState stateAir = new BlockState(Blocks.AIR, ImmutableMap.of());
-    final BlockState stateNotAir = new BlockState(Blocks.DIRT, ImmutableMap.of());
-
-    when(world.getBlockState(pos7)).thenReturn(stateAir);
+    when(world.getBlock(pos7)).thenReturn(Blocks.AIR);
     Assertions.assertTrue(Tasks.airInFlowPath(world, pos, dir));
-    verify(world).getBlockState(pos7);
+    verify(world).getBlock(pos7);
 
-    when(world.getBlockState(pos7)).thenReturn(stateNotAir);
-    when(world.getBlockState(pos14)).thenReturn(stateAir);
+    when(world.getBlock(pos7)).thenReturn(Blocks.DIRT);
+    when(world.getBlock(pos14)).thenReturn(Blocks.AIR);
     Assertions.assertTrue(Tasks.airInFlowPath(world, pos, dir));
-    verify(world, times(2)).getBlockState(pos7); // Total calls since world create.
-    verify(world).getBlockState(pos14);
+    verify(world, times(2)).getBlock(pos7); // Total calls since world create.
+    verify(world).getBlock(pos14);
 
-    when(world.getBlockState(pos7)).thenReturn(stateNotAir);
-    when(world.getBlockState(pos14)).thenReturn(stateNotAir);
+    when(world.getBlock(pos7)).thenReturn(Blocks.DIRT);
+    when(world.getBlock(pos14)).thenReturn(Blocks.DIRT);
     Assertions.assertFalse(Tasks.airInFlowPath(world, pos, dir));
-    verify(world, times(3)).getBlockState(pos7);
-    verify(world, times(2)).getBlockState(pos14);
+    verify(world, times(3)).getBlock(pos7);
+    verify(world, times(2)).getBlock(pos14);
   }
 
   @Test
@@ -97,22 +94,22 @@ public class TasksTest {
 
     // No decay of water on top of water.
     level = FluidLevel.FLOW1;
-    when(world.getBlockState(pos.down())).thenReturn(stateWater);
+    when(world.getBlock(pos.down())).thenReturn(Blocks.WATER);
     Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
     // No decay if block will become air.
-    when(world.getBlockState(pos.down())).thenReturn(Blocks.CLAY.getDefaultState());
+    when(world.getBlock(pos.down())).thenReturn(Blocks.CLAY);
     Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
     // No decay for 45 degree
-    when(world.getBlockState(pos.down())).thenReturn(Blocks.COBBLESTONE.getDefaultState());
+    when(world.getBlock(pos.down())).thenReturn(Blocks.COBBLESTONE);
     when(world.getFlowVelocity(any(BlockState.class), any(BlockPos.class))).thenReturn(new Vec3d(0.707, 0, 0.707));
     Assertions.assertFalse(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
     // Decay dirt
-    when(world.getBlockState(pos.down())).thenReturn(Blocks.DIRT.getDefaultState());
+    when(world.getBlock(pos.down())).thenReturn(Blocks.DIRT);
     when(world.getFlowVelocity(any(BlockState.class), any(BlockPos.class))).thenReturn(new Vec3d(0.0, 0, 1)); // south
-    when(world.getBlockState(pos.down().south())).thenReturn(Blocks.SAND.getDefaultState());
+    when(world.getBlock(pos.down().south())).thenReturn(Blocks.SAND);
     Assertions.assertTrue(Tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
   }
@@ -135,11 +132,11 @@ public class TasksTest {
     final Random rand = new Random(); // unused, in tests
 
     // Found water
-    when(world.getBlockState(any(BlockPos.class))).thenReturn(stateWater);
+    when(world.getBlock(any(BlockPos.class))).thenReturn(Blocks.WATER);
     Assertions.assertFalse(Tasks.maybeAddMoss(stateWater, world, pos, rand));
 
     // Found cobble, which is DECAY_ALWAYS_ODDS, adds moss
-    when(world.getBlockState(any(BlockPos.class))).thenReturn(stateCobble);
+    when(world.getBlock(any(BlockPos.class))).thenReturn(Blocks.COBBLESTONE);
     Assertions.assertTrue(Tasks.maybeAddMoss(stateWater, world, pos, rand));
     verify(world).setBlockState(any(BlockPos.class), eq(Blocks.MOSSY_COBBLESTONE.getDefaultState()), anyInt());
   }

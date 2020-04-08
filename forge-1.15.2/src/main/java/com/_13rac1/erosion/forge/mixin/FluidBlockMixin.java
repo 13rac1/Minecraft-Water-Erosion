@@ -38,6 +38,10 @@ public class FluidBlockMixin extends Block {
       return this.world.getBlockState(pos);
     }
 
+    public Block getBlock(BlockPos pos) {
+      return this.world.getBlockState(pos).getBlock();
+    }
+
     public Boolean setBlockState(BlockPos pos, BlockState newState, Integer flags) {
       return this.world.setBlockState(pos, newState, flags);
     }

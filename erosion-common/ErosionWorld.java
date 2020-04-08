@@ -8,6 +8,8 @@ import net.minecraft.block.BlockState;
 public interface ErosionWorld {
   BlockState getBlockState(BlockPos pos);
 
+  Block getBlock(BlockPos pos);
+
   Boolean setBlockState(BlockPos pos, BlockState newState, Integer flags);
 
   int getSeaLevel();
