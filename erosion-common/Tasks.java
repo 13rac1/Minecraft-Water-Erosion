@@ -1,5 +1,6 @@
 package com._13rac1.erosion.common;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -7,7 +8,6 @@ import java.util.Random;
 
 import net.minecraft.block.FluidBlock;
 import net.minecraft.tag.BlockTags;
-import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.Vec3d;
@@ -18,44 +18,54 @@ import net.minecraft.block.BlockState;
 // TODO: Add Menu to allow disable of some features:
 // https://www.curseforge.com/minecraft/mc-mods/modmenu
 
-// IDEA: Change Lake generation to create more water sources on hills
-// https://fabricmc.net/wiki/tutorial:fluids
-
-// IDEA: Can eroded ponds/lakes turn into source blocks? Can they fill up?
-
-// IDEA: Flows touching sea level turn to source blocks! Wait. No. Because then
-// water will flow forever until it gets to the sea. Should it?
-
-// IDEA: Flows INTO a source block wall should turn into a source block. That
-// never happens though, because the source block will have a flow itself. What
-// if flows towards each other become source blocks?
-
-// TODO: Level7 flows delete the block under. If the block below is water, they
-// should delete block in the flow direction too. There are odd cases where a
-// downward dig will not go forward.
-
-// IDEA: Turn upper edge blocks of pools to sand or add a mud block?
-
-// IDEA: Wall breaking should check for air one block down in a flow reachable
-// radius to seek downhill rather than always going straight.
-
-// IDEA: Avoid carving channels in sand/gravel since it is affected by gravity.
-// Perhaps better better if seeking downhill.
+// IDEA: Turn upper edge blocks add a mud block?
 
 // IDEA: IRL streams have rocks. Minecraft world gen doesn't place these rocks.
 // Can they be added to world gen? Could large flows find/place stones?
 
+// IDEA: Source with non-zero flow velocity should erode under to make the start of waterfalls more realistic.
+
+// IDEA: Actual sea level can erode if there is open air nearby.
+
+// IDEA: Instead of just distance, rate the entire flow line. Score it. Turn to the best score. Most water or air. Water weighed more than air.
+
+// MCBUG-FIX: Check for air next to source blocks and flow there. Maybe just call update()? Solve the problem of watergen leaving water not flowing where it should be.
+
+// IDEA: Recalc the flow math for the water blocks around, then do the math and reset the height instead of deleting. MIGHT fix random holes on incline flows.
+
+// IDEA: Falling8: If air in front, water/or solid (non-air) below, then any non-clear block in front of that, then create source block. This is a way to fill steep pools. Look up to  7 blocks forward.
+
+// IDEA: Lazy state lookup on a class for isEdge().
+
+// IDEA: Source breaks should count number of flowing7 in the break direction plane, and only break when it will not cause entire sides of lakes to disappear.
+
+// IDEA: Source blocks check 3-4 blocks under for air and erode straight down. Flood the caves, but also made them more obvious.
+
+// IDEA: Return "Reasons" for not eroding, which can be unit tested for the correct reason not just any.
+
 public class Tasks {
+
+  // Copied from net.minecraft.util(.math).Direction to reduce imports and deal
+  // with Forge/Fabric storing the class in different locations.
+  private static final Vec3i VECTOR_DOWN = new Vec3i(0, -1, 0);
+  private static final Vec3i VECTOR_UP = new Vec3i(0, 1, 0);
+  private static final Vec3i VECTOR_NORTH = new Vec3i(0, 0, -1);
+  private static final Vec3i VECTOR_NORTH_EAST = new Vec3i(1, 0, -1);
+  private static final Vec3i VECTOR_EAST = new Vec3i(1, 0, 0);
+  private static final Vec3i VECTOR_SOUTH_EAST = new Vec3i(1, 0, 1);
+  private static final Vec3i VECTOR_SOUTH = new Vec3i(0, 0, 1);
+  private static final Vec3i VECTOR_SOUTH_WEST = new Vec3i(-1, 0, 1);
+  private static final Vec3i VECTOR_WEST = new Vec3i(-1, 0, 0);
+  private static final Vec3i VECTOR_NORTH_WEST = new Vec3i(-1, 0, -1);
+
   // blockFlags is used with world.setBlockState() when blocks are replaced with
   // air.
   private static final Integer blockFlags = BlockFlag.PROPAGATE_CHANGE | BlockFlag.NOTIFY_LISTENERS;
 
-  private static final List<Vec3i> posFourEdges = Arrays.asList(new Vec3i(1, 0, 0), new Vec3i(0, 0, -1),
-      new Vec3i(-1, 0, 0), new Vec3i(0, 0, 1));
+  private static final List<Vec3i> posFourEdges = Arrays.asList(VECTOR_NORTH, VECTOR_EAST, VECTOR_SOUTH, VECTOR_WEST);
 
-  private static final List<Vec3i> posEightAround = Arrays.asList(new Vec3i(1, 0, 1), new Vec3i(1, 0, 0),
-      new Vec3i(1, 0, -1), new Vec3i(0, 0, -1), new Vec3i(-1, 0, -1), new Vec3i(-1, 0, 0), new Vec3i(-1, 0, 1),
-      new Vec3i(0, 0, 1));
+  private static final List<Vec3i> posEightAround = Arrays.asList(VECTOR_NORTH, VECTOR_NORTH_EAST, VECTOR_EAST,
+      VECTOR_SOUTH_EAST, VECTOR_SOUTH, VECTOR_SOUTH_WEST, VECTOR_WEST, VECTOR_NORTH_WEST);
 
   private static final List<Vec3i> posEightAroundUp = Arrays.asList(new Vec3i(1, 1, 1), new Vec3i(1, 1, 0),
       new Vec3i(1, 1, -1), new Vec3i(0, 1, -1), new Vec3i(-1, 1, -1), new Vec3i(-1, 1, 0), new Vec3i(-1, 1, 1),
@@ -177,17 +187,22 @@ public class Tasks {
   }
 
   // Rotate a given direction vector to the left: North->West.
-  protected Vec3i dirLeft(Vec3i in) {
-    return in.crossProduct(Direction.DOWN.getDirectionVec());
+  protected Vec3i dirTurnLeft(Vec3i in) {
+    return in.crossProduct(VECTOR_DOWN);
   }
 
   // Rotate a given direction vector to the right: North-East.
-  protected Vec3i dirRight(Vec3i in) {
-    return in.crossProduct(Direction.UP.getDirectionVec());
+  protected Vec3i dirTurnRight(Vec3i in) {
+    return in.crossProduct(VECTOR_UP);
   }
 
   private static List<Integer> wallBreakers = Arrays.asList(FluidLevel.FLOW1, FluidLevel.FLOW2, FluidLevel.FLOW3,
       FluidLevel.FLOW4, FluidLevel.FLOW5, FluidLevel.FLOW6, FluidLevel.FLOW7);
+
+  private class wallBreakOption {
+    Vec3i dir;
+    Integer distance;
+  }
 
   private boolean maybeFlowingWall(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
 
@@ -213,28 +228,84 @@ public class Tasks {
       Flow7Adjust = -1;
     }
 
-    Vec3i dir = new Vec3i(Math.round(velocity.x), velocity.y + Flow7Adjust, Math.round(velocity.z));
-    Vec3i dirStart = dir;
-    // TODO: Allow Water
-    // Check forward, left, then right.
-    if (!airInFlowPath(world, pos, dir)) {
-      dir = dirLeft(dirStart);
-      if (!airInFlowPath(world, pos, dir)) {
-        dir = dirRight(dirStart);
-        if (!airInFlowPath(world, pos, dir)) {
-          // Skip if air was not found in any of the three allowed break directions.
-          // If North flow, then North, West, East are checked.
-          return false;
-        }
-      }
+    Vec3i dirForward = new Vec3i(Math.round(velocity.x), velocity.y + Flow7Adjust, Math.round(velocity.z));
+
+    Block forwardBlock = world.getBlock(pos.add(dirForward));
+    // The block in the direction of flow must be a solid block, not
+    // air/water/lava. This is the defining feature of a "wall break", there
+    // must be a wall.
+    if (isAir(forwardBlock) || forwardBlock == Blocks.WATER || forwardBlock == Blocks.LAVA) {
+      return false;
     }
 
-    // Find the position of the block in the flow direction.
-    BlockPos flowPos = pos.add(dir);
-    // TODO: Search left/right from straight for "downhill" and break in that
+    Vec3i dirLeft = dirTurnLeft(dirForward);
+    Vec3i dirRight = dirTurnRight(dirForward);
+
+    // Search left/right from straight for "downhill" and break in that
     // direction. Downhill is the direction of air. This will keep streams going
     // further downhill rather than going straight when there is a cliff one
     // block to the side.
+
+    // Must be an erodable block, not air, water, or something not erodable.
+    Boolean canErodeForward = ErodableBlocks.canErode(forwardBlock);
+    Boolean canErodeLeft = ErodableBlocks.canErode(world.getBlock(pos.add(dirLeft)));
+    Boolean canErodeRight = ErodableBlocks.canErode(world.getBlock(pos.add(dirRight)));
+
+    List<wallBreakOption> options = new ArrayList<>();
+
+    // 128 is max returned
+    if (canErodeForward) {
+      Integer dist = distanceToAirWaterInFlowPath(world, pos, dirForward, level);
+      if (dist != 128) {
+        wallBreakOption opt = new wallBreakOption();
+        opt.dir = dirForward;
+        opt.distance = dist;
+        options.add(opt);
+      }
+    }
+
+    if (canErodeLeft) {
+      Integer dist = distanceToAirWaterInFlowPath(world, pos, dirLeft, level);
+      if (dist != 128) {
+        wallBreakOption opt = new wallBreakOption();
+        opt.dir = dirLeft;
+        opt.distance = dist;
+        options.add(opt);
+      }
+    }
+
+    if (canErodeRight) {
+      Integer dist = distanceToAirWaterInFlowPath(world, pos, dirRight, level);
+      if (dist != 128) {
+        wallBreakOption opt = new wallBreakOption();
+        opt.dir = dirRight;
+        opt.distance = dist;
+        options.add(opt);
+      }
+    }
+
+    // Return when no directions can find Air or Water.
+    if (options.size() == 0) {
+      return false;
+    }
+
+    Integer shortestDistance = 128;
+    Vec3i shortestDir = null;
+    for (wallBreakOption option : options) {
+      if (option.distance < shortestDistance) {
+        shortestDistance = option.distance;
+        shortestDir = option.dir;
+      }
+    }
+
+    if (shortestDir == null) {
+      return false;
+    }
+
+    // System.out.println("dir:" + shortestDir + " distance:" + shortestDistance);
+
+    // Find the position of the block in the flow direction.
+    BlockPos flowPos = pos.add(shortestDir);
 
     // Block above cannot be wood, keep trees standing on dirt.
     // TODO: Look more than one block up for wood.
@@ -254,16 +325,14 @@ public class Tasks {
     if (!ErodableBlocks.maybeErode(rand, wallBlock)) {
       return false;
     }
-    // TODO: The block behind must have the same flow direction.
 
-    // System.out.println("Removing block to side:" +
-    // flowState.getBlock().getName().asFormattedString());
-
-    // TODO: decay walls
+    // TODO: decay walls? Problem is it'll slow down the wall breaks a lot, which
+    // means the flows will not go as far as blocks erode below. Perhaps this is
+    // more realistic limits.
     // Block decayBlock = ErodableBlocks.maybeDecay(rand, wallBlock);
     // world.setBlockState(flowPos, decayBlock.getDefaultState(), blockFlags);
-    // TODO: Consider placing a water block with correct level instead of assuming
-    // it will flow.
+    // TODO: Place a water block with correct level instead of assuming
+    // it will flow. Should resolve holes.
     world.setBlockState(flowPos, Blocks.AIR.getDefaultState(), blockFlags);
     return true;
   }
@@ -273,11 +342,9 @@ public class Tasks {
     if (level != FluidLevel.SOURCE) {
       return;
     }
-    // TODO: Break when there's less than three blocks to air. This will create
-    // more crevasse waterfalls.
 
     // Skip blocks less than sea level+, because there are a lot of them.
-    if (pos.getY() <= world.getSeaLevel()) {
+    if (pos.getY() < world.getSeaLevel()) {
       // System.out.println("Too Low" + pos.getY() + "sea:" +
       // world.getSeaLevel());
       return;
@@ -285,7 +352,7 @@ public class Tasks {
 
     // Skip blocks without air above.
     Block upBlock = world.getBlockState(pos.up()).getBlock();
-    if (upBlock != Blocks.AIR && upBlock != Blocks.CAVE_AIR) {
+    if (!isAir(upBlock)) {
       // System.out.println("Not Surface Water:" +
       // world.getBlockState(pos.up()).getBlock().getName().asFormattedString());
       // System.out.println("Y:" + pos.getY() + "sea:" + world.getSeaLevel());
@@ -325,7 +392,8 @@ public class Tasks {
       }
       // Found a breakable block in the direction.
 
-      if (!airInFlowPath(world, pos, dir)) {
+      Integer dist = distanceToAirWaterInFlowPath(world, pos, dir, level);
+      if (dist == 128) {
         // Skip if air was not found in the direction of breakage.
         continue;
       }
@@ -354,8 +422,6 @@ public class Tasks {
       }
       // TODO: Better odds for waterFound > 1.
 
-      // TODO: Check depth. Greater depth increases odds of a wall breakthrough.
-
       if (!ErodableBlocks.maybeErode(rand, sideBlock)) {
         // TODO: Should this chance check occur earlier?
         return;
@@ -376,8 +442,6 @@ public class Tasks {
 
   // Start from the provided BlockPos and trace
   protected boolean airInFlowPath(ErosionWorld world, BlockPos pos, Vec3i dir) {
-    // TODO: Should all blocks in the potential route be checked? May find
-    // smaller gaps and crevasses. A slow mode.
     int yDeeper = 0;
     for (int airMultipler : Arrays.asList(7, 14)) {
       Vec3i airDirection = new Vec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
@@ -392,6 +456,59 @@ public class Tasks {
     }
 
     return false;
+  }
+
+  // Trace the flow path from the current position given the flow level to find
+  // the distance to the closest open space: air, cave air, water, or leaves.
+  protected Integer distanceToAirWaterInFlowPath(ErosionWorld world, BlockPos pos, Vec3i dir, Integer level) {
+    if (level > FluidLevel.FLOW7) {
+      return 128;
+    }
+    // level is now [0,1,2,3,4,5,6,7]
+    Integer distanceToAirWater = 0;
+
+    // The Minecraft in-game UI shows the opposite water level value than the
+    // true block metadata. Data `level==1`, the closest to the source block, is
+    // displayed as Targeted Fluid level:7. Data `level==7`, the furthest from
+    // the source block, is displayed as Targeted Fluid level:1.
+    Integer flowDistanceRemaining = 7 - level;
+
+    BlockPos posCurrent = pos;
+    Block blockCurrent;
+    // Check how far as the current flow can go at the current height.
+    while (flowDistanceRemaining > 0) {
+      flowDistanceRemaining -= 1;
+      distanceToAirWater += 1;
+
+      posCurrent = posCurrent.add(dir);
+      blockCurrent = world.getBlock(posCurrent);
+
+      if (isAir(blockCurrent) || BlockTags.LEAVES.contains(blockCurrent) || blockCurrent == Blocks.WATER) {
+        return distanceToAirWater;
+      }
+      if (!ErodableBlocks.canErode(blockCurrent)) {
+        // Fail if unerodable block is found in path before air/water.
+        return 128;
+      }
+
+    }
+
+    // Still here? Dig down and search up to 14 blocks
+    posCurrent = posCurrent.down();
+    flowDistanceRemaining = 7;
+    while (flowDistanceRemaining > 0) {
+      flowDistanceRemaining -= 1;
+      distanceToAirWater += 1;
+
+      posCurrent = posCurrent.add(dir);
+      blockCurrent = world.getBlock(posCurrent);
+      // TODO: Check for Water
+      if (isAir(blockCurrent) || BlockTags.LEAVES.contains(blockCurrent)) {
+        return distanceToAirWater;
+      }
+    }
+
+    return 128; // Meaningless high value
   }
 
   protected boolean maybeDecayUnder(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {

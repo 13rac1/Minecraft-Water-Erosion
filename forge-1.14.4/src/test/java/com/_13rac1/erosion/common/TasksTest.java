@@ -56,12 +56,12 @@ public class TasksTest {
     Vec3i dirLeft = dirForward.crossProduct(Direction.DOWN.getDirectionVec());
     BlockPos posLeft = posStart.add(dirLeft);
     Assertions.assertEquals(posStart.west(), posLeft);
-    Assertions.assertEquals(dirLeft, tasks.dirLeft(dirForward));
+    Assertions.assertEquals(dirLeft, tasks.dirTurnLeft(dirForward));
 
     Vec3i dirRight = dirForward.crossProduct(Direction.UP.getDirectionVec());
     BlockPos posRight = posStart.add(dirRight);
     Assertions.assertEquals(posStart.east(), posRight);
-    Assertions.assertEquals(dirRight, tasks.dirRight(dirForward));
+    Assertions.assertEquals(dirRight, tasks.dirTurnRight(dirForward));
   }
 
   @Test

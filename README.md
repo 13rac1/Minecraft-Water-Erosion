@@ -81,6 +81,10 @@ This "core mod" adds code to the Water block `randomTick()` functions using the
 [Mixin framework][MixinFramework]. The code and functionality is structured to
 use the least possible system CPU, but a CPU increase may still be noticed.
 
+The Minecraft in-game UI shows the opposite water level value than the true block
+metadata. Data `level==1` is displayed as Targeted Fluid level:7. Data `level==7`
+is displayed as Targeted Fluid level:1.
+
 `randomTick()` is only called by the Minecraft runtime for a 128 block radius
 around the player, so the odds of erosion occuring are set fairly high. The odds
 should be reduced if random tick distance or speed is increased.
