@@ -196,6 +196,24 @@ public class Tasks {
     return in.crossProduct(VECTOR_UP);
   }
 
+  protected boolean treeInColumn(ErosionWorld world, BlockPos pos) {
+    final Integer MAX_UP = 5;
+    Integer count = 0;
+    BlockPos currentPos = pos.up();
+    while (count < MAX_UP) {
+      Block currentBlock = world.getBlock(currentPos);
+      if (BlockTags.LOGS.contains(currentBlock)) {
+        return true;
+      }
+      if (isAir(currentBlock)) {
+        return false;
+      }
+      count++;
+      currentPos = currentPos.up();
+    }
+    return false;
+  }
+
   private static List<Integer> wallBreakers = Arrays.asList(FluidLevel.FLOW1, FluidLevel.FLOW2, FluidLevel.FLOW3,
       FluidLevel.FLOW4, FluidLevel.FLOW5, FluidLevel.FLOW6, FluidLevel.FLOW7);
 
@@ -230,26 +248,33 @@ public class Tasks {
 
     Vec3i dirForward = new Vec3i(Math.round(velocity.x), velocity.y + Flow7Adjust, Math.round(velocity.z));
 
-    Block forwardBlock = world.getBlock(pos.add(dirForward));
+    BlockPos posForward = pos.add(dirForward);
+    Block blockForward = world.getBlock(posForward);
     // The block in the direction of flow must be a solid block, not
     // air/water/lava. This is the defining feature of a "wall break", there
     // must be a wall.
-    if (isAir(forwardBlock) || forwardBlock == Blocks.WATER || forwardBlock == Blocks.LAVA) {
+    if (isAir(blockForward) || blockForward == Blocks.WATER || blockForward == Blocks.LAVA) {
       return false;
     }
 
     Vec3i dirLeft = dirTurnLeft(dirForward);
     Vec3i dirRight = dirTurnRight(dirForward);
+    BlockPos posLeft = pos.add(dirLeft);
+    BlockPos posRight = pos.add(dirRight);
 
     // Search left/right from straight for "downhill" and break in that
     // direction. Downhill is the direction of air. This will keep streams going
     // further downhill rather than going straight when there is a cliff one
     // block to the side.
 
-    // Must be an erodable block, not air, water, or something not erodable.
-    Boolean canErodeForward = ErodableBlocks.canErode(forwardBlock);
-    Boolean canErodeLeft = ErodableBlocks.canErode(world.getBlock(pos.add(dirLeft)));
-    Boolean canErodeRight = ErodableBlocks.canErode(world.getBlock(pos.add(dirRight)));
+    // Must be an erodable block without a tree above, not air, water, or
+    // something not erodable.
+    Boolean canErodeForward = ErodableBlocks.canErode(blockForward) && !treeInColumn(world, posForward);
+    Boolean canErodeLeft = ErodableBlocks.canErode(world.getBlock(posLeft)) && !treeInColumn(world, posLeft);
+    Boolean canErodeRight = ErodableBlocks.canErode(world.getBlock(posRight)) && !treeInColumn(world, posRight);
+    if (!canErodeForward && !canErodeLeft && !canErodeRight) {
+      return false;
+    }
 
     List<wallBreakOption> options = new ArrayList<>();
 
