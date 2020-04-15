@@ -30,7 +30,7 @@ test-server: build
 	rm -rf ${PWD}/forge-1.12.2/tests/server/mods
 	mkdir -p ${PWD}/forge-1.12.2/tests/server/mods
 	cp dist/water-erosion-1.12.2-forge-*-full.jar ${PWD}/forge-1.12.2/tests/server/mods
-	docker rm mc
+	docker rm mc || true
 	docker run -it -v ${PWD}/forge-1.12.2/tests/server:/data -e VERSION=1.12.2 -e TYPE=FORGE  -p 25565:25565 \
         -e EULA=TRUE --name mc itzg/minecraft-server
 
