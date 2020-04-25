@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import com._13rac1.erosion.forge.Config;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.tag.BlockTags;
@@ -103,7 +105,9 @@ public class ErodableBlocks {
       erodables.put(Blocks.SAND, new Erodable(SAND_RESIST_ODDS, Blocks.CLAY));
       erodables.put(Blocks.GRAVEL, new Erodable(GRAVEL_RESIST_ODDS, Blocks.SAND));
       erodables.put(Blocks.COARSE_DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.GRAVEL));
-      erodables.put(Blocks.FARMLAND, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
+      if (Config.ERODE_FARMLAND.get()) {
+        erodables.put(Blocks.FARMLAND, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
+      }
       erodables.put(Blocks.DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
       erodables.put(Blocks.PODZOL, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
       erodables.put(Blocks.GRASS_BLOCK, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
