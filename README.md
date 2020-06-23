@@ -46,9 +46,10 @@ Supported versions:
 
 * Fabric 1.14.4
 * Fabric 1.15.2
-* Fabric 1.16.x - latest snapshot
+* Fabric 1.16.x
 * Forge 1.14.4
 * Forge 1.15.2
+* Forge 1.16.x
 
 ### Fabric versions
 
@@ -160,8 +161,4 @@ make # Builds all supported versions.
 
 ### Water Erosion Mod for Minecraft
 
-Copyright 2019 by Brad Erickson. Licensed GPL.
-
-### Fabric Template
-
-Copyright 2019 by the Fabric Minecraft Modding Toolchain authors. Licensed CC0.
+Copyright 2020 by Brad Erickson. Licensed GPL.
