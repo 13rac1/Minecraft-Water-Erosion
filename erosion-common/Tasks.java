@@ -9,8 +9,8 @@ import java.util.Random;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -47,29 +47,30 @@ public class Tasks {
 
   // Copied from net.minecraft.util(.math).Direction to reduce imports and deal
   // with Forge/Fabric storing the class in different locations.
-  private static final Vec3i VECTOR_DOWN = new Vec3i(0, -1, 0);
-  private static final Vec3i VECTOR_UP = new Vec3i(0, 1, 0);
-  private static final Vec3i VECTOR_NORTH = new Vec3i(0, 0, -1);
-  private static final Vec3i VECTOR_NORTH_EAST = new Vec3i(1, 0, -1);
-  private static final Vec3i VECTOR_EAST = new Vec3i(1, 0, 0);
-  private static final Vec3i VECTOR_SOUTH_EAST = new Vec3i(1, 0, 1);
-  private static final Vec3i VECTOR_SOUTH = new Vec3i(0, 0, 1);
-  private static final Vec3i VECTOR_SOUTH_WEST = new Vec3i(-1, 0, 1);
-  private static final Vec3i VECTOR_WEST = new Vec3i(-1, 0, 0);
-  private static final Vec3i VECTOR_NORTH_WEST = new Vec3i(-1, 0, -1);
+  private static final Vector3i VECTOR_DOWN = new Vector3i(0, -1, 0);
+  private static final Vector3i VECTOR_UP = new Vector3i(0, 1, 0);
+  private static final Vector3i VECTOR_NORTH = new Vector3i(0, 0, -1);
+  private static final Vector3i VECTOR_NORTH_EAST = new Vector3i(1, 0, -1);
+  private static final Vector3i VECTOR_EAST = new Vector3i(1, 0, 0);
+  private static final Vector3i VECTOR_SOUTH_EAST = new Vector3i(1, 0, 1);
+  private static final Vector3i VECTOR_SOUTH = new Vector3i(0, 0, 1);
+  private static final Vector3i VECTOR_SOUTH_WEST = new Vector3i(-1, 0, 1);
+  private static final Vector3i VECTOR_WEST = new Vector3i(-1, 0, 0);
+  private static final Vector3i VECTOR_NORTH_WEST = new Vector3i(-1, 0, -1);
 
   // blockFlags is used with world.setBlockState() when blocks are replaced with
   // air.
   private static final Integer blockFlags = BlockFlag.PROPAGATE_CHANGE | BlockFlag.NOTIFY_LISTENERS;
 
-  private static final List<Vec3i> posFourEdges = Arrays.asList(VECTOR_NORTH, VECTOR_EAST, VECTOR_SOUTH, VECTOR_WEST);
+  private static final List<Vector3i> posFourEdges = Arrays.asList(VECTOR_NORTH, VECTOR_EAST, VECTOR_SOUTH,
+      VECTOR_WEST);
 
-  private static final List<Vec3i> posEightAround = Arrays.asList(VECTOR_NORTH, VECTOR_NORTH_EAST, VECTOR_EAST,
+  private static final List<Vector3i> posEightAround = Arrays.asList(VECTOR_NORTH, VECTOR_NORTH_EAST, VECTOR_EAST,
       VECTOR_SOUTH_EAST, VECTOR_SOUTH, VECTOR_SOUTH_WEST, VECTOR_WEST, VECTOR_NORTH_WEST);
 
-  private static final List<Vec3i> posEightAroundUp = Arrays.asList(new Vec3i(1, 1, 1), new Vec3i(1, 1, 0),
-      new Vec3i(1, 1, -1), new Vec3i(0, 1, -1), new Vec3i(-1, 1, -1), new Vec3i(-1, 1, 0), new Vec3i(-1, 1, 1),
-      new Vec3i(0, 1, 1));
+  private static final List<Vector3i> posEightAroundUp = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(1, 1, 0),
+      new Vector3i(1, 1, -1), new Vector3i(0, 1, -1), new Vector3i(-1, 1, -1), new Vector3i(-1, 1, 0),
+      new Vector3i(-1, 1, 1), new Vector3i(0, 1, 1));
 
   // Primary run function
   public void run(BlockState state, ErosionWorld world, BlockPos pos, Random rand) {
@@ -187,12 +188,12 @@ public class Tasks {
   }
 
   // Rotate a given direction vector to the left: North->West.
-  protected Vec3i dirTurnLeft(Vec3i in) {
+  protected Vector3i dirTurnLeft(Vector3i in) {
     return in.crossProduct(VECTOR_DOWN);
   }
 
   // Rotate a given direction vector to the right: North-East.
-  protected Vec3i dirTurnRight(Vec3i in) {
+  protected Vector3i dirTurnRight(Vector3i in) {
     return in.crossProduct(VECTOR_UP);
   }
 
@@ -202,7 +203,7 @@ public class Tasks {
     BlockPos currentPos = pos.up();
     while (count < MAX_UP) {
       Block currentBlock = world.getBlock(currentPos);
-      if (BlockTags.LOGS.contains(currentBlock)) {
+      if (BlockTags.LOGS.func_230235_a_(currentBlock)) {
         return true;
       }
       if (isAir(currentBlock)) {
@@ -218,7 +219,7 @@ public class Tasks {
       FluidLevel.FLOW4, FluidLevel.FLOW5, FluidLevel.FLOW6, FluidLevel.FLOW7);
 
   private class wallBreakOption {
-    Vec3i dir;
+    Vector3i dir;
     Integer distance;
   }
 
@@ -231,7 +232,7 @@ public class Tasks {
 
     // Find flow direction: Velocity is a 3D vector normalized to 1 pointing the
     // direction the water is flowing.
-    Vec3d velocity = world.getFlowVelocity(state, pos);
+    Vector3d velocity = world.getFlowVelocity(state, pos);
     // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
     // with a more definitive direction such as 0, 90, or 22.5.
     if (Math.abs(velocity.x) < 0.8 && Math.abs(velocity.z) < 0.8) {
@@ -246,7 +247,7 @@ public class Tasks {
       Flow7Adjust = -1;
     }
 
-    Vec3i dirForward = new Vec3i(Math.round(velocity.x), velocity.y + Flow7Adjust, Math.round(velocity.z));
+    Vector3i dirForward = new Vector3i(Math.round(velocity.x), velocity.y + Flow7Adjust, Math.round(velocity.z));
 
     BlockPos posForward = pos.add(dirForward);
     Block blockForward = world.getBlock(posForward);
@@ -257,8 +258,8 @@ public class Tasks {
       return false;
     }
 
-    Vec3i dirLeft = dirTurnLeft(dirForward);
-    Vec3i dirRight = dirTurnRight(dirForward);
+    Vector3i dirLeft = dirTurnLeft(dirForward);
+    Vector3i dirRight = dirTurnRight(dirForward);
     BlockPos posLeft = pos.add(dirLeft);
     BlockPos posRight = pos.add(dirRight);
 
@@ -315,7 +316,7 @@ public class Tasks {
     }
 
     Integer shortestDistance = 128;
-    Vec3i shortestDir = null;
+    Vector3i shortestDir = null;
     for (wallBreakOption option : options) {
       if (option.distance < shortestDistance) {
         shortestDistance = option.distance;
@@ -336,7 +337,7 @@ public class Tasks {
     // TODO: Look more than one block up for wood.
     BlockPos aboveFlowPos = flowPos.up();
     Block aboveFlowBlock = world.getBlock(aboveFlowPos);
-    if (BlockTags.LOGS.contains(aboveFlowBlock)) {
+    if (BlockTags.LOGS.func_230235_a_(aboveFlowBlock)) {
       return false;
     }
     // TODO: Do not remove an erodable block if the stack above is unsupported.
@@ -385,19 +386,19 @@ public class Tasks {
     }
 
     // Skip blocks already flowing
-    Vec3d velocity = world.getFlowVelocity(state, pos);
+    Vector3d velocity = world.getFlowVelocity(state, pos);
     if (velocity.length() > 0) {
       return;
     }
     // System.out.println("length:" + velocity.length());
 
     // Blocks near an erodable surface only.
-    List<Vec3i> listDirection = Arrays.asList(new Vec3i(1, 0, 0), new Vec3i(-1, 0, 0), new Vec3i(0, 0, 1),
-        new Vec3i(0, 0, -1));
+    List<Vector3i> listDirection = Arrays.asList(new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0), new Vector3i(0, 0, 1),
+        new Vector3i(0, 0, -1));
     // Randomize the list each run.
     Collections.shuffle(listDirection);
 
-    for (Vec3i dir : listDirection) {
+    for (Vector3i dir : listDirection) {
       BlockPos sidePos = pos.add(dir);
 
       Block sideBlock = world.getBlock(sidePos);
@@ -428,7 +429,7 @@ public class Tasks {
       // breaking generated farms.
       int waterFound = 0;
       for (int waterMultipler : Arrays.asList(1, 2, 3)) {
-        Vec3i waterDirection = new Vec3i(-dir.getX() * waterMultipler, dir.getY(), -dir.getZ() * waterMultipler);
+        Vector3i waterDirection = new Vector3i(-dir.getX() * waterMultipler, dir.getY(), -dir.getZ() * waterMultipler);
         // System.out.println("maybewaterdir:" + waterDirection);
         BlockPos maybeWaterPos = pos.add(waterDirection);
         BlockState maybeWaterState = world.getBlockState(maybeWaterPos);
@@ -466,16 +467,16 @@ public class Tasks {
   }
 
   // Start from the provided BlockPos and trace
-  protected boolean airInFlowPath(ErosionWorld world, BlockPos pos, Vec3i dir) {
+  protected boolean airInFlowPath(ErosionWorld world, BlockPos pos, Vector3i dir) {
     int yDeeper = 0;
     for (int airMultipler : Arrays.asList(7, 14)) {
-      Vec3i airDirection = new Vec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
+      Vector3i airDirection = new Vector3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
       // Go deeper each iteration
       yDeeper++;
       BlockPos maybeAirPos = pos.add(airDirection);
       Block maybeAirBlock = world.getBlock(maybeAirPos);
 
-      if (isAir(maybeAirBlock) || BlockTags.LEAVES.contains(maybeAirBlock)) {
+      if (isAir(maybeAirBlock) || BlockTags.LEAVES.func_230235_a_(maybeAirBlock)) {
         return true;
       }
     }
@@ -485,7 +486,7 @@ public class Tasks {
 
   // Trace the flow path from the current position given the flow level to find
   // the distance to the closest open space: air, cave air, water, or leaves.
-  protected Integer distanceToAirWaterInFlowPath(ErosionWorld world, BlockPos pos, Vec3i dir, Integer level) {
+  protected Integer distanceToAirWaterInFlowPath(ErosionWorld world, BlockPos pos, Vector3i dir, Integer level) {
     if (level > FluidLevel.FLOW7) {
       return 128;
     }
@@ -508,7 +509,7 @@ public class Tasks {
       posCurrent = posCurrent.add(dir);
       blockCurrent = world.getBlock(posCurrent);
 
-      if (isAir(blockCurrent) || BlockTags.LEAVES.contains(blockCurrent) || blockCurrent == Blocks.WATER) {
+      if (isAir(blockCurrent) || BlockTags.LEAVES.func_230235_a_(blockCurrent) || blockCurrent == Blocks.WATER) {
         return distanceToAirWater;
       }
       if (!ErodableBlocks.canErode(blockCurrent)) {
@@ -528,7 +529,7 @@ public class Tasks {
       posCurrent = posCurrent.add(dir);
       blockCurrent = world.getBlock(posCurrent);
       // TODO: Check for Water
-      if (isAir(blockCurrent) || BlockTags.LEAVES.contains(blockCurrent)) {
+      if (isAir(blockCurrent) || BlockTags.LEAVES.func_230235_a_(blockCurrent)) {
         return distanceToAirWater;
       }
     }
@@ -558,7 +559,7 @@ public class Tasks {
       return false;
     }
 
-    Vec3d velocity = world.getFlowVelocity(state, pos);
+    Vector3d velocity = world.getFlowVelocity(state, pos);
     // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
     // with a more definitive direction such as 0, 90, or 22.5.
     if (Math.abs(velocity.x) < 0.8 && Math.abs(velocity.z) < 0.8) {
@@ -570,7 +571,7 @@ public class Tasks {
 
     // Find the position of the block in the flow direction, round to closest 90
     // degree angle.
-    BlockPos flowPos = underPos.add(new Vec3i(Math.round(velocity.x), 0, Math.round(velocity.z)));
+    BlockPos flowPos = underPos.add(new Vector3i(Math.round(velocity.x), 0, Math.round(velocity.z)));
     Block flowBlock = world.getBlock(flowPos);
 
     // If the block in the flow direction is any of the lesser blocks underBlocks
@@ -597,7 +598,7 @@ public class Tasks {
   // Cobblestone and Stone Bricks grow moss near water, check every block around.
   // Returns true when a change is made.
   protected boolean maybeAddMoss(ErosionWorld world, BlockPos pos, Random rand) {
-    List<Vec3i> listDirection = posEightAround;
+    List<Vector3i> listDirection = posEightAround;
     // TODO: Add one level above the water line
     // listDirection.addAll(posEightAroundUp);
 
@@ -605,7 +606,7 @@ public class Tasks {
     // TODO: Just pick a random number since everything returns now.
     Collections.shuffle(listDirection);
 
-    for (Vec3i dir : listDirection) {
+    for (Vector3i dir : listDirection) {
       BlockPos sidePos = pos.add(dir);
       Block sideBlock = world.getBlock(sidePos);
 

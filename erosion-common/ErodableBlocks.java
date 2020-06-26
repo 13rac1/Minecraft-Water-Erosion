@@ -156,11 +156,11 @@ public class ErodableBlocks {
 
     // Check block tags to erode leaves, wool, and mod-provided blocks.
     // TODO: Less CPU to fill the hashmap with all values once.
-    if (BlockTags.LEAVES.contains(block)) {
+    if (BlockTags.LEAVES.func_230235_a_(block)) {
       return LEAF_RESIST_ODDS;
-    } else if (BlockTags.SAND.contains(block)) {
+    } else if (BlockTags.SAND.func_230235_a_(block)) {
       return SAND_RESIST_ODDS;
-    } else if (BlockTags.WOOL.contains(block)) {
+    } else if (BlockTags.WOOL.func_230235_a_(block)) {
       return WOOL_RESIST_ODDS;
     }
 
