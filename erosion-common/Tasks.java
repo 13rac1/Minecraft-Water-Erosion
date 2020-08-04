@@ -203,7 +203,7 @@ public class Tasks {
     BlockPos currentPos = pos.up();
     while (count < MAX_UP) {
       Block currentBlock = world.getBlock(currentPos);
-      if (BlockTags.LOGS.func_230235_a_(currentBlock)) {
+      if (BlockTags.LOGS.contains(currentBlock)) {
         return true;
       }
       if (isAir(currentBlock)) {
@@ -337,7 +337,7 @@ public class Tasks {
     // TODO: Look more than one block up for wood.
     BlockPos aboveFlowPos = flowPos.up();
     Block aboveFlowBlock = world.getBlock(aboveFlowPos);
-    if (BlockTags.LOGS.func_230235_a_(aboveFlowBlock)) {
+    if (BlockTags.LOGS.contains(aboveFlowBlock)) {
       return false;
     }
     // TODO: Do not remove an erodable block if the stack above is unsupported.
@@ -476,7 +476,7 @@ public class Tasks {
       BlockPos maybeAirPos = pos.add(airDirection);
       Block maybeAirBlock = world.getBlock(maybeAirPos);
 
-      if (isAir(maybeAirBlock) || BlockTags.LEAVES.func_230235_a_(maybeAirBlock)) {
+      if (isAir(maybeAirBlock) || BlockTags.LEAVES.contains(maybeAirBlock)) {
         return true;
       }
     }
@@ -509,7 +509,7 @@ public class Tasks {
       posCurrent = posCurrent.add(dir);
       blockCurrent = world.getBlock(posCurrent);
 
-      if (isAir(blockCurrent) || BlockTags.LEAVES.func_230235_a_(blockCurrent) || blockCurrent == Blocks.WATER) {
+      if (isAir(blockCurrent) || BlockTags.LEAVES.contains(blockCurrent) || blockCurrent == Blocks.WATER) {
         return distanceToAirWater;
       }
       if (!ErodableBlocks.canErode(blockCurrent)) {
@@ -529,7 +529,7 @@ public class Tasks {
       posCurrent = posCurrent.add(dir);
       blockCurrent = world.getBlock(posCurrent);
       // TODO: Check for Water
-      if (isAir(blockCurrent) || BlockTags.LEAVES.func_230235_a_(blockCurrent)) {
+      if (isAir(blockCurrent) || BlockTags.LEAVES.contains(blockCurrent)) {
         return distanceToAirWater;
       }
     }
