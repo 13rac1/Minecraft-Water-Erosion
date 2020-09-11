@@ -5,5 +5,5 @@ package net.minecraft.tag;
 // the common library will find the import.
 
 // TODO: Can/should the Fabric mappings be changed?
-public class BlockTags extends net.minecraft.tags.BlockTags {
+public class BlockTags {
 }
