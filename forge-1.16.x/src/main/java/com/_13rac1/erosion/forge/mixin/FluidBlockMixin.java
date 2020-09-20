@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com._13rac1.erosion.common.ErosionWorld;
 import com._13rac1.erosion.common.Tasks;
+import com._13rac1.erosion.minecraft.EBlockPos;
 
 @Mixin(FlowingFluidBlock.class)
 public class FluidBlockMixin extends Block {
@@ -35,25 +36,25 @@ public class FluidBlockMixin extends Block {
       this.world = world;
     }
 
-    public BlockState getBlockState(BlockPos pos) {
-      return this.world.getBlockState(pos);
+    public BlockState getBlockState(EBlockPos pos) {
+      return this.world.getBlockState(pos.getPos());
     }
 
-    public Block getBlock(BlockPos pos) {
-      return this.world.getBlockState(pos).getBlock();
+    public Block getBlock(EBlockPos pos) {
+      return this.world.getBlockState(pos.getPos()).getBlock();
     }
 
-    public Boolean setBlockState(BlockPos pos, BlockState newState, Integer flags) {
-      return this.world.setBlockState(pos, newState, flags);
+    public Boolean setBlockState(EBlockPos pos, BlockState newState, Integer flags) {
+      return this.world.setBlockState(pos.getPos(), newState, flags);
     }
 
     public int getSeaLevel() {
       return this.world.getSeaLevel();
     }
 
-    public Vector3d getFlowVelocity(BlockState state, BlockPos pos) {
+    public Vector3d getFlowVelocity(BlockState state, EBlockPos pos) {
       FluidState fluidState = state.getFluidState();
-      return fluidState.getFlow(this.world, pos);
+      return fluidState.getFlow(this.world, pos.getPos());
     }
 
     public Boolean isFluidBlock(Block block) {
@@ -72,6 +73,6 @@ public class FluidBlockMixin extends Block {
   private void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random rand, CallbackInfo info) {
     ForgeWorld forgeWorld = new ForgeWorld(world);
 
-    tasks.run(state, forgeWorld, pos, rand);
+    tasks.run(state, forgeWorld, new EBlockPos(pos), rand);
   }
 }

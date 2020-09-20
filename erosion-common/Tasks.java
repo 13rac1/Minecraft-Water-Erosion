@@ -8,12 +8,13 @@ import java.util.Random;
 
 import net.minecraft.block.FluidBlock;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+
+import com._13rac1.erosion.minecraft.EVec3i;
+import com._13rac1.erosion.minecraft.EBlockPos;
 
 // TODO: Add Menu to allow disable of some features:
 // https://www.curseforge.com/minecraft/mc-mods/modmenu
@@ -47,33 +48,32 @@ public class Tasks {
 
   // Copied from net.minecraft.util(.math).Direction to reduce imports and deal
   // with Forge/Fabric storing the class in different locations.
-  private static final Vector3i VECTOR_DOWN = new Vector3i(0, -1, 0);
-  private static final Vector3i VECTOR_UP = new Vector3i(0, 1, 0);
-  private static final Vector3i VECTOR_NORTH = new Vector3i(0, 0, -1);
-  private static final Vector3i VECTOR_NORTH_EAST = new Vector3i(1, 0, -1);
-  private static final Vector3i VECTOR_EAST = new Vector3i(1, 0, 0);
-  private static final Vector3i VECTOR_SOUTH_EAST = new Vector3i(1, 0, 1);
-  private static final Vector3i VECTOR_SOUTH = new Vector3i(0, 0, 1);
-  private static final Vector3i VECTOR_SOUTH_WEST = new Vector3i(-1, 0, 1);
-  private static final Vector3i VECTOR_WEST = new Vector3i(-1, 0, 0);
-  private static final Vector3i VECTOR_NORTH_WEST = new Vector3i(-1, 0, -1);
+  private static final EVec3i VECTOR_DOWN = new EVec3i(0, -1, 0);
+  private static final EVec3i VECTOR_UP = new EVec3i(0, 1, 0);
+  private static final EVec3i VECTOR_NORTH = new EVec3i(0, 0, -1);
+  private static final EVec3i VECTOR_NORTH_EAST = new EVec3i(1, 0, -1);
+  private static final EVec3i VECTOR_EAST = new EVec3i(1, 0, 0);
+  private static final EVec3i VECTOR_SOUTH_EAST = new EVec3i(1, 0, 1);
+  private static final EVec3i VECTOR_SOUTH = new EVec3i(0, 0, 1);
+  private static final EVec3i VECTOR_SOUTH_WEST = new EVec3i(-1, 0, 1);
+  private static final EVec3i VECTOR_WEST = new EVec3i(-1, 0, 0);
+  private static final EVec3i VECTOR_NORTH_WEST = new EVec3i(-1, 0, -1);
 
   // blockFlags is used with world.setBlockState() when blocks are replaced with
   // air.
   private static final Integer blockFlags = BlockFlag.PROPAGATE_CHANGE | BlockFlag.NOTIFY_LISTENERS;
 
-  private static final List<Vector3i> posFourEdges = Arrays.asList(VECTOR_NORTH, VECTOR_EAST, VECTOR_SOUTH,
-      VECTOR_WEST);
+  private static final List<EVec3i> posFourEdges = Arrays.asList(VECTOR_NORTH, VECTOR_EAST, VECTOR_SOUTH, VECTOR_WEST);
 
-  private static final List<Vector3i> posEightAround = Arrays.asList(VECTOR_NORTH, VECTOR_NORTH_EAST, VECTOR_EAST,
+  private static final List<EVec3i> posEightAround = Arrays.asList(VECTOR_NORTH, VECTOR_NORTH_EAST, VECTOR_EAST,
       VECTOR_SOUTH_EAST, VECTOR_SOUTH, VECTOR_SOUTH_WEST, VECTOR_WEST, VECTOR_NORTH_WEST);
 
-  private static final List<Vector3i> posEightAroundUp = Arrays.asList(new Vector3i(1, 1, 1), new Vector3i(1, 1, 0),
-      new Vector3i(1, 1, -1), new Vector3i(0, 1, -1), new Vector3i(-1, 1, -1), new Vector3i(-1, 1, 0),
-      new Vector3i(-1, 1, 1), new Vector3i(0, 1, 1));
+  private static final List<EVec3i> posEightAroundUp = Arrays.asList(new EVec3i(1, 1, 1), new EVec3i(1, 1, 0),
+      new EVec3i(1, 1, -1), new EVec3i(0, 1, -1), new EVec3i(-1, 1, -1), new EVec3i(-1, 1, 0), new EVec3i(-1, 1, 1),
+      new EVec3i(0, 1, 1));
 
   // Primary run function
-  public void run(BlockState state, ErosionWorld world, BlockPos pos, Random rand) {
+  public void run(BlockState state, ErosionWorld world, EBlockPos pos, Random rand) {
 
     Integer level = state.get(FluidBlock.LEVEL);
 
@@ -97,9 +97,9 @@ public class Tasks {
     maybeDecayUnder(state, world, pos, rand, level);
   }
 
-  private void maybeErodeEdge(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+  private void maybeErodeEdge(BlockState state, ErosionWorld world, EBlockPos pos, Random rand, Integer level) {
     // Get the block under us.
-    BlockPos underPos = pos.down();
+    EBlockPos underPos = pos.down();
     Block underBlock = world.getBlock(underPos);
 
     // Return if the block below us is not erodable.
@@ -149,7 +149,7 @@ public class Tasks {
     // delete enough to fix water rapids, but not disrupt the flow of
     // waterfalls which results in incorrect
     Integer upDeleteCount = 0;
-    BlockPos posUp = pos.up();
+    EBlockPos posUp = pos.up();
 
     while (world.isFluidBlock(world.getBlock(posUp))) {
       upDeleteCount++;
@@ -168,11 +168,11 @@ public class Tasks {
     // callback?
   }
 
-  protected boolean isEdge(ErosionWorld world, BlockPos pos) {
-    List<BlockPos> listSidePos = Arrays.asList(pos.north(), pos.south(), pos.east(), pos.west());
+  protected boolean isEdge(ErosionWorld world, EBlockPos pos) {
+    List<EBlockPos> listSidePos = Arrays.asList(pos.north(), pos.south(), pos.east(), pos.west());
 
-    for (BlockPos sidePos : listSidePos) {
-      BlockPos underPos = sidePos.down();
+    for (EBlockPos sidePos : listSidePos) {
+      EBlockPos underPos = sidePos.down();
       Block underBlock = world.getBlock(underPos);
 
       if (!world.isFluidBlock(underBlock)) {
@@ -188,19 +188,19 @@ public class Tasks {
   }
 
   // Rotate a given direction vector to the left: North->West.
-  protected Vector3i dirTurnLeft(Vector3i in) {
+  protected EVec3i dirTurnLeft(EVec3i in) {
     return in.crossProduct(VECTOR_DOWN);
   }
 
   // Rotate a given direction vector to the right: North-East.
-  protected Vector3i dirTurnRight(Vector3i in) {
+  protected EVec3i dirTurnRight(EVec3i in) {
     return in.crossProduct(VECTOR_UP);
   }
 
-  protected boolean treeInColumn(ErosionWorld world, BlockPos pos) {
+  protected boolean treeInColumn(ErosionWorld world, EBlockPos pos) {
     final Integer MAX_UP = 5;
     Integer count = 0;
-    BlockPos currentPos = pos.up();
+    EBlockPos currentPos = pos.up();
     while (count < MAX_UP) {
       Block currentBlock = world.getBlock(currentPos);
       if (BlockTags.LOGS.contains(currentBlock)) {
@@ -219,11 +219,11 @@ public class Tasks {
       FluidLevel.FLOW4, FluidLevel.FLOW5, FluidLevel.FLOW6, FluidLevel.FLOW7);
 
   private class wallBreakOption {
-    Vector3i dir;
+    EVec3i dir;
     Integer distance;
   }
 
-  private boolean maybeFlowingWall(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+  private boolean maybeFlowingWall(BlockState state, ErosionWorld world, EBlockPos pos, Random rand, Integer level) {
 
     if (!wallBreakers.contains(level)) {
       // level Flow7 goes down, never to the side.
@@ -247,9 +247,9 @@ public class Tasks {
       Flow7Adjust = -1;
     }
 
-    Vector3i dirForward = new Vector3i(Math.round(velocity.x), velocity.y + Flow7Adjust, Math.round(velocity.z));
+    EVec3i dirForward = new EVec3i(Math.round(velocity.x), velocity.y + Flow7Adjust, Math.round(velocity.z));
 
-    BlockPos posForward = pos.add(dirForward);
+    EBlockPos posForward = pos.add(dirForward);
     Block blockForward = world.getBlock(posForward);
     // The block in the direction of flow must be a solid block, not
     // air/water/lava. This is the defining feature of a "wall break", there
@@ -258,10 +258,10 @@ public class Tasks {
       return false;
     }
 
-    Vector3i dirLeft = dirTurnLeft(dirForward);
-    Vector3i dirRight = dirTurnRight(dirForward);
-    BlockPos posLeft = pos.add(dirLeft);
-    BlockPos posRight = pos.add(dirRight);
+    EVec3i dirLeft = dirTurnLeft(dirForward);
+    EVec3i dirRight = dirTurnRight(dirForward);
+    EBlockPos posLeft = pos.add(dirLeft);
+    EBlockPos posRight = pos.add(dirRight);
 
     // Search left/right from straight for "downhill" and break in that
     // direction. Downhill is the direction of air. This will keep streams going
@@ -316,7 +316,7 @@ public class Tasks {
     }
 
     Integer shortestDistance = 128;
-    Vector3i shortestDir = null;
+    EVec3i shortestDir = null;
     for (wallBreakOption option : options) {
       if (option.distance < shortestDistance) {
         shortestDistance = option.distance;
@@ -331,11 +331,11 @@ public class Tasks {
     // System.out.println("dir:" + shortestDir + " distance:" + shortestDistance);
 
     // Find the position of the block in the flow direction.
-    BlockPos flowPos = pos.add(shortestDir);
+    EBlockPos flowPos = pos.add(shortestDir);
 
     // Block above cannot be wood, keep trees standing on dirt.
     // TODO: Look more than one block up for wood.
-    BlockPos aboveFlowPos = flowPos.up();
+    EBlockPos aboveFlowPos = flowPos.up();
     Block aboveFlowBlock = world.getBlock(aboveFlowPos);
     if (BlockTags.LOGS.contains(aboveFlowBlock)) {
       return false;
@@ -363,7 +363,7 @@ public class Tasks {
     return true;
   }
 
-  private void maybeSourceBreak(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+  private void maybeSourceBreak(BlockState state, ErosionWorld world, EBlockPos pos, Random rand, Integer level) {
     // Source blocks only.
     if (level != FluidLevel.SOURCE) {
       return;
@@ -393,13 +393,13 @@ public class Tasks {
     // System.out.println("length:" + velocity.length());
 
     // Blocks near an erodable surface only.
-    List<Vector3i> listDirection = Arrays.asList(new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0), new Vector3i(0, 0, 1),
-        new Vector3i(0, 0, -1));
+    List<EVec3i> listDirection = Arrays.asList(new EVec3i(1, 0, 0), new EVec3i(-1, 0, 0), new EVec3i(0, 0, 1),
+        new EVec3i(0, 0, -1));
     // Randomize the list each run.
     Collections.shuffle(listDirection);
 
-    for (Vector3i dir : listDirection) {
-      BlockPos sidePos = pos.add(dir);
+    for (EVec3i dir : listDirection) {
+      EBlockPos sidePos = pos.add(dir);
 
       Block sideBlock = world.getBlock(sidePos);
       if (sideBlock == Blocks.WATER) {
@@ -429,9 +429,9 @@ public class Tasks {
       // breaking generated farms.
       int waterFound = 0;
       for (int waterMultipler : Arrays.asList(1, 2, 3)) {
-        Vector3i waterDirection = new Vector3i(-dir.getX() * waterMultipler, dir.getY(), -dir.getZ() * waterMultipler);
+        EVec3i waterDirection = new EVec3i(-dir.getX() * waterMultipler, dir.getY(), -dir.getZ() * waterMultipler);
         // System.out.println("maybewaterdir:" + waterDirection);
-        BlockPos maybeWaterPos = pos.add(waterDirection);
+        EBlockPos maybeWaterPos = pos.add(waterDirection);
         BlockState maybeWaterState = world.getBlockState(maybeWaterPos);
         // System.out.println("maybe water:" +
         // maybeWaterState.getBlock().getName().asFormattedString());
@@ -466,14 +466,14 @@ public class Tasks {
     return block == Blocks.AIR || block == Blocks.CAVE_AIR;
   }
 
-  // Start from the provided BlockPos and trace
-  protected boolean airInFlowPath(ErosionWorld world, BlockPos pos, Vector3i dir) {
+  // Start from the provided EBlockPos and trace
+  protected boolean airInFlowPath(ErosionWorld world, EBlockPos pos, EVec3i dir) {
     int yDeeper = 0;
     for (int airMultipler : Arrays.asList(7, 14)) {
-      Vector3i airDirection = new Vector3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
+      EVec3i airDirection = new EVec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
       // Go deeper each iteration
       yDeeper++;
-      BlockPos maybeAirPos = pos.add(airDirection);
+      EBlockPos maybeAirPos = pos.add(airDirection);
       Block maybeAirBlock = world.getBlock(maybeAirPos);
 
       if (isAir(maybeAirBlock) || BlockTags.LEAVES.contains(maybeAirBlock)) {
@@ -486,7 +486,7 @@ public class Tasks {
 
   // Trace the flow path from the current position given the flow level to find
   // the distance to the closest open space: air, cave air, water, or leaves.
-  protected Integer distanceToAirWaterInFlowPath(ErosionWorld world, BlockPos pos, Vector3i dir, Integer level) {
+  protected Integer distanceToAirWaterInFlowPath(ErosionWorld world, EBlockPos pos, EVec3i dir, Integer level) {
     if (level > FluidLevel.FLOW7) {
       return 128;
     }
@@ -499,7 +499,7 @@ public class Tasks {
     // the source block, is displayed as Targeted Fluid level:1.
     Integer flowDistanceRemaining = 7 - level;
 
-    BlockPos posCurrent = pos;
+    EBlockPos posCurrent = pos;
     Block blockCurrent;
     // Check how far as the current flow can go at the current height.
     while (flowDistanceRemaining > 0) {
@@ -537,14 +537,14 @@ public class Tasks {
     return 128; // Meaningless high value
   }
 
-  protected boolean maybeDecayUnder(BlockState state, ErosionWorld world, BlockPos pos, Random rand, Integer level) {
+  protected boolean maybeDecayUnder(BlockState state, ErosionWorld world, EBlockPos pos, Random rand, Integer level) {
     // TODO: Should we be using rand?
     // return if water is source or falling or FLOW7
     if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW7) {
       return false;
     }
     // Get the block under us.
-    BlockPos underPos = pos.down();
+    EBlockPos underPos = pos.down();
     Block underBlock = world.getBlock(underPos);
 
     if (!ErodableBlocks.canErode(underBlock)) {
@@ -571,7 +571,7 @@ public class Tasks {
 
     // Find the position of the block in the flow direction, round to closest 90
     // degree angle.
-    BlockPos flowPos = underPos.add(new Vector3i(Math.round(velocity.x), 0, Math.round(velocity.z)));
+    EBlockPos flowPos = underPos.add(new EVec3i(Math.round(velocity.x), 0, Math.round(velocity.z)));
     Block flowBlock = world.getBlock(flowPos);
 
     // If the block in the flow direction is any of the lesser blocks underBlocks
@@ -597,8 +597,8 @@ public class Tasks {
 
   // Cobblestone and Stone Bricks grow moss near water, check every block around.
   // Returns true when a change is made.
-  protected boolean maybeAddMoss(ErosionWorld world, BlockPos pos, Random rand) {
-    List<Vector3i> listDirection = posEightAround;
+  protected boolean maybeAddMoss(ErosionWorld world, EBlockPos pos, Random rand) {
+    List<EVec3i> listDirection = posEightAround;
     // TODO: Add one level above the water line
     // listDirection.addAll(posEightAroundUp);
 
@@ -606,8 +606,8 @@ public class Tasks {
     // TODO: Just pick a random number since everything returns now.
     Collections.shuffle(listDirection);
 
-    for (Vector3i dir : listDirection) {
-      BlockPos sidePos = pos.add(dir);
+    for (EVec3i dir : listDirection) {
+      EBlockPos sidePos = pos.add(dir);
       Block sideBlock = world.getBlock(sidePos);
 
       if (!isCobbleStone(sideBlock) && !isStoneBricks(sideBlock)) {
