@@ -1,10 +1,10 @@
 package com._13rac1.erosion.common;
 
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 
 import com._13rac1.erosion.minecraft.EBlockPos;
+import com._13rac1.erosion.minecraft.EVec3d;
 
 public interface ErosionWorld {
   BlockState getBlockState(EBlockPos pos);
@@ -26,7 +26,7 @@ public interface ErosionWorld {
   // (0.7071067613036184, 0.0, -0.7071067613036184)
   // (0.9999999664723898, 0.0, 0.0)
   // (0.3162277853996985, 0.0, -0.9486833137896449) - Rare
-  Vector3d getFlowVelocity(BlockState state, EBlockPos pos);
+  EVec3d getFlowVelocity(BlockState state, EBlockPos pos);
 
   Boolean isFluidBlock(Block block);
 }

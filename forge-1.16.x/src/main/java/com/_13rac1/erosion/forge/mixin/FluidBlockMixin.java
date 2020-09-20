@@ -10,7 +10,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.util.math.vector.Vector3d;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com._13rac1.erosion.common.ErosionWorld;
 import com._13rac1.erosion.common.Tasks;
 import com._13rac1.erosion.minecraft.EBlockPos;
+import com._13rac1.erosion.minecraft.EVec3d;
 
 @Mixin(FlowingFluidBlock.class)
 public class FluidBlockMixin extends Block {
@@ -52,9 +52,9 @@ public class FluidBlockMixin extends Block {
       return this.world.getSeaLevel();
     }
 
-    public Vector3d getFlowVelocity(BlockState state, EBlockPos pos) {
+    public EVec3d getFlowVelocity(BlockState state, EBlockPos pos) {
       FluidState fluidState = state.getFluidState();
-      return fluidState.getFlow(this.world, pos.getPos());
+      return new EVec3d(fluidState.getFlow(this.world, pos.getPos()));
     }
 
     public Boolean isFluidBlock(Block block) {

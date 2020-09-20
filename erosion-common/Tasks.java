@@ -8,12 +8,12 @@ import java.util.Random;
 
 import net.minecraft.block.FluidBlock;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 
 import com._13rac1.erosion.minecraft.EVec3i;
+import com._13rac1.erosion.minecraft.EVec3d;
 import com._13rac1.erosion.minecraft.EBlockPos;
 
 // TODO: Add Menu to allow disable of some features:
@@ -232,10 +232,10 @@ public class Tasks {
 
     // Find flow direction: Velocity is a 3D vector normalized to 1 pointing the
     // direction the water is flowing.
-    Vector3d velocity = world.getFlowVelocity(state, pos);
+    EVec3d velocity = world.getFlowVelocity(state, pos);
     // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
     // with a more definitive direction such as 0, 90, or 22.5.
-    if (Math.abs(velocity.x) < 0.8 && Math.abs(velocity.z) < 0.8) {
+    if (Math.abs(velocity.getX()) < 0.8 && Math.abs(velocity.getZ()) < 0.8) {
       // Skip 45 degree flows.
       // The velocity vector is normalized, therefore 45 degree flows are
       // represented by two floats of +/- 0.707.
@@ -247,7 +247,8 @@ public class Tasks {
       Flow7Adjust = -1;
     }
 
-    EVec3i dirForward = new EVec3i(Math.round(velocity.x), velocity.y + Flow7Adjust, Math.round(velocity.z));
+    EVec3i dirForward = new EVec3i(Math.round(velocity.getX()), velocity.getY() + Flow7Adjust,
+        Math.round(velocity.getZ()));
 
     EBlockPos posForward = pos.add(dirForward);
     Block blockForward = world.getBlock(posForward);
@@ -386,7 +387,7 @@ public class Tasks {
     }
 
     // Skip blocks already flowing
-    Vector3d velocity = world.getFlowVelocity(state, pos);
+    EVec3d velocity = world.getFlowVelocity(state, pos);
     if (velocity.length() > 0) {
       return;
     }
@@ -559,10 +560,10 @@ public class Tasks {
       return false;
     }
 
-    Vector3d velocity = world.getFlowVelocity(state, pos);
+    EVec3d velocity = world.getFlowVelocity(state, pos);
     // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
     // with a more definitive direction such as 0, 90, or 22.5.
-    if (Math.abs(velocity.x) < 0.8 && Math.abs(velocity.z) < 0.8) {
+    if (Math.abs(velocity.getX()) < 0.8 && Math.abs(velocity.getZ()) < 0.8) {
       // Skip 45 degree flows.
       // The velocity vector is normalized, therefore 45 degree flows are
       // represented by two floats of +/- 0.707.
@@ -571,7 +572,7 @@ public class Tasks {
 
     // Find the position of the block in the flow direction, round to closest 90
     // degree angle.
-    EBlockPos flowPos = underPos.add(new EVec3i(Math.round(velocity.x), 0, Math.round(velocity.z)));
+    EBlockPos flowPos = underPos.add(new EVec3i(Math.round(velocity.getX()), 0, Math.round(velocity.getZ())));
     Block flowBlock = world.getBlock(flowPos);
 
     // If the block in the flow direction is any of the lesser blocks underBlocks
@@ -582,7 +583,6 @@ public class Tasks {
     world.setBlockState(underPos, decayTo.getDefaultState(), blockFlags);
     // System.out.println("maybeDecayUnder!");
     return true;
-
   }
 
   protected boolean isCobbleStone(Block block) {
