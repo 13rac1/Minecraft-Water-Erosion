@@ -6,12 +6,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.block.FluidBlock;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 
+import com._13rac1.erosion.minecraft.EFluidBlock;
 import com._13rac1.erosion.minecraft.EVec3i;
 import com._13rac1.erosion.minecraft.EVec3d;
 import com._13rac1.erosion.minecraft.EBlockPos;
@@ -75,7 +75,7 @@ public class Tasks {
   // Primary run function
   public void run(BlockState state, ErosionWorld world, EBlockPos pos, Random rand) {
 
-    Integer level = state.get(FluidBlock.LEVEL);
+    Integer level = state.get(EFluidBlock.LEVEL);
 
     maybeSourceBreak(state, world, pos, rand, level);
 
@@ -127,14 +127,15 @@ public class Tasks {
     if (decayBlock == Blocks.AIR) {
       // Removing the block under the water block.
       Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
-      world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(FluidBlock.LEVEL, underBlocklevel), blockFlags);
+      world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(EFluidBlock.LEVEL, underBlocklevel),
+          blockFlags);
     } else {
       // Decay the block and do nothing else.
       world.setBlockState(underPos, decayBlock.getDefaultState(), blockFlags);
       return;
     }
     // Don't delete source blocks
-    if (state.get(FluidBlock.LEVEL) == FluidLevel.SOURCE) {
+    if (state.get(EFluidBlock.LEVEL) == FluidLevel.SOURCE) {
       // Technically this should never happen.
       return;
     }
@@ -156,7 +157,7 @@ public class Tasks {
       if (upDeleteCount > 3) {
         break;
       }
-      if (world.getBlockState(posUp).get(FluidBlock.LEVEL) == FluidLevel.SOURCE) {
+      if (world.getBlockState(posUp).get(EFluidBlock.LEVEL) == FluidLevel.SOURCE) {
         break;
       }
       // TODO: Go up until finding the last water block and delete that. The
