@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import com._13rac1.erosion.forge.Config;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.tag.BlockTags;
@@ -13,6 +11,9 @@ import net.minecraft.tag.BlockTags;
 // Differing erosion resistance depending on the type of block.
 // leaves < sand < gravel < dirt < grass
 public class ErodableBlocks {
+  // May be changed during system startup.
+  public static IErosionConfig Config = new DefaultErosionConfig();
+
   private static final Integer MAX_RESIST_ODDS = 0; // 1/0 = never
   // Odds less (a larger number) than source resistance will never be broken by
   // a source block. Primarily to block cobblestone from ever being broken.
@@ -105,7 +106,7 @@ public class ErodableBlocks {
       erodables.put(Blocks.SAND, new Erodable(SAND_RESIST_ODDS, Blocks.CLAY));
       erodables.put(Blocks.GRAVEL, new Erodable(GRAVEL_RESIST_ODDS, Blocks.SAND));
       erodables.put(Blocks.COARSE_DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.GRAVEL));
-      if (Config.ERODE_FARMLAND.get()) {
+      if (Config.GetErodeFarmLand()) {
         erodables.put(Blocks.FARMLAND, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
       }
       erodables.put(Blocks.DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));

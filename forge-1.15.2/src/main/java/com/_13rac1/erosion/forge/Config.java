@@ -7,6 +7,7 @@ import com.electronwill.nightconfig.core.io.WritingMode;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
+// A Forge Configuration Class
 public class Config {
   public static final String CATEGORY_GENERAL = "general";
   public static ForgeConfigSpec COMMON_CONFIG;
