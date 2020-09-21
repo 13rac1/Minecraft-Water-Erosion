@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.tags.BlockTags;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -15,6 +14,7 @@ import com._13rac1.erosion.minecraft.EFluidBlock;
 import com._13rac1.erosion.minecraft.EVec3i;
 import com._13rac1.erosion.minecraft.EVec3d;
 import com._13rac1.erosion.minecraft.EBlockPos;
+import com._13rac1.erosion.minecraft.EBlockTags;
 
 // TODO: Add Menu to allow disable of some features:
 // https://www.curseforge.com/minecraft/mc-mods/modmenu
@@ -204,7 +204,7 @@ public class Tasks {
     EBlockPos currentPos = pos.up();
     while (count < MAX_UP) {
       Block currentBlock = world.getBlock(currentPos);
-      if (BlockTags.LOGS.contains(currentBlock)) {
+      if (EBlockTags.LOGS.contains(currentBlock)) {
         return true;
       }
       if (isAir(currentBlock)) {
@@ -339,7 +339,7 @@ public class Tasks {
     // TODO: Look more than one block up for wood.
     EBlockPos aboveFlowPos = flowPos.up();
     Block aboveFlowBlock = world.getBlock(aboveFlowPos);
-    if (BlockTags.LOGS.contains(aboveFlowBlock)) {
+    if (EBlockTags.LOGS.contains(aboveFlowBlock)) {
       return false;
     }
     // TODO: Do not remove an erodable block if the stack above is unsupported.
@@ -478,7 +478,7 @@ public class Tasks {
       EBlockPos maybeAirPos = pos.add(airDirection);
       Block maybeAirBlock = world.getBlock(maybeAirPos);
 
-      if (isAir(maybeAirBlock) || BlockTags.LEAVES.contains(maybeAirBlock)) {
+      if (isAir(maybeAirBlock) || EBlockTags.LEAVES.contains(maybeAirBlock)) {
         return true;
       }
     }
@@ -511,7 +511,7 @@ public class Tasks {
       posCurrent = posCurrent.add(dir);
       blockCurrent = world.getBlock(posCurrent);
 
-      if (isAir(blockCurrent) || BlockTags.LEAVES.contains(blockCurrent) || blockCurrent == Blocks.WATER) {
+      if (isAir(blockCurrent) || EBlockTags.LEAVES.contains(blockCurrent) || blockCurrent == Blocks.WATER) {
         return distanceToAirWater;
       }
       if (!ErodableBlocks.canErode(blockCurrent)) {
@@ -531,7 +531,7 @@ public class Tasks {
       posCurrent = posCurrent.add(dir);
       blockCurrent = world.getBlock(posCurrent);
       // TODO: Check for Water
-      if (isAir(blockCurrent) || BlockTags.LEAVES.contains(blockCurrent)) {
+      if (isAir(blockCurrent) || EBlockTags.LEAVES.contains(blockCurrent)) {
         return distanceToAirWater;
       }
     }

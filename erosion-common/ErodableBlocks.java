@@ -6,7 +6,8 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-//import net.minecraft.tag.BlockTags;
+
+import com._13rac1.erosion.minecraft.EBlockTags;
 
 // Differing erosion resistance depending on the type of block.
 // leaves < sand < gravel < dirt < grass
@@ -156,13 +157,13 @@ public class ErodableBlocks {
 
     // Check block tags to erode leaves, wool, and mod-provided blocks.
     // TODO: Less CPU to fill the hashmap with all values once.
-    // if (BlockTags.LEAVES.contains(block)) {
-    // return LEAF_RESIST_ODDS;
-    // } else if (BlockTags.SAND.contains(block)) {
-    // return SAND_RESIST_ODDS;
-    // } else if (BlockTags.WOOL.contains(block)) {
-    // return WOOL_RESIST_ODDS;
-    // }
+    if (EBlockTags.LEAVES.contains(block)) {
+      return LEAF_RESIST_ODDS;
+    } else if (EBlockTags.SAND.contains(block)) {
+      return SAND_RESIST_ODDS;
+    } else if (EBlockTags.WOOL.contains(block)) {
+      return WOOL_RESIST_ODDS;
+    }
 
     return MAX_RESIST_ODDS;
   }

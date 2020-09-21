@@ -32,6 +32,7 @@ minecraft {
     mappings channel: 'snapshot', version: '20200723-1.16.1'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
+    // https://mcforge.readthedocs.io/en/latest/advanced/accesstransformers/
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
