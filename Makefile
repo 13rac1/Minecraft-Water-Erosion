@@ -17,7 +17,7 @@ build:
 test:
 	cd forge-1.14.4;./gradlew test jacocoTestReport
 	# Test Coverage Report location:
-	echo ${PWD}/forge-1.14.4/build/reports/jacoco/test/html/index.html
+	xdg-open ${PWD}/forge-1.14.4/build/reports/jacoco/test/html/index.html
 
 .PHONY: screenshots
 screenshots:
