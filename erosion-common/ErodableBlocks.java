@@ -51,17 +51,26 @@ public class ErodableBlocks {
   private static final Integer DECAY_TO_MOSSY_COBBLE_ODDS = 0;
   private static final Integer DECAY_TO_MOSSY_BRICKS_ODDS = 1;
 
-  // Erodable describes block metadata which controls the odds of erosion and
-  // what block it may decay to.
-  static class Erodable {
-    Integer resistanceOdds;
-    Block decayBlock;
-    ArrayList<Block> decayList;
+  /**
+   * Exception thrown when the decay list for an erodable block is not finite or
+   * does not end at Blocks.AIR.
+   */
+  public static class IncompleteDecayListException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
 
-    Erodable(Integer resistanceOdds, Block decayBlock) {
-      this.resistanceOdds = resistanceOdds;
-      this.decayBlock = decayBlock;
-      this.decayList = new ArrayList<>();
+    public IncompleteDecayListException(Block block, ErodableOptions options) {
+      super("DecayList for " + block + " is not finite " + options.decayList);
+    }
+  }
+
+  /**
+   * Exception thrown when the decayToBlock is null or not found.
+   */
+  public static class NullDecayToBlockException extends RuntimeException {
+    private static final long serialVersionUID = 1L;
+
+    public NullDecayToBlockException(Block block, ErodableOptions options) {
+      super("decayToBlock for " + block + " is null " + options.decayList);
     }
   }
 
@@ -79,84 +88,102 @@ public class ErodableBlocks {
       decayables.put(Blocks.SAND, DECAY_TO_SAND_ODDS);
       decayables.put(Blocks.GRAVEL, DECAY_TO_GRAVEL_ODDS);
       decayables.put(Blocks.DIRT, DECAY_TO_DIRT_ODDS);
-      // decayables.put(Blocks.COARSE_DIRT, DECAY_TO_COARSE_DIRT_ODDS);
+      decayables.put(Blocks.COARSE_DIRT, DECAY_TO_COARSE_DIRT_ODDS);
       decayables.put(Blocks.MOSSY_COBBLESTONE, DECAY_TO_MOSSY_COBBLE_ODDS);
-      // decayables.put(Blocks.MOSSY_COBBLESTONE_SLAB, DECAY_TO_MOSSY_COBBLE_ODDS);
-      // decayables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, DECAY_TO_MOSSY_COBBLE_ODDS);
-      // decayables.put(Blocks.MOSSY_COBBLESTONE_WALL, DECAY_TO_MOSSY_COBBLE_ODDS);
-      // decayables.put(Blocks.MOSSY_STONE_BRICKS, DECAY_TO_MOSSY_BRICKS_ODDS);
-      // decayables.put(Blocks.MOSSY_STONE_BRICK_SLAB, DECAY_TO_MOSSY_BRICKS_ODDS);
-      // decayables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, DECAY_TO_MOSSY_BRICKS_ODDS);
-      // decayables.put(Blocks.MOSSY_STONE_BRICK_WALL, DECAY_TO_MOSSY_BRICKS_ODDS);
+      decayables.put(Blocks.MOSSY_COBBLESTONE_SLAB, DECAY_TO_MOSSY_COBBLE_ODDS);
+      decayables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, DECAY_TO_MOSSY_COBBLE_ODDS);
+      decayables.put(Blocks.MOSSY_COBBLESTONE_WALL, DECAY_TO_MOSSY_COBBLE_ODDS);
+      decayables.put(Blocks.MOSSY_STONE_BRICKS, DECAY_TO_MOSSY_BRICKS_ODDS);
+      decayables.put(Blocks.MOSSY_STONE_BRICK_SLAB, DECAY_TO_MOSSY_BRICKS_ODDS);
+      decayables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, DECAY_TO_MOSSY_BRICKS_ODDS);
+      decayables.put(Blocks.MOSSY_STONE_BRICK_WALL, DECAY_TO_MOSSY_BRICKS_ODDS);
     }
     return decayables;
   }
 
   // erodables lists the erodable blocks, their odds of erosion, and what they
   // decay to.
-  private static HashMap<Block, Erodable> erodables;
+  private static HashMap<Block, ErodableOptions> erodables;
 
-  private static HashMap<Block, Erodable> getErodables() {
+  // tiny helper func to clean up getErodables
+  private static void addOption(Block erodableBlock, Integer resistanceOdds, Block decayToBlock) {
+    if (erodableBlock == null) {
+      // skip null blocks. null is used in 1.12.2 for blocks missing vs 1.14.x+.
+      // TODO: Log warn on skip
+      return;
+    }
+    if (decayToBlock == null) {
+      // Any unset decayToBlock is Air not null.
+      // TODO: Log warn on Air
+      decayToBlock = Blocks.AIR;
+    }
+    erodables.put(erodableBlock, new ErodableOptions(resistanceOdds, decayToBlock));
+  }
+
+  private static HashMap<Block, ErodableOptions> getErodables() {
     // Note: Cannot be initialized during startup because the code runs before
     // Blocks is initialized.
     if (erodables == null) {
-      erodables = new HashMap<Block, Erodable>();
+      erodables = new HashMap<Block, ErodableOptions>();
       // Ordered weakest to strongest
-      erodables.put(Blocks.CLAY, new Erodable(CLAY_RESIST_ODDS, Blocks.AIR));
-      // erodables.put(Blocks.RED_SAND, new Erodable(SAND_RESIST_ODDS, Blocks.CLAY));
-      erodables.put(Blocks.SAND, new Erodable(SAND_RESIST_ODDS, Blocks.CLAY));
-      erodables.put(Blocks.GRAVEL, new Erodable(GRAVEL_RESIST_ODDS, Blocks.SAND));
+      addOption(Blocks.CLAY, CLAY_RESIST_ODDS, Blocks.AIR);
+      addOption(Blocks.CLAY, CLAY_RESIST_ODDS, Blocks.AIR);
+      addOption(Blocks.RED_SAND, SAND_RESIST_ODDS, Blocks.CLAY);
+      addOption(Blocks.SAND, SAND_RESIST_ODDS, Blocks.CLAY);
+      addOption(Blocks.GRAVEL, GRAVEL_RESIST_ODDS, Blocks.SAND);
 
-      // erodables.put(Blocks.COARSE_DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.GRAVEL));
+      // addOption(Blocks.COARSE_DIRT, DIRT_RESIST_ODDS, Blocks.GRAVEL);
       if (Config.GetErodeFarmLand()) {
-        erodables.put(Blocks.FARMLAND, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
+        addOption(Blocks.FARMLAND, DIRT_RESIST_ODDS, Blocks.DIRT);
       }
-      erodables.put(Blocks.DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
-      //erodables.put(Blocks.PODZOL, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
-      //erodables.put(Blocks.GRASS_BLOCK, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
-      erodables.put(Blocks.GRASS, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
+
+      addOption(Blocks.DIRT, DIRT_RESIST_ODDS, Blocks.GRAVEL);
+      addOption(Blocks.PODZOL, DIRT_RESIST_ODDS, Blocks.COARSE_DIRT);
+      addOption(Blocks.GRASS_BLOCK, GRASS_RESIST_ODDS, Blocks.DIRT);
+      addOption(Blocks.GRASS, GRASS_RESIST_ODDS, Blocks.DIRT);
       // Grass Paths grow into Grass
-      erodables.put(Blocks.GRASS_PATH, new Erodable(GRASS_RESIST_ODDS, Blocks.GRASS));
-      erodables.put(Blocks.MOSSY_COBBLESTONE, new Erodable(COBBLE_RESIST_ODDS, Blocks.GRAVEL));
+      addOption(Blocks.GRASS_PATH, GRASS_RESIST_ODDS, Blocks.GRASS);
+      addOption(Blocks.MOSSY_COBBLESTONE, COBBLE_RESIST_ODDS, Blocks.GRAVEL);
       // Directly to air because the gravel block is a larger volume than the original
-      // erodables.put(Blocks.MOSSY_COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.AIR));
-      // erodables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, new
-      // Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
-      // erodables.put(Blocks.MOSSY_COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.AIR));
-      erodables.put(Blocks.COBBLESTONE, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE));
+      addOption(Blocks.MOSSY_COBBLESTONE_SLAB, COBBLE_RESIST_ODDS, Blocks.AIR);
+      addOption(Blocks.MOSSY_COBBLESTONE_STAIRS, COBBLE_RESIST_ODDS, Blocks.AIR);
+      addOption(Blocks.MOSSY_COBBLESTONE_WALL, COBBLE_RESIST_ODDS, Blocks.AIR);
+      addOption(Blocks.COBBLESTONE, COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE);
+      addOption(Blocks.COBBLESTONE_SLAB, COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_SLAB);
+      addOption(Blocks.COBBLESTONE_STAIRS, COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_STAIRS);
+      addOption(Blocks.COBBLESTONE_WALL, COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_WALL);
+      addOption(Blocks.MOSSY_STONE_BRICKS, BRICK_RESIST_ODDS, Blocks.GRAVEL);
+      addOption(Blocks.MOSSY_STONE_BRICK_SLAB, COBBLE_RESIST_ODDS, Blocks.AIR);
+      addOption(Blocks.MOSSY_STONE_BRICK_STAIRS, COBBLE_RESIST_ODDS, Blocks.AIR);
+      addOption(Blocks.MOSSY_STONE_BRICK_WALL, COBBLE_RESIST_ODDS, Blocks.AIR);
+      addOption(Blocks.STONE_BRICKS, COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICKS);
+      addOption(Blocks.STONE_BRICK_SLAB, COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_SLAB);
+      addOption(Blocks.STONE_BRICK_STAIRS, COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_STAIRS);
+      addOption(Blocks.STONE_BRICK_WALL, COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_WALL);
 
-      // erodables.put(Blocks.COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.MOSSY_COBBLESTONE_SLAB));
-      // erodables.put(Blocks.COBBLESTONE_STAIRS, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.MOSSY_COBBLESTONE_STAIRS));
-      // erodables.put(Blocks.COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.MOSSY_COBBLESTONE_WALL));
-      // erodables.put(Blocks.MOSSY_STONE_BRICKS, new Erodable(BRICK_RESIST_ODDS,
-      // Blocks.GRAVEL));
-      // erodables.put(Blocks.MOSSY_STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.AIR));
-      // erodables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, new
-      // Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
-      // erodables.put(Blocks.MOSSY_STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.AIR));
-      // erodables.put(Blocks.STONE_BRICKS, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.MOSSY_STONE_BRICKS));
-      // erodables.put(Blocks.STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.MOSSY_STONE_BRICK_SLAB));
-      // erodables.put(Blocks.STONE_BRICK_STAIRS, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.MOSSY_STONE_BRICK_STAIRS));
-      // erodables.put(Blocks.STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS,
-      // Blocks.MOSSY_STONE_BRICK_WALL));
+      erodables.forEach((block, options) -> {
+        if (block == null) {
+          // skip calculation of decaylist if the block is null. Shouldn't happen due to
+          // check in addOption().
+          // TODO: Log a warning
+          return;
+        }
 
-      erodables.forEach((block, erodable) -> {
-        Erodable current = erodable;
+        int count = 0;
+        ErodableOptions current = options;
         // Loop and fill out the decayList, aka the ordered list of what a block will
         // decay to. Stop when AIR is found.
-        while (current.decayBlock != Blocks.AIR) {
-          erodable.decayList.add(current.decayBlock);
-          current = erodables.get(current.decayBlock);
+        while (current.decayToBlock != Blocks.AIR) {
+          count++;
+          if (count > 9) {
+            throw new IncompleteDecayListException(block, options);
+          }
+
+          options.decayList.add(current.decayToBlock);
+          current = erodables.get(current.decayToBlock);
+          if (current == null) {
+            throw new NullDecayToBlockException(block, options);
+          }
         }
       });
     }
@@ -200,7 +227,7 @@ public class ErodableBlocks {
     Block decayToBlock = Blocks.AIR;
 
     if (getErodables().containsKey(block)) {
-      decayToBlock = getErodables().get(block).decayBlock;
+      decayToBlock = getErodables().get(block).decayToBlock;
     }
 
     if (getDecayables().containsKey(decayToBlock)) {
@@ -225,10 +252,10 @@ public class ErodableBlocks {
 
   public static Block decayTo(Block block) {
 
-    HashMap<Block, Erodable> erodables = getErodables();
+    HashMap<Block, ErodableOptions> erodables = getErodables();
 
     if (erodables.containsKey(block)) {
-      return erodables.get(block).decayBlock;
+      return erodables.get(block).decayToBlock;
     }
     return Blocks.AIR;
   }

@@ -17,7 +17,7 @@ public class BlockState {
   }
 
   public Integer get(PropertyInteger Key) {
-    return (Integer) state.getProperties().get(FluidBlock.LEVEL);
+    return (Integer) state.getProperties().get(BlockLiquid.LEVEL);
   }
 
   public Block getBlock() {

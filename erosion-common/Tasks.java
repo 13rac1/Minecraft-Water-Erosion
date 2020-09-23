@@ -126,6 +126,7 @@ public class Tasks {
     // underBlock.getName().asFormattedString());
 
     Block decayBlock = ErodableBlocks.maybeDecay(rand, underBlock);
+
     if (decayBlock == Blocks.AIR) {
       // Removing the block under the water block.
       Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
@@ -471,7 +472,7 @@ public class Tasks {
   }
 
   private boolean isAir(Block block) {
-    return block == Blocks.AIR; // || block == Blocks.CAVE_AIR;
+    return block == Blocks.AIR || block == Blocks.CAVE_AIR;
   }
 
   // Start from the provided EBlockPos and trace
@@ -593,13 +594,13 @@ public class Tasks {
   }
 
   protected boolean isCobbleStone(Block block) {
-    // || block == Blocks.COBBLESTONE_STAIRS
-    return block == Blocks.COBBLESTONE || block == Blocks.COBBLESTONE_WALL || block == Blocks.COBBLESTONE_WALL;
+    return block == Blocks.COBBLESTONE || block == Blocks.COBBLESTONE_WALL || block == Blocks.COBBLESTONE_STAIRS
+        || block == Blocks.COBBLESTONE_WALL;
   }
 
   protected boolean isStoneBricks(Block block) {
-    return block == Blocks.STONEBRICK || block == Blocks.STONE_BRICK_STAIRS;
-    // block == Blocks.STONEBRICK_WALL || || block == Blocks.STONE_BRICK_WALL;
+    return block == Blocks.STONE_BRICKS || block == Blocks.STONE_BRICK_WALL || block == Blocks.STONE_BRICK_STAIRS
+        || block == Blocks.STONE_BRICK_WALL;
   }
 
   // Cobblestone and Stone Bricks grow moss near water, check every block around.
