@@ -12,12 +12,13 @@ import org.junit.jupiter.api.Test;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.FluidBlock;
 import net.minecraft.state.IProperty;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+
+import com._13rac1.erosion.minecraft.EFluidBlock;
+import com._13rac1.erosion.minecraft.EVec3i;
+import com._13rac1.erosion.minecraft.EVec3d;
+import com._13rac1.erosion.minecraft.EBlockPos;
 
 public class TasksTest {
   private static Tasks tasks = new Tasks();
@@ -34,32 +35,32 @@ public class TasksTest {
 
     Assertions.assertEquals(Blocks.AIR, state.getBlock());
 
-    final ImmutableMap<IProperty<?>, Comparable<?>> propertiesWater = ImmutableMap.of(FluidBlock.LEVEL,
+    final ImmutableMap<IProperty<?>, Comparable<?>> propertiesWater = ImmutableMap.of(EFluidBlock.LEVEL,
         FluidLevel.SOURCE);
     final BlockState stateWater = new BlockState(Blocks.WATER, propertiesWater);
 
     Assertions.assertEquals(Blocks.WATER, stateWater.getBlock());
-    Assertions.assertEquals(FluidLevel.SOURCE, stateWater.get(FluidBlock.LEVEL));
+    Assertions.assertEquals(FluidLevel.SOURCE, stateWater.get(EFluidBlock.LEVEL));
   }
 
   @Test
   void testDirLeftRight() {
     // Verbosely test both the Minecraft libraries and the Task methods work as
     // expected.
-    BlockPos posStart = new BlockPos(0, 0, 0);
-    Vec3i dirForward = Direction.NORTH.getDirectionVec();
-    BlockPos posForward = posStart.add(dirForward);
+    EBlockPos posStart = new EBlockPos(0, 0, 0);
+    EVec3i dirForward = new EVec3i(Direction.NORTH.getDirectionVec());
+    EBlockPos posForward = posStart.add(dirForward);
 
     Assertions.assertNotEquals(posStart.south(), posForward);
     Assertions.assertEquals(posStart.north(), posForward);
 
-    Vec3i dirLeft = dirForward.crossProduct(Direction.DOWN.getDirectionVec());
-    BlockPos posLeft = posStart.add(dirLeft);
+    EVec3i dirLeft = dirForward.crossProduct(new EVec3i(Direction.DOWN.getDirectionVec()));
+    EBlockPos posLeft = posStart.add(dirLeft);
     Assertions.assertEquals(posStart.west(), posLeft);
     Assertions.assertEquals(dirLeft, tasks.dirTurnLeft(dirForward));
 
-    Vec3i dirRight = dirForward.crossProduct(Direction.UP.getDirectionVec());
-    BlockPos posRight = posStart.add(dirRight);
+    EVec3i dirRight = dirForward.crossProduct(new EVec3i(Direction.UP.getDirectionVec()));
+    EBlockPos posRight = posStart.add(dirRight);
     Assertions.assertEquals(posStart.east(), posRight);
     Assertions.assertEquals(dirRight, tasks.dirTurnRight(dirForward));
   }
@@ -69,7 +70,7 @@ public class TasksTest {
     // isEdge() checks north first, so this is just a test of the first return.
     // TODO: Check failure cases.
     final ErosionWorld world = mock(ErosionWorld.class);
-    final BlockPos pos = new BlockPos(0, 0, 0);
+    final EBlockPos pos = new EBlockPos(0, 0, 0);
 
     when(world.getBlock(pos.north().down())).thenReturn(Blocks.WATER);
     when(world.isFluidBlock(Blocks.WATER)).thenReturn(true);
@@ -79,13 +80,13 @@ public class TasksTest {
   @Test
   void testAirFlowInPath() {
     final ErosionWorld world = mock(ErosionWorld.class);
-    final BlockPos pos = new BlockPos(0, 0, 0);
-    final Vec3i dir = new Vec3i(1, 0, 0); // South is positive
+    final EBlockPos pos = new EBlockPos(0, 0, 0);
+    final EVec3i dir = new EVec3i(1, 0, 0); // South is positive
 
-    final Vec3i airDirection7 = new Vec3i(7, 0, 0);
-    final Vec3i airDirection14 = new Vec3i(14, -1, 0);
-    final BlockPos pos7 = pos.add(airDirection7);
-    final BlockPos pos14 = pos.add(airDirection14);
+    final EVec3i airDirection7 = new EVec3i(7, 0, 0);
+    final EVec3i airDirection14 = new EVec3i(14, -1, 0);
+    final EBlockPos pos7 = pos.add(airDirection7);
+    final EBlockPos pos14 = pos.add(airDirection14);
 
     when(world.getBlock(pos7)).thenReturn(Blocks.AIR);
     Assertions.assertTrue(tasks.airInFlowPath(world, pos, dir));
@@ -107,7 +108,7 @@ public class TasksTest {
   @Test
   void testMaybeDecayUnder() {
     final ErosionWorld world = mock(ErosionWorld.class);
-    final BlockPos pos = new BlockPos(0, 0, 0);
+    final EBlockPos pos = new EBlockPos(0, 0, 0);
     final BlockState stateWater = Blocks.WATER.getDefaultState();
     final Random rand = new Random(); // unused, in tests
 
@@ -126,12 +127,12 @@ public class TasksTest {
 
     // No decay for 45 degree
     when(world.getBlock(pos.down())).thenReturn(Blocks.COBBLESTONE);
-    when(world.getFlowVelocity(any(BlockState.class), any(BlockPos.class))).thenReturn(new Vec3d(0.707, 0, 0.707));
+    when(world.getFlowVelocity(any(BlockState.class), any(EBlockPos.class))).thenReturn(new EVec3d(0.707, 0, 0.707));
     Assertions.assertFalse(tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
     // Decay dirt
     when(world.getBlock(pos.down())).thenReturn(Blocks.DIRT);
-    when(world.getFlowVelocity(any(BlockState.class), any(BlockPos.class))).thenReturn(new Vec3d(0.0, 0, 1)); // south
+    when(world.getFlowVelocity(any(BlockState.class), any(EBlockPos.class))).thenReturn(new EVec3d(0.0, 0, 1)); // south
     when(world.getBlock(pos.down().south())).thenReturn(Blocks.SAND);
     Assertions.assertTrue(tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
 
@@ -149,16 +150,16 @@ public class TasksTest {
   @Test
   void testMaybeAddMoss() {
     final ErosionWorld world = mock(ErosionWorld.class);
-    final BlockPos pos = new BlockPos(0, 0, 0);
+    final EBlockPos pos = new EBlockPos(0, 0, 0);
     final Random rand = new Random(); // unused, in tests
 
     // Found water
-    when(world.getBlock(any(BlockPos.class))).thenReturn(Blocks.WATER);
+    when(world.getBlock(any(EBlockPos.class))).thenReturn(Blocks.WATER);
     Assertions.assertFalse(tasks.maybeAddMoss(world, pos, rand));
 
     // Found cobble, which is DECAY_ALWAYS_ODDS, adds moss
-    when(world.getBlock(any(BlockPos.class))).thenReturn(Blocks.COBBLESTONE);
+    when(world.getBlock(any(EBlockPos.class))).thenReturn(Blocks.COBBLESTONE);
     Assertions.assertTrue(tasks.maybeAddMoss(world, pos, rand));
-    verify(world).setBlockState(any(BlockPos.class), eq(Blocks.MOSSY_COBBLESTONE.getDefaultState()), anyInt());
+    verify(world).setBlockState(any(EBlockPos.class), eq(Blocks.MOSSY_COBBLESTONE.getDefaultState()), anyInt());
   }
 }

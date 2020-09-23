@@ -11,6 +11,8 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com._13rac1.erosion.common.ErodableBlocks;
+
 @Mod("water-erosion")
 public class WaterErosionMod {
   private static final Logger LOGGER = LogManager.getLogger();
@@ -23,6 +25,9 @@ public class WaterErosionMod {
     MinecraftForge.EVENT_BUS.register(this);
 
     Config.loadConfig(Config.COMMON_CONFIG, FMLPaths.CONFIGDIR.get().resolve("water-erosion.toml"));
+
+    // Set the ErodableBlocks Config static to a new instance of the ErosionConfig.
+    ErodableBlocks.Config = new ErosionConfig();
   }
 
   private void setup(final FMLCommonSetupEvent event) {
