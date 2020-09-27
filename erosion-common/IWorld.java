@@ -6,7 +6,7 @@ import net.minecraft.block.BlockState;
 import com._13rac1.erosion.minecraft.EBlockPos;
 import com._13rac1.erosion.minecraft.EVec3d;
 
-public interface ErosionWorld {
+public interface IWorld {
   BlockState getBlockState(EBlockPos pos);
 
   Block getBlock(EBlockPos pos);

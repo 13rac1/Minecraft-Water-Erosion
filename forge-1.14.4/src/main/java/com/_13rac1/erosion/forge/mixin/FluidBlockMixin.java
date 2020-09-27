@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com._13rac1.erosion.common.ErosionWorld;
 import com._13rac1.erosion.common.Tasks;
 
 import com._13rac1.erosion.minecraft.EBlockPos;

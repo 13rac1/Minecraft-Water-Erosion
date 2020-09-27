@@ -69,7 +69,7 @@ public class TasksTest {
   void testIsEdgeNorth() {
     // isEdge() checks north first, so this is just a test of the first return.
     // TODO: Check failure cases.
-    final ErosionWorld world = mock(ErosionWorld.class);
+    final IWorld world = mock(IWorld.class);
     final EBlockPos pos = new EBlockPos(0, 0, 0);
 
     when(world.getBlock(pos.north().down())).thenReturn(Blocks.WATER);
@@ -79,7 +79,7 @@ public class TasksTest {
 
   @Test
   void testAirFlowInPath() {
-    final ErosionWorld world = mock(ErosionWorld.class);
+    final IWorld world = mock(IWorld.class);
     final EBlockPos pos = new EBlockPos(0, 0, 0);
     final EVec3i dir = new EVec3i(1, 0, 0); // South is positive
 
@@ -107,7 +107,7 @@ public class TasksTest {
 
   @Test
   void testMaybeDecayUnder() {
-    final ErosionWorld world = mock(ErosionWorld.class);
+    final IWorld world = mock(IWorld.class);
     final EBlockPos pos = new EBlockPos(0, 0, 0);
     final BlockState stateWater = Blocks.WATER.getDefaultState();
     final Random rand = new Random(); // unused, in tests
@@ -149,7 +149,7 @@ public class TasksTest {
 
   @Test
   void testMaybeAddMoss() {
-    final ErosionWorld world = mock(ErosionWorld.class);
+    final IWorld world = mock(IWorld.class);
     final EBlockPos pos = new EBlockPos(0, 0, 0);
     final Random rand = new Random(); // unused, in tests
 

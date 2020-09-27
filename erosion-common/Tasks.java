@@ -73,7 +73,7 @@ public class Tasks {
       new EVec3i(0, 1, 1));
 
   // Primary run function
-  public void run(BlockState state, ErosionWorld world, EBlockPos pos, Random rand) {
+  public void run(BlockState state, IWorld world, EBlockPos pos, Random rand) {
 
     Integer level = state.get(EFluidBlock.LEVEL);
 
@@ -97,7 +97,7 @@ public class Tasks {
     maybeDecayUnder(state, world, pos, rand, level);
   }
 
-  private void maybeErodeEdge(BlockState state, ErosionWorld world, EBlockPos pos, Random rand, Integer level) {
+  private void maybeErodeEdge(BlockState state, IWorld world, EBlockPos pos, Random rand, Integer level) {
     // Get the block under us.
     EBlockPos underPos = pos.down();
     Block underBlock = world.getBlock(underPos);
@@ -169,7 +169,7 @@ public class Tasks {
     // callback?
   }
 
-  protected boolean isEdge(ErosionWorld world, EBlockPos pos) {
+  protected boolean isEdge(IWorld world, EBlockPos pos) {
     List<EBlockPos> listSidePos = Arrays.asList(pos.north(), pos.south(), pos.east(), pos.west());
 
     for (EBlockPos sidePos : listSidePos) {
@@ -198,7 +198,7 @@ public class Tasks {
     return in.crossProduct(VECTOR_UP);
   }
 
-  protected boolean treeInColumn(ErosionWorld world, EBlockPos pos) {
+  protected boolean treeInColumn(IWorld world, EBlockPos pos) {
     final Integer MAX_UP = 5;
     Integer count = 0;
     EBlockPos currentPos = pos.up();
@@ -224,7 +224,7 @@ public class Tasks {
     Integer distance;
   }
 
-  private boolean maybeFlowingWall(BlockState state, ErosionWorld world, EBlockPos pos, Random rand, Integer level) {
+  private boolean maybeFlowingWall(BlockState state, IWorld world, EBlockPos pos, Random rand, Integer level) {
 
     if (!wallBreakers.contains(level)) {
       // level Flow7 goes down, never to the side.
@@ -365,7 +365,7 @@ public class Tasks {
     return true;
   }
 
-  private void maybeSourceBreak(BlockState state, ErosionWorld world, EBlockPos pos, Random rand, Integer level) {
+  private void maybeSourceBreak(BlockState state, IWorld world, EBlockPos pos, Random rand, Integer level) {
     // Source blocks only.
     if (level != FluidLevel.SOURCE) {
       return;
@@ -469,7 +469,7 @@ public class Tasks {
   }
 
   // Start from the provided EBlockPos and trace
-  protected boolean airInFlowPath(ErosionWorld world, EBlockPos pos, EVec3i dir) {
+  protected boolean airInFlowPath(IWorld world, EBlockPos pos, EVec3i dir) {
     int yDeeper = 0;
     for (int airMultipler : Arrays.asList(7, 14)) {
       EVec3i airDirection = new EVec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
@@ -488,7 +488,7 @@ public class Tasks {
 
   // Trace the flow path from the current position given the flow level to find
   // the distance to the closest open space: air, cave air, water, or leaves.
-  protected Integer distanceToAirWaterInFlowPath(ErosionWorld world, EBlockPos pos, EVec3i dir, Integer level) {
+  protected Integer distanceToAirWaterInFlowPath(IWorld world, EBlockPos pos, EVec3i dir, Integer level) {
     if (level > FluidLevel.FLOW7) {
       return 128;
     }
@@ -539,7 +539,7 @@ public class Tasks {
     return 128; // Meaningless high value
   }
 
-  protected boolean maybeDecayUnder(BlockState state, ErosionWorld world, EBlockPos pos, Random rand, Integer level) {
+  protected boolean maybeDecayUnder(BlockState state, IWorld world, EBlockPos pos, Random rand, Integer level) {
     // TODO: Should we be using rand?
     // return if water is source or falling or FLOW7
     if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW7) {
@@ -598,7 +598,7 @@ public class Tasks {
 
   // Cobblestone and Stone Bricks grow moss near water, check every block around.
   // Returns true when a change is made.
-  protected boolean maybeAddMoss(ErosionWorld world, EBlockPos pos, Random rand) {
+  protected boolean maybeAddMoss(IWorld world, EBlockPos pos, Random rand) {
     List<EVec3i> listDirection = posEightAround;
     // TODO: Add one level above the water line
     // listDirection.addAll(posEightAroundUp);

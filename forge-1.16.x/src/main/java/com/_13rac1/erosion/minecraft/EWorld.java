@@ -3,15 +3,15 @@ package com._13rac1.erosion.minecraft;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.fluid.IFluidState;
-import net.minecraft.world.World;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.world.server.ServerWorld;
 
 import com._13rac1.erosion.common.IWorld;
 
 public class EWorld implements IWorld {
-  private World world;
+  private ServerWorld world;
 
-  public EWorld(World world) {
+  public EWorld(ServerWorld world) {
     this.world = world;
   }
 
@@ -32,7 +32,7 @@ public class EWorld implements IWorld {
   }
 
   public EVec3d getFlowVelocity(BlockState state, EBlockPos pos) {
-    IFluidState fluidState = state.getFluidState();
+    FluidState fluidState = state.getFluidState();
     return new EVec3d(fluidState.getFlow(this.world, pos.getPos()));
   }
 

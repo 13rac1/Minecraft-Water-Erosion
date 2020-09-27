@@ -6,9 +6,9 @@ import net.minecraft.block.FluidBlock;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.world.World;
 
-import com._13rac1.erosion.common.ErosionWorld;
+import com._13rac1.erosion.common.IWorld;
 
-public class EWorld implements ErosionWorld {
+public class EWorld implements IWorld {
   private World world;
 
   public EWorld(World world) {
