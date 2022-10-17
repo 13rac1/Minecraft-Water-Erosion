@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com._13rac1.erosion.minecraft.EFluidBlock;
 import com._13rac1.erosion.minecraft.EVec3i;
-import com._13rac1.erosion.minecraft.EVec3d;
+import com._13rac1.erosion.minecraft.EVec3;
 import com._13rac1.erosion.minecraft.EBlockPos;
 import com._13rac1.erosion.minecraft.EBlockTags;
 
@@ -73,9 +73,9 @@ public class Tasks {
       new EVec3i(0, 1, 1));
 
   // Primary run function
-  public void run(BlockState state, IWorld world, EBlockPos pos, Random rand) {
+  public void run(BlockState state, IWorld world, EBlockPos pos, RandomSource rand) {
 
-    Integer level = state.get(EFluidBlock.LEVEL);
+    Integer level = state.getValue(EFluidBlock.LEVEL);
 
     maybeSourceBreak(state, world, pos, rand, level);
 
@@ -97,9 +97,9 @@ public class Tasks {
     maybeDecayUnder(state, world, pos, rand, level);
   }
 
-  private void maybeErodeEdge(BlockState state, IWorld world, EBlockPos pos, Random rand, Integer level) {
+  private void maybeErodeEdge(BlockState state, IWorld world, EBlockPos pos, RandomSource rand, Integer level) {
     // Get the block under us.
-    EBlockPos underPos = pos.down();
+    EBlockPos underPos = pos.below();
     Block underBlock = world.getBlock(underPos);
 
     // Return if the block below us is not erodable.
@@ -127,43 +127,43 @@ public class Tasks {
     if (decayBlock == Blocks.AIR) {
       // Removing the block under the water block.
       Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
-      world.setBlockState(underPos, Blocks.WATER.getDefaultState().with(EFluidBlock.LEVEL, underBlocklevel),
-          blockFlags);
+      
+      world.setBlockAndUpdate(underPos, Blocks.WATER.defaultBlockState().setValue(EFluidBlock.LEVEL, underBlocklevel));
     } else {
       // Decay the block and do nothing else.
-      world.setBlockState(underPos, decayBlock.getDefaultState(), blockFlags);
+      world.setBlockAndUpdate(underPos, decayBlock.defaultBlockState());
       return;
     }
     // Don't delete source blocks
-    if (state.get(EFluidBlock.LEVEL) == FluidLevel.SOURCE) {
+    if (state.getValue(EFluidBlock.LEVEL) == FluidLevel.SOURCE) {
       // Technically this should never happen.
       return;
     }
 
     // Delete the water block
     // TODO: Maybe the water block itself shouldn't be deleted?
-    world.setBlockState(pos, Blocks.AIR.getDefaultState(), blockFlags);
-
+    world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+    
     // Delete upwards until there's no water, a water source is found, or three
     // water blocks have been removed. The goal is to lower the water level
     // naturally without having to reflow the entire stream/creek/river. and
     // delete enough to fix water rapids, but not disrupt the flow of
     // waterfalls which results in incorrect
     Integer upDeleteCount = 0;
-    EBlockPos posUp = pos.up();
+    EBlockPos posUp = pos.above();
 
     while (world.isFluidBlock(world.getBlock(posUp))) {
       upDeleteCount++;
       if (upDeleteCount > 3) {
         break;
       }
-      if (world.getBlockState(posUp).get(EFluidBlock.LEVEL) == FluidLevel.SOURCE) {
+      if (world.getBlockState(posUp).getValue(EFluidBlock.LEVEL) == FluidLevel.SOURCE) {
         break;
       }
       // TODO: Go up until finding the last water block and delete that. The
       // rest are fine.
-      world.setBlockState(posUp, Blocks.AIR.getDefaultState(), blockFlags);
-      posUp = posUp.up();
+      world.setBlockAndUpdate(posUp, Blocks.AIR.defaultBlockState());
+      posUp = posUp.above();
     }
     // TODO: Anything further to do since we are deleting ourself? Cancel the
     // callback?
@@ -173,7 +173,7 @@ public class Tasks {
     List<EBlockPos> listSidePos = Arrays.asList(pos.north(), pos.south(), pos.east(), pos.west());
 
     for (EBlockPos sidePos : listSidePos) {
-      EBlockPos underPos = sidePos.down();
+      EBlockPos underPos = sidePos.below();
       Block underBlock = world.getBlock(underPos);
 
       if (!world.isFluidBlock(underBlock)) {
@@ -201,17 +201,19 @@ public class Tasks {
   protected boolean treeInColumn(IWorld world, EBlockPos pos) {
     final Integer MAX_UP = 5;
     Integer count = 0;
-    EBlockPos currentPos = pos.up();
+    EBlockPos currentPos = pos.above();
     while (count < MAX_UP) {
       Block currentBlock = world.getBlock(currentPos);
-      if (EBlockTags.LOGS.contains(currentBlock)) {
+      BlockState currentBlockState = world.getBlockState(currentPos);
+
+      if (currentBlockState.is(EBlockTags.LOGS)) {
         return true;
       }
       if (isAir(currentBlock)) {
         return false;
       }
       count++;
-      currentPos = currentPos.up();
+      currentPos = currentPos.above();
     }
     return false;
   }
@@ -224,7 +226,7 @@ public class Tasks {
     Integer distance;
   }
 
-  private boolean maybeFlowingWall(BlockState state, IWorld world, EBlockPos pos, Random rand, Integer level) {
+  private boolean maybeFlowingWall(BlockState state, IWorld world, EBlockPos pos, RandomSource rand, Integer level) {
 
     if (!wallBreakers.contains(level)) {
       // level Flow7 goes down, never to the side.
@@ -233,7 +235,7 @@ public class Tasks {
 
     // Find flow direction: Velocity is a 3D vector normalized to 1 pointing the
     // direction the water is flowing.
-    EVec3d velocity = world.getFlowVelocity(state, pos);
+    EVec3 velocity = world.getFlowVelocity(state, pos);
     // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
     // with a more definitive direction such as 0, 90, or 22.5.
     if (Math.abs(velocity.getX()) < 0.8 && Math.abs(velocity.getZ()) < 0.8) {
@@ -337,9 +339,10 @@ public class Tasks {
 
     // Block above cannot be wood, keep trees standing on dirt.
     // TODO: Look more than one block up for wood.
-    EBlockPos aboveFlowPos = flowPos.up();
-    Block aboveFlowBlock = world.getBlock(aboveFlowPos);
-    if (EBlockTags.LOGS.contains(aboveFlowBlock)) {
+    EBlockPos aboveFlowPos = flowPos.above();
+    BlockState aboveFlowBlockState = world.getBlockState(aboveFlowPos);
+
+    if (aboveFlowBlockState.is(EBlockTags.LOGS)) {
       return false;
     }
     // TODO: Do not remove an erodable block if the stack above is unsupported.
@@ -361,11 +364,11 @@ public class Tasks {
     // world.setBlockState(flowPos, decayBlock.getDefaultState(), blockFlags);
     // TODO: Place a water block with correct level instead of assuming
     // it will flow. Should resolve holes.
-    world.setBlockState(flowPos, Blocks.AIR.getDefaultState(), blockFlags);
+    world.setBlockAndUpdate(flowPos, Blocks.AIR.defaultBlockState());
     return true;
   }
 
-  private void maybeSourceBreak(BlockState state, IWorld world, EBlockPos pos, Random rand, Integer level) {
+  private void maybeSourceBreak(BlockState state, IWorld world, EBlockPos pos, RandomSource rand, Integer level) {
     // Source blocks only.
     if (level != FluidLevel.SOURCE) {
       return;
@@ -379,7 +382,7 @@ public class Tasks {
     }
 
     // Skip blocks without air above.
-    Block upBlock = world.getBlockState(pos.up()).getBlock();
+    Block upBlock = world.getBlockState(pos.above()).getBlock();
     if (!isAir(upBlock)) {
       // System.out.println("Not Surface Water:" +
       // world.getBlockState(pos.up()).getBlock().getName().asFormattedString());
@@ -388,7 +391,7 @@ public class Tasks {
     }
 
     // Skip blocks already flowing
-    EVec3d velocity = world.getFlowVelocity(state, pos);
+    EVec3 velocity = world.getFlowVelocity(state, pos);
     if (velocity.length() > 0) {
       return;
     }
@@ -458,7 +461,7 @@ public class Tasks {
       // System.out.println(
       // "Removing block to source side:" +
       // world.getBlockState(sidePos).getBlock().getName().asFormattedString());
-      world.setBlockState(sidePos, Blocks.AIR.getDefaultState(), blockFlags);
+      world.setBlockAndUpdate(sidePos, Blocks.AIR.defaultBlockState());
       // Only process the first erodable side found.
       return;
     }
@@ -477,8 +480,9 @@ public class Tasks {
       yDeeper++;
       EBlockPos maybeAirPos = pos.add(airDirection);
       Block maybeAirBlock = world.getBlock(maybeAirPos);
+      BlockState maybeAirBlockState = world.getBlockState(pos);
 
-      if (isAir(maybeAirBlock) || EBlockTags.LEAVES.contains(maybeAirBlock)) {
+      if (isAir(maybeAirBlock) || maybeAirBlockState.is(EBlockTags.LEAVES)) {
         return true;
       }
     }
@@ -503,6 +507,7 @@ public class Tasks {
 
     EBlockPos posCurrent = pos;
     Block blockCurrent;
+    BlockState blockstateCurrent;
     // Check how far as the current flow can go at the current height.
     while (flowDistanceRemaining > 0) {
       flowDistanceRemaining -= 1;
@@ -510,8 +515,9 @@ public class Tasks {
 
       posCurrent = posCurrent.add(dir);
       blockCurrent = world.getBlock(posCurrent);
+      blockstateCurrent = world.getBlockState(posCurrent);
 
-      if (isAir(blockCurrent) || EBlockTags.LEAVES.contains(blockCurrent) || blockCurrent == Blocks.WATER) {
+      if (isAir(blockCurrent) || blockstateCurrent.is(EBlockTags.LEAVES) || blockCurrent == Blocks.WATER) {
         return distanceToAirWater;
       }
       if (!ErodableBlocks.canErode(blockCurrent)) {
@@ -522,7 +528,7 @@ public class Tasks {
     }
 
     // Still here? Dig down and search up to 14 blocks
-    posCurrent = posCurrent.down();
+    posCurrent = posCurrent.below();
     flowDistanceRemaining = 7;
     while (flowDistanceRemaining > 0) {
       flowDistanceRemaining -= 1;
@@ -530,8 +536,9 @@ public class Tasks {
 
       posCurrent = posCurrent.add(dir);
       blockCurrent = world.getBlock(posCurrent);
+      blockstateCurrent = world.getBlockState(posCurrent);
       // TODO: Check for Water
-      if (isAir(blockCurrent) || EBlockTags.LEAVES.contains(blockCurrent)) {
+      if (isAir(blockCurrent) || blockstateCurrent.is(EBlockTags.LEAVES)) {
         return distanceToAirWater;
       }
     }
@@ -539,14 +546,14 @@ public class Tasks {
     return 128; // Meaningless high value
   }
 
-  protected boolean maybeDecayUnder(BlockState state, IWorld world, EBlockPos pos, Random rand, Integer level) {
+  protected boolean maybeDecayUnder(BlockState state, IWorld world, EBlockPos pos, RandomSource rand, Integer level) {
     // TODO: Should we be using rand?
     // return if water is source or falling or FLOW7
     if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW7) {
       return false;
     }
     // Get the block under us.
-    EBlockPos underPos = pos.down();
+    EBlockPos underPos = pos.below();
     Block underBlock = world.getBlock(underPos);
 
     if (!ErodableBlocks.canErode(underBlock)) {
@@ -561,7 +568,7 @@ public class Tasks {
       return false;
     }
 
-    EVec3d velocity = world.getFlowVelocity(state, pos);
+    EVec3 velocity = world.getFlowVelocity(state, pos);
     // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
     // with a more definitive direction such as 0, 90, or 22.5.
     if (Math.abs(velocity.getX()) < 0.8 && Math.abs(velocity.getZ()) < 0.8) {
@@ -581,7 +588,7 @@ public class Tasks {
     if (!ErodableBlocks.getDecayList(underBlock).contains(flowBlock)) {
       return false;
     }
-    world.setBlockState(underPos, decayTo.getDefaultState(), blockFlags);
+    world.setBlockAndUpdate(underPos, decayTo.defaultBlockState());
     // System.out.println("maybeDecayUnder!");
     return true;
   }
@@ -598,7 +605,7 @@ public class Tasks {
 
   // Cobblestone and Stone Bricks grow moss near water, check every block around.
   // Returns true when a change is made.
-  protected boolean maybeAddMoss(IWorld world, EBlockPos pos, Random rand) {
+  protected boolean maybeAddMoss(IWorld world, EBlockPos pos, RandomSource rand) {
     List<EVec3i> listDirection = posEightAround;
     // TODO: Add one level above the water line
     // listDirection.addAll(posEightAroundUp);
@@ -622,7 +629,7 @@ public class Tasks {
       if (mossBlock == Blocks.AIR) {
         return false; // Stop the loop
       }
-      world.setBlockState(sidePos, mossBlock.getDefaultState(), blockFlags);
+      world.setBlockAndUpdate(sidePos, mossBlock.defaultBlockState());
       return true; // Stop the loop
     }
     return false;

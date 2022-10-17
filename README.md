@@ -44,31 +44,16 @@ Decay hierarchy:
 
 Supported versions:
 
+* Forge 1.19.x
+
+Previously Supported Versions:
+
 * Fabric 1.14.4
 * Fabric 1.15.2
 * Fabric 1.16.x
 * Forge 1.14.4
 * Forge 1.15.2
 * Forge 1.16.x
-
-### Fabric versions
-
-Download the current release `water-erosion-x.x.x-fabric-x.x.x.jar` and add to
-your installation.
-
-### Forge versions
-
-The Forge version for Minecraft 1.12.2 is a Coremod containing an embedded copy
-of the org.spongepowered.asm.launch.MixinTweaker library.
-
-The Forge versions for Minecraft 1.14.4+ require
-[MixinBootstrap][MixinBootstrap]. Download the current release
-`water-erosion-x.x.x-forge-x.x.x.jar`, then download the
-[`MixinBootstrap-1.0.0.jar`][MixinBootstrapJar]. Put both files in your
-MinecraftForge Mod folder.
-
-[MixinBootstrap]: https://github.com/LXGaming/MixinBootstrap
-[MixinBootstrapJar]: https://github.com/LXGaming/MixinBootstrap/releases/download/v1.0.2/MixinBootstrap-1.0.2.jar
 
 ## TODO features
 
@@ -147,18 +132,8 @@ Tested on Minecraft 1.15.1
 
 Aquarela - Russian documentary about water
 
-## Build
-
-This monorepo builds all supported Fabric and Forge versions. The important
-"business rules" are abstracted into a separate library which is symlinked into
-each project.
-
-```bash
-make # Builds all supported versions.
-```
-
 ## License
 
 ### Water Erosion Mod for Minecraft
 
-Copyright 2020 by Brad Erickson. Licensed GPL.
+Copyright 2022 by Brad Erickson. Licensed GPL.

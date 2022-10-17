@@ -2,10 +2,11 @@ package com._13rac1.erosion.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com._13rac1.erosion.minecraft.EBlockTags;
 
@@ -114,8 +115,9 @@ public class ErodableBlocks {
       erodables.put(Blocks.PODZOL, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
       erodables.put(Blocks.GRASS_BLOCK, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
       erodables.put(Blocks.GRASS, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
-      // Grass Paths grow into Grass
-      erodables.put(Blocks.GRASS_PATH, new Erodable(GRASS_RESIST_ODDS, Blocks.GRASS));
+      // Dirt Paths grow into Grass
+      // Note: 1.17.x - grass_path blocks have been renamed to dirt_path
+      erodables.put(Blocks.DIRT_PATH, new Erodable(GRASS_RESIST_ODDS, Blocks.GRASS));
       erodables.put(Blocks.MOSSY_COBBLESTONE, new Erodable(COBBLE_RESIST_ODDS, Blocks.GRAVEL));
       // Directly to air because the gravel block is a larger volume than the original
       erodables.put(Blocks.MOSSY_COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
@@ -157,11 +159,12 @@ public class ErodableBlocks {
 
     // Check block tags to erode leaves, wool, and mod-provided blocks.
     // TODO: Less CPU to fill the hashmap with all values once.
-    if (EBlockTags.LEAVES.contains(block)) {
+    BlockState bs = block.defaultBlockState();
+    if (bs.is(EBlockTags.LEAVES)) {
       return LEAF_RESIST_ODDS;
-    } else if (EBlockTags.SAND.contains(block)) {
+    } else if (bs.is(EBlockTags.SAND)) {
       return SAND_RESIST_ODDS;
-    } else if (EBlockTags.WOOL.contains(block)) {
+    } else if (bs.is(EBlockTags.WOOL)) {
       return WOOL_RESIST_ODDS;
     }
 
@@ -172,13 +175,13 @@ public class ErodableBlocks {
     return getResistance(block) != MAX_RESIST_ODDS;
   }
 
-  public static boolean maybeErode(Random rand, Block block) {
+  public static boolean maybeErode(RandomSource rand, Block block) {
     return rand.nextInt(getResistance(block)) == 0;
   }
 
   // maybeDecay decides which block the passed block should decay to. It returns
   // Blocks.AIR by default, but some callers may place water instead.
-  public static Block maybeDecay(Random rand, Block block) {
+  public static Block maybeDecay(RandomSource rand, Block block) {
     Integer odds = DECAY_NEVER_ODDS;
 
     Block decayToBlock = Blocks.AIR;
