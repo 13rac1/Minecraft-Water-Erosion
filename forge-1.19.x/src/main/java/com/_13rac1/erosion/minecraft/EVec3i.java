@@ -18,7 +18,7 @@ public class EVec3i {
   }
 
   public EVec3i(double x, double y, double z) {
-    this.vec = new Vec3i(x, y, z);
+    this.vec = new Vec3i((int) x, (int) y, (int) z);
   }
 
   private Vec3i getVec() {

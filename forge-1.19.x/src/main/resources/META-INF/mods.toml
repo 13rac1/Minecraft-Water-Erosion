@@ -49,6 +49,6 @@ Erosion brings water to life in Minecraft. Worlds evolve with creeks, streams, a
 [[dependencies.watererosion]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.2]"
+    versionRange="[1.19.4]"
     ordering="NONE"
     side="BOTH"
