@@ -45,6 +45,7 @@ Decay hierarchy:
 Supported versions:
 
 * Forge 1.19.x
+* Fabric 1.19.x
 
 Previously Supported Versions:
 
@@ -136,4 +137,4 @@ Aquarela - Russian documentary about water
 
 ### Water Erosion Mod for Minecraft
 
-Copyright 2022 by Brad Erickson. Licensed GPL.
+Copyright 2023 by Brad Erickson. Licensed GPL.

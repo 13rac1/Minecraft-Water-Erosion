@@ -1,1 +1,0 @@
-MixinConnector: com._13rac1.erosion.forge.MixinConnector
