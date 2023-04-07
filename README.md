@@ -82,6 +82,9 @@ Source water blocks at or below the world sea level are ignored to reduce CPU us
 
 ## Test Areas
 
+Note: All test areas were found in pre-1.17 before the major world gen updates in
+Caves & Cliffs, so new ones need to be located.
+
 Create each world, teleport to the specified location, and, optionally, change
 the `randomTickSpeed` setting to speed up the process.
 
@@ -132,6 +135,22 @@ Tested on Minecraft 1.15.1
 ## Inspiration
 
 Aquarela - Russian documentary about water
+
+## Development
+
+### Forge Dev
+
+Forge dependency versions are specified in:
+
+* `build.gradle`
+* `src/main/resources/META-INF/mods.toml`
+
+### Fabric Dev
+
+Fabric dependency versions are specified in:
+
+* `gradle.properties`
+* `src/main/resources/fabric.mod.json`
 
 ## License
 
