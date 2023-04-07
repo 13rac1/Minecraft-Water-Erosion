@@ -12,9 +12,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-
-import com._13rac1.erosion.minecraft.EFluidBlock;
-import com._13rac1.erosion.minecraft.EBlockTags;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.tags.BlockTags;
 
 // TODO: Add Menu to allow disable of some features:
 // https://www.curseforge.com/minecraft/mc-mods/modmenu
@@ -75,7 +74,7 @@ public class Tasks {
   // Primary run function
   public void run(BlockState state, IWorld world, BlockPos pos, RandomSource rand) {
 
-    Integer level = state.getValue(EFluidBlock.LEVEL);
+    Integer level = state.getValue(LiquidBlock.LEVEL);
 
     maybeSourceBreak(state, world, pos, rand, level);
 
@@ -128,14 +127,14 @@ public class Tasks {
       // Removing the block under the water block.
       Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
 
-      world.setBlockAndUpdate(underPos, Blocks.WATER.defaultBlockState().setValue(EFluidBlock.LEVEL, underBlocklevel));
+      world.setBlockAndUpdate(underPos, Blocks.WATER.defaultBlockState().setValue(LiquidBlock.LEVEL, underBlocklevel));
     } else {
       // Decay the block and do nothing else.
       world.setBlockAndUpdate(underPos, decayBlock.defaultBlockState());
       return;
     }
     // Don't delete source blocks
-    if (state.getValue(EFluidBlock.LEVEL) == FluidLevel.SOURCE) {
+    if (state.getValue(LiquidBlock.LEVEL) == FluidLevel.SOURCE) {
       // Technically this should never happen.
       return;
     }
@@ -157,7 +156,7 @@ public class Tasks {
       if (upDeleteCount > 3) {
         break;
       }
-      if (world.getBlockState(posUp).getValue(EFluidBlock.LEVEL) == FluidLevel.SOURCE) {
+      if (world.getBlockState(posUp).getValue(LiquidBlock.LEVEL) == FluidLevel.SOURCE) {
         break;
       }
       // TODO: Go up until finding the last water block and delete that. The
@@ -206,7 +205,7 @@ public class Tasks {
       Block currentBlock = world.getBlock(currentPos);
       BlockState currentBlockState = world.getBlockState(currentPos);
 
-      if (currentBlockState.is(EBlockTags.LOGS)) {
+      if (currentBlockState.is(BlockTags.LOGS)) {
         return true;
       }
       if (isAir(currentBlock)) {
@@ -342,7 +341,7 @@ public class Tasks {
     BlockPos aboveFlowPos = flowPos.above();
     BlockState aboveFlowBlockState = world.getBlockState(aboveFlowPos);
 
-    if (aboveFlowBlockState.is(EBlockTags.LOGS)) {
+    if (aboveFlowBlockState.is(BlockTags.LOGS)) {
       return false;
     }
     // TODO: Do not remove an erodable block if the stack above is unsupported.
@@ -482,7 +481,7 @@ public class Tasks {
       Block maybeAirBlock = world.getBlock(maybeAirPos);
       BlockState maybeAirBlockState = world.getBlockState(pos);
 
-      if (isAir(maybeAirBlock) || maybeAirBlockState.is(EBlockTags.LEAVES)) {
+      if (isAir(maybeAirBlock) || maybeAirBlockState.is(BlockTags.LEAVES)) {
         return true;
       }
     }
@@ -517,7 +516,7 @@ public class Tasks {
       blockCurrent = world.getBlock(posCurrent);
       blockstateCurrent = world.getBlockState(posCurrent);
 
-      if (isAir(blockCurrent) || blockstateCurrent.is(EBlockTags.LEAVES) || blockCurrent == Blocks.WATER) {
+      if (isAir(blockCurrent) || blockstateCurrent.is(BlockTags.LEAVES) || blockCurrent == Blocks.WATER) {
         return distanceToAirWater;
       }
       if (!ErodableBlocks.canErode(blockCurrent)) {
@@ -538,7 +537,7 @@ public class Tasks {
       blockCurrent = world.getBlock(posCurrent);
       blockstateCurrent = world.getBlockState(posCurrent);
       // TODO: Check for Water
-      if (isAir(blockCurrent) || blockstateCurrent.is(EBlockTags.LEAVES)) {
+      if (isAir(blockCurrent) || blockstateCurrent.is(BlockTags.LEAVES)) {
         return distanceToAirWater;
       }
     }

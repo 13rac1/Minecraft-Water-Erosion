@@ -7,8 +7,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-
-import com._13rac1.erosion.minecraft.EBlockTags;
+import net.minecraft.tags.BlockTags;
 
 // Differing erosion resistance depending on the type of block.
 // leaves < sand < gravel < dirt < grass
@@ -160,11 +159,11 @@ public class ErodableBlocks {
     // Check block tags to erode leaves, wool, and mod-provided blocks.
     // TODO: Less CPU to fill the hashmap with all values once.
     BlockState bs = block.defaultBlockState();
-    if (bs.is(EBlockTags.LEAVES)) {
+    if (bs.is(BlockTags.LEAVES)) {
       return LEAF_RESIST_ODDS;
-    } else if (bs.is(EBlockTags.SAND)) {
+    } else if (bs.is(BlockTags.SAND)) {
       return SAND_RESIST_ODDS;
-    } else if (bs.is(EBlockTags.WOOL)) {
+    } else if (bs.is(BlockTags.WOOL)) {
       return WOOL_RESIST_ODDS;
     }
 
