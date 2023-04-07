@@ -1,6 +1,6 @@
 package com._13rac1.erosion.minecraft;
 
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.core.Vec3i;
 
 public class EVec3i {
   Vec3i vec;
@@ -18,7 +18,7 @@ public class EVec3i {
   }
 
   public EVec3i(double x, double y, double z) {
-    this.vec = new Vec3i(x, y, z);
+    this.vec = new Vec3i((int) x, (int) y, (int) z);
   }
 
   private Vec3i getVec() {
@@ -38,25 +38,6 @@ public class EVec3i {
   }
 
   public EVec3i crossProduct(EVec3i vec) {
-    return new EVec3i(this.vec.crossProduct(vec.getVec()));
-  }
-
-  // Overriding equals() to compare two EVec3i objects
-  // ref: https://www.geeksforgeeks.org/overriding-equals-method-in-java/
-  // Required for the unit tests which currently only appear in Forge-1.14.4
-  @Override
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    }
-
-    if (!(o instanceof EVec3i)) {
-      return false;
-    }
-
-    EVec3i v = (EVec3i) o;
-
-    // Compare wrapped Vec3i objects instead.
-    return this.vec.equals(v.vec);
-  }
+    return new EVec3i(this.vec.cross(this.vec));
+  };
 }

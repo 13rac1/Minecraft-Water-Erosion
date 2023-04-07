@@ -1,17 +1,17 @@
 package com._13rac1.erosion.minecraft;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.Level;
 
 import com._13rac1.erosion.common.IWorld;
 
 public class EWorld implements IWorld {
-  private World world;
+  private Level world;
 
-  public EWorld(World world) {
+  public EWorld(Level world) {
     this.world = world;
   }
 
@@ -23,21 +23,21 @@ public class EWorld implements IWorld {
     return this.world.getBlockState(pos.getPos()).getBlock();
   }
 
-  public Boolean setBlockState(EBlockPos pos, BlockState newState, Integer flags) {
-    return this.world.setBlockState(pos.getPos(), newState, flags);
+  public Boolean setBlockAndUpdate(EBlockPos pos, BlockState newState) {
+    return this.world.setBlockAndUpdate(pos.getPos(), newState);
   }
 
   public int getSeaLevel() {
     return this.world.getSeaLevel();
   }
 
-  public EVec3d getFlowVelocity(BlockState state, EBlockPos pos) {
+  public EVec3 getFlowVelocity(BlockState state, EBlockPos pos) {
     FluidState fluidState = state.getFluidState();
-    return new EVec3d(fluidState.getVelocity(this.world, pos.getPos()));
+    return new EVec3(fluidState.getFlow(this.world, pos.getPos()));
   }
 
   public Boolean isFluidBlock(Block block) {
-    return block instanceof FluidBlock;
+    return block instanceof LiquidBlock;
   }
 
 }

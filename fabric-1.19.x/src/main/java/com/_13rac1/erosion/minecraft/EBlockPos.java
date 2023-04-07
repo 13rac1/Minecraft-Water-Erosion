@@ -1,6 +1,6 @@
 package com._13rac1.erosion.minecraft;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public class EBlockPos {
   private BlockPos pos;
@@ -9,21 +9,17 @@ public class EBlockPos {
     this.pos = pos;
   }
 
-  public EBlockPos(int x, int y, int z) {
-    this.pos = new BlockPos(x, y, z);
-  }
-
   public BlockPos getPos() {
     // TODO: Make private?
     return this.pos;
   }
 
-  public EBlockPos up() {
-    return new EBlockPos(this.pos.up());
+  public EBlockPos above() {
+    return new EBlockPos(this.pos.above());
   }
 
-  public EBlockPos down() {
-    return new EBlockPos(this.pos.down());
+  public EBlockPos below() {
+    return new EBlockPos(this.pos.below());
   }
 
   public EBlockPos north() {
@@ -39,11 +35,12 @@ public class EBlockPos {
   }
 
   public EBlockPos west() {
+
     return new EBlockPos(this.pos.west());
   }
 
   public EBlockPos add(EVec3i value) {
-    return new EBlockPos(this.pos.add(value.vec));
+    return new EBlockPos(this.pos.offset(value.vec));
   }
 
   public int getX() {
@@ -56,25 +53,6 @@ public class EBlockPos {
 
   public int getZ() {
     return pos.getZ();
-  }
-
-  // Overriding equals() to compare two EBlockPos objects
-  // ref: https://www.geeksforgeeks.org/overriding-equals-method-in-java/
-  // Required for the unit tests which currently only appear in Forge-1.14.4
-  @Override
-  public boolean equals(Object o) {
-    if (o == this) {
-      return true;
-    }
-
-    if (!(o instanceof EBlockPos)) {
-      return false;
-    }
-
-    EBlockPos bp = (EBlockPos) o;
-
-    // Compare wrapped BlockPos objects instead.
-    return pos.equals(bp.pos);
   }
 
 }
