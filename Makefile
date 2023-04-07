@@ -9,7 +9,6 @@ build:
 	mkdir -p dist
 	cp fabric-*/build/libs/*.jar dist/
 	cp forge-*/build/libs/*.jar dist/
-	rm dist/*-dev.jar
 
 # Fix/upgrade tests
 #.PHONY: test
