@@ -14,7 +14,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com._13rac1.erosion.common.Tasks;
-import com._13rac1.erosion.minecraft.EWorld;
 
 @Mixin(LiquidBlock.class)
 public class LiquidBlockMixin extends Block {
@@ -32,8 +31,7 @@ public class LiquidBlockMixin extends Block {
 
 	@Inject(method = "randomTick", at = @At("HEAD"), require = 1)
 	public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rand, CallbackInfo info) {
-		EWorld forgeWorld = new EWorld(world);
 
-		tasks.run(state, forgeWorld, new BlockPos(pos), rand);
+		tasks.run(state, world, new BlockPos(pos), rand);
 	}
 }

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.tags.BlockTags;
 
 // TODO: Add Menu to allow disable of some features:
@@ -58,10 +60,6 @@ public class Tasks {
   private static final Vec3i VECTOR_WEST = new Vec3i(-1, 0, 0);
   private static final Vec3i VECTOR_NORTH_WEST = new Vec3i(-1, 0, -1);
 
-  // blockFlags is used with world.setBlockState() when blocks are replaced with
-  // air.
-  private static final Integer blockFlags = BlockFlag.PROPAGATE_CHANGE | BlockFlag.NOTIFY_LISTENERS;
-
   private static final List<Vec3i> posFourEdges = Arrays.asList(VECTOR_NORTH, VECTOR_EAST, VECTOR_SOUTH, VECTOR_WEST);
 
   private static final List<Vec3i> posEightAround = Arrays.asList(VECTOR_NORTH, VECTOR_NORTH_EAST, VECTOR_EAST,
@@ -72,7 +70,7 @@ public class Tasks {
       new Vec3i(0, 1, 1));
 
   // Primary run function
-  public void run(BlockState state, IWorld world, BlockPos pos, RandomSource rand) {
+  public void run(BlockState state, Level world, BlockPos pos, RandomSource rand) {
 
     Integer level = state.getValue(LiquidBlock.LEVEL);
 
@@ -96,10 +94,34 @@ public class Tasks {
     maybeDecayUnder(state, world, pos, rand, level);
   }
 
-  private void maybeErodeEdge(BlockState state, IWorld world, BlockPos pos, RandomSource rand, Integer level) {
+  /**
+   * Find flow direction: Velocity is a 3D vector normalized to 1 pointing the 2D
+   * direction the water is flowing, ignoring up and down.
+   */
+  // Range of possible values include:
+  // (-1.0, 0.0, 0.0)
+  // (0.0, 0.0, -1.0)
+  // (0.8944271606898969, 0.0, -0.44721361033295565)
+  // (0.7071067613036184, 0.0, -0.7071067613036184)
+  // (0.9999999664723898, 0.0, 0.0)
+  // (0.3162277853996985, 0.0, -0.9486833137896449) - Rare
+  public Vec3 getFlowVelocity(Level world, BlockState state, BlockPos pos) {
+    FluidState fluidState = state.getFluidState();
+    return fluidState.getFlow(world, pos);
+  }
+
+  public Boolean isFluidBlock(Block block) {
+    return block instanceof LiquidBlock;
+  }
+
+  public Block getBlock(Level world, BlockPos pos) {
+    return world.getBlockState(pos).getBlock();
+  }
+
+  private void maybeErodeEdge(BlockState state, Level world, BlockPos pos, RandomSource rand, Integer level) {
     // Get the block under us.
     BlockPos underPos = pos.below();
-    Block underBlock = world.getBlock(underPos);
+    Block underBlock = getBlock(world, underPos);
 
     // Return if the block below us is not erodable.
     // TODO: Technically this call is redundant now.
@@ -151,7 +173,7 @@ public class Tasks {
     Integer upDeleteCount = 0;
     BlockPos posUp = pos.above();
 
-    while (world.isFluidBlock(world.getBlock(posUp))) {
+    while (isFluidBlock(getBlock(world, posUp))) {
       upDeleteCount++;
       if (upDeleteCount > 3) {
         break;
@@ -168,14 +190,14 @@ public class Tasks {
     // callback?
   }
 
-  protected boolean isEdge(IWorld world, BlockPos pos) {
+  protected boolean isEdge(Level world, BlockPos pos) {
     List<BlockPos> listSidePos = Arrays.asList(pos.north(), pos.south(), pos.east(), pos.west());
 
     for (BlockPos sidePos : listSidePos) {
       BlockPos underPos = sidePos.below();
-      Block underBlock = world.getBlock(underPos);
+      Block underBlock = getBlock(world, underPos);
 
-      if (!world.isFluidBlock(underBlock)) {
+      if (!isFluidBlock(underBlock)) {
         // System.out.println("Did not find side under water block: " +
         // underBlock.getClass().getName());
         continue;
@@ -197,12 +219,12 @@ public class Tasks {
     return in.cross(VECTOR_UP);
   }
 
-  protected boolean treeInColumn(IWorld world, BlockPos pos) {
+  protected boolean treeInColumn(Level world, BlockPos pos) {
     final Integer MAX_UP = 5;
     Integer count = 0;
     BlockPos currentPos = pos.above();
     while (count < MAX_UP) {
-      Block currentBlock = world.getBlock(currentPos);
+      Block currentBlock = getBlock(world, currentPos);
       BlockState currentBlockState = world.getBlockState(currentPos);
 
       if (currentBlockState.is(BlockTags.LOGS)) {
@@ -225,7 +247,7 @@ public class Tasks {
     Integer distance;
   }
 
-  private boolean maybeFlowingWall(BlockState state, IWorld world, BlockPos pos, RandomSource rand, Integer level) {
+  private boolean maybeFlowingWall(BlockState state, Level world, BlockPos pos, RandomSource rand, Integer level) {
 
     if (!wallBreakers.contains(level)) {
       // level Flow7 goes down, never to the side.
@@ -234,7 +256,7 @@ public class Tasks {
 
     // Find flow direction: Velocity is a 3D vector normalized to 1 pointing the
     // direction the water is flowing.
-    Vec3 velocity = world.getFlowVelocity(state, pos);
+    Vec3 velocity = getFlowVelocity(world, state, pos);
     // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
     // with a more definitive direction such as 0, 90, or 22.5.
     if (Math.abs(velocity.x) < 0.8 && Math.abs(velocity.z) < 0.8) {
@@ -253,7 +275,7 @@ public class Tasks {
         (int) Math.round(velocity.z));
 
     BlockPos posForward = pos.offset(dirForward);
-    Block blockForward = world.getBlock(posForward);
+    Block blockForward = getBlock(world, posForward);
     // The block in the direction of flow must be a solid block, not
     // air/water/lava. This is the defining feature of a "wall break", there
     // must be a wall.
@@ -274,8 +296,8 @@ public class Tasks {
     // Must be an erodable block without a tree above, not air, water, or
     // something not erodable.
     Boolean canErodeForward = ErodableBlocks.canErode(blockForward) && !treeInColumn(world, posForward);
-    Boolean canErodeLeft = ErodableBlocks.canErode(world.getBlock(posLeft)) && !treeInColumn(world, posLeft);
-    Boolean canErodeRight = ErodableBlocks.canErode(world.getBlock(posRight)) && !treeInColumn(world, posRight);
+    Boolean canErodeLeft = ErodableBlocks.canErode(getBlock(world, posLeft)) && !treeInColumn(world, posLeft);
+    Boolean canErodeRight = ErodableBlocks.canErode(getBlock(world, posRight)) && !treeInColumn(world, posRight);
     if (!canErodeForward && !canErodeLeft && !canErodeRight) {
       return false;
     }
@@ -348,7 +370,7 @@ public class Tasks {
     // Search around the stack to confirm a block other than air and water is
     // touching it.
 
-    Block wallBlock = world.getBlock(flowPos);
+    Block wallBlock = getBlock(world, flowPos);
     if (!ErodableBlocks.canErode(wallBlock)) {
       return false;
     }
@@ -360,14 +382,14 @@ public class Tasks {
     // means the flows will not go as far as blocks erode below. Perhaps this is
     // more realistic limits.
     // Block decayBlock = ErodableBlocks.maybeDecay(rand, wallBlock);
-    // world.setBlockState(flowPos, decayBlock.getDefaultState(), blockFlags);
+    // world.setBlockState(flowPos, decayBlock.getDefaultState());
     // TODO: Place a water block with correct level instead of assuming
     // it will flow. Should resolve holes.
     world.setBlockAndUpdate(flowPos, Blocks.AIR.defaultBlockState());
     return true;
   }
 
-  private void maybeSourceBreak(BlockState state, IWorld world, BlockPos pos, RandomSource rand, Integer level) {
+  private void maybeSourceBreak(BlockState state, Level world, BlockPos pos, RandomSource rand, Integer level) {
     // Source blocks only.
     if (level != FluidLevel.SOURCE) {
       return;
@@ -390,7 +412,7 @@ public class Tasks {
     }
 
     // Skip blocks already flowing
-    Vec3 velocity = world.getFlowVelocity(state, pos);
+    Vec3 velocity = getFlowVelocity(world, state, pos);
     if (velocity.length() > 0) {
       return;
     }
@@ -405,7 +427,7 @@ public class Tasks {
     for (Vec3i dir : listDirection) {
       BlockPos sidePos = pos.offset(dir);
 
-      Block sideBlock = world.getBlock(sidePos);
+      Block sideBlock = getBlock(world, sidePos);
       if (sideBlock == Blocks.WATER) {
         // Short circuit water blocks. Should save CPU as this will be the most
         // common result.
@@ -471,14 +493,14 @@ public class Tasks {
   }
 
   // Start from the provided BlockPos and trace
-  protected boolean airInFlowPath(IWorld world, BlockPos pos, Vec3i dir) {
+  protected boolean airInFlowPath(Level world, BlockPos pos, Vec3i dir) {
     int yDeeper = 0;
     for (int airMultipler : Arrays.asList(7, 14)) {
       Vec3i airDirection = new Vec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
       // Go deeper each iteration
       yDeeper++;
       BlockPos maybeAirPos = pos.offset(airDirection);
-      Block maybeAirBlock = world.getBlock(maybeAirPos);
+      Block maybeAirBlock = getBlock(world, maybeAirPos);
       BlockState maybeAirBlockState = world.getBlockState(pos);
 
       if (isAir(maybeAirBlock) || maybeAirBlockState.is(BlockTags.LEAVES)) {
@@ -491,7 +513,7 @@ public class Tasks {
 
   // Trace the flow path from the current position given the flow level to find
   // the distance to the closest open space: air, cave air, water, or leaves.
-  protected Integer distanceToAirWaterInFlowPath(IWorld world, BlockPos pos, Vec3i dir, Integer level) {
+  protected Integer distanceToAirWaterInFlowPath(Level world, BlockPos pos, Vec3i dir, Integer level) {
     if (level > FluidLevel.FLOW7) {
       return 128;
     }
@@ -513,7 +535,7 @@ public class Tasks {
       distanceToAirWater += 1;
 
       posCurrent = posCurrent.offset(dir);
-      blockCurrent = world.getBlock(posCurrent);
+      blockCurrent = getBlock(world, posCurrent);
       blockstateCurrent = world.getBlockState(posCurrent);
 
       if (isAir(blockCurrent) || blockstateCurrent.is(BlockTags.LEAVES) || blockCurrent == Blocks.WATER) {
@@ -534,7 +556,7 @@ public class Tasks {
       distanceToAirWater += 1;
 
       posCurrent = posCurrent.offset(dir);
-      blockCurrent = world.getBlock(posCurrent);
+      blockCurrent = getBlock(world, posCurrent);
       blockstateCurrent = world.getBlockState(posCurrent);
       // TODO: Check for Water
       if (isAir(blockCurrent) || blockstateCurrent.is(BlockTags.LEAVES)) {
@@ -545,7 +567,7 @@ public class Tasks {
     return 128; // Meaningless high value
   }
 
-  protected boolean maybeDecayUnder(BlockState state, IWorld world, BlockPos pos, RandomSource rand, Integer level) {
+  protected boolean maybeDecayUnder(BlockState state, Level world, BlockPos pos, RandomSource rand, Integer level) {
     // TODO: Should we be using rand?
     // return if water is source or falling or FLOW7
     if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW7) {
@@ -553,7 +575,7 @@ public class Tasks {
     }
     // Get the block under us.
     BlockPos underPos = pos.below();
-    Block underBlock = world.getBlock(underPos);
+    Block underBlock = getBlock(world, underPos);
 
     if (!ErodableBlocks.canErode(underBlock)) {
       return false;
@@ -567,7 +589,7 @@ public class Tasks {
       return false;
     }
 
-    Vec3 velocity = world.getFlowVelocity(state, pos);
+    Vec3 velocity = getFlowVelocity(world, state, pos);
     // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
     // with a more definitive direction such as 0, 90, or 22.5.
     if (Math.abs(velocity.x) < 0.8 && Math.abs(velocity.z) < 0.8) {
@@ -581,7 +603,7 @@ public class Tasks {
     // degree angle.
     BlockPos flowPos = underPos
         .offset(new Vec3i((int) Math.round(velocity.x), 0, (int) Math.round(velocity.z)));
-    Block flowBlock = world.getBlock(flowPos);
+    Block flowBlock = getBlock(world, flowPos);
 
     // If the block in the flow direction is any of the lesser blocks underBlocks
     // can become, then decay to the next lesser in the list.
@@ -605,7 +627,7 @@ public class Tasks {
 
   // Cobblestone and Stone Bricks grow moss near water, check every block around.
   // Returns true when a change is made.
-  protected boolean maybeAddMoss(IWorld world, BlockPos pos, RandomSource rand) {
+  protected boolean maybeAddMoss(Level world, BlockPos pos, RandomSource rand) {
     List<Vec3i> listDirection = posEightAround;
     // TODO: Add one level above the water line
     // listDirection.addAll(posEightAroundUp);
@@ -616,7 +638,7 @@ public class Tasks {
 
     for (Vec3i dir : listDirection) {
       BlockPos sidePos = pos.offset(dir);
-      Block sideBlock = world.getBlock(sidePos);
+      Block sideBlock = getBlock(world, sidePos);
 
       if (!isCobbleStone(sideBlock) && !isStoneBricks(sideBlock)) {
         // Stop the loop. Randomized, means 1:16 odds.
