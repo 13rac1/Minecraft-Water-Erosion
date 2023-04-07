@@ -1,7 +1,5 @@
 package com._13rac1.erosion.forge.mixin;
 
-import java.util.Random;
-
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com._13rac1.erosion.common.Tasks;
 import com._13rac1.erosion.minecraft.EWorld;
-import com._13rac1.erosion.minecraft.EBlockPos;
 
 @Mixin(LiquidBlock.class)
 public class LiquidBlockMixin extends Block {
@@ -37,6 +34,6 @@ public class LiquidBlockMixin extends Block {
   public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rand, CallbackInfo info) {
     EWorld forgeWorld = new EWorld(world);
 
-    tasks.run(state, forgeWorld, new EBlockPos(pos), rand);
+    tasks.run(state, forgeWorld, new BlockPos(pos), rand);
   }
 }

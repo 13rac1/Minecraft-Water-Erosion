@@ -2,16 +2,15 @@ package com._13rac1.erosion.common;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-
-import com._13rac1.erosion.minecraft.EBlockPos;
-import com._13rac1.erosion.minecraft.EVec3;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 public interface IWorld {
-  BlockState getBlockState(EBlockPos pos);
+  BlockState getBlockState(BlockPos pos);
 
-  Block getBlock(EBlockPos pos);
+  Block getBlock(BlockPos pos);
 
-  Boolean setBlockAndUpdate(EBlockPos pos, BlockState newState);
+  Boolean setBlockAndUpdate(BlockPos pos, BlockState newState);
 
   int getSeaLevel();
 
@@ -26,7 +25,7 @@ public interface IWorld {
   // (0.7071067613036184, 0.0, -0.7071067613036184)
   // (0.9999999664723898, 0.0, 0.0)
   // (0.3162277853996985, 0.0, -0.9486833137896449) - Rare
-  EVec3 getFlowVelocity(BlockState state, EBlockPos pos);
+  Vec3 getFlowVelocity(BlockState state, BlockPos pos);
 
   Boolean isFluidBlock(Block block);
 }

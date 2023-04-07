@@ -5,6 +5,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.Level;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 import com._13rac1.erosion.common.IWorld;
 
@@ -15,25 +17,25 @@ public class EWorld implements IWorld {
     this.world = world;
   }
 
-  public BlockState getBlockState(EBlockPos pos) {
-    return this.world.getBlockState(pos.getPos());
+  public BlockState getBlockState(BlockPos pos) {
+    return this.world.getBlockState(pos);
   }
 
-  public Block getBlock(EBlockPos pos) {
-    return this.world.getBlockState(pos.getPos()).getBlock();
+  public Block getBlock(BlockPos pos) {
+    return this.world.getBlockState(pos).getBlock();
   }
 
-  public Boolean setBlockAndUpdate(EBlockPos pos, BlockState newState) {
-    return this.world.setBlockAndUpdate(pos.getPos(), newState);
+  public Boolean setBlockAndUpdate(BlockPos pos, BlockState newState) {
+    return this.world.setBlockAndUpdate(pos, newState);
   }
 
   public int getSeaLevel() {
     return this.world.getSeaLevel();
   }
 
-  public EVec3 getFlowVelocity(BlockState state, EBlockPos pos) {
+  public Vec3 getFlowVelocity(BlockState state, BlockPos pos) {
     FluidState fluidState = state.getFluidState();
-    return new EVec3(fluidState.getFlow(this.world, pos.getPos()));
+    return fluidState.getFlow(this.world, pos);
   }
 
   public Boolean isFluidBlock(Block block) {
