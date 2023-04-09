@@ -30,17 +30,17 @@ import net.minecraft.util.RandomSource;
 
 public class TestTasks extends TestTasksCommon {
   // Helper to reduce clutter while describing blocks in a mock world.
-  void whenBlock(Level world, int x, int y, int z, Block block) {
+  private void whenBlock(Level world, int x, int y, int z, Block block) {
     final BlockPos pos = new BlockPos(x, y, z);
     when(world.getBlockState(pos)).thenReturn(block.defaultBlockState());
   }
 
-  void whenBlock(Level world, BlockPos pos, Block block) {
+  private void whenBlock(Level world, BlockPos pos, Block block) {
     when(world.getBlockState(pos)).thenReturn(block.defaultBlockState());
   }
 
   // Helper to reduce clutter to confirm access of blocks in a mock world.
-  void verifyBlock(Level world, int x, int y, int z) {
+  private void verifyBlock(Level world, int x, int y, int z) {
     final BlockPos pos = new BlockPos(x, y, z);
     verify(world).getBlockState(pos);
   }
@@ -244,12 +244,12 @@ public class TestTasks extends TestTasksCommon {
 
     // No decay under source blocks
     Integer level = FluidLevel.SOURCE;
-    Assertions.assertFalse(tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+    Assertions.assertFalse(tasks.maybeDecayUnder(world, stateWater, pos, rand, level));
 
     // No decay of water on top of water.
     level = FluidLevel.FLOW1;
     when(world.getBlockState(pos.below())).thenReturn(water);
-    Assertions.assertFalse(tasks.maybeDecayUnder(stateWater, world, pos, rand, level));
+    Assertions.assertFalse(tasks.maybeDecayUnder(world, stateWater, pos, rand, level));
 
     // Need a spyTask to mock out getFlowVelocity() returns
     // https://site.mockito.org/javadoc/current/org/mockito/Spy.html
@@ -266,12 +266,12 @@ public class TestTasks extends TestTasksCommon {
     // No decay if block will become air.
     level = FluidLevel.FLOW1;
     when(world.getBlockState(pos.below())).thenReturn(clay);
-    Assertions.assertFalse(spyTask.maybeDecayUnder(stateWater, world, pos, rand, level));
+    Assertions.assertFalse(spyTask.maybeDecayUnder(world, stateWater, pos, rand, level));
 
     // No decay for 45 degree angles.
     when(world.getBlockState(pos.below())).thenReturn(cobblestone);
     doReturn(degree45).when(spyTask).getFlowVelocity(any(Level.class), any(BlockPos.class), any(BlockState.class));
-    Assertions.assertFalse(spyTask.maybeDecayUnder(stateWater, world, pos, rand,
+    Assertions.assertFalse(spyTask.maybeDecayUnder(world, stateWater, pos, rand,
         FluidLevel.FLOW1));
 
     // Decay dirt
@@ -279,7 +279,7 @@ public class TestTasks extends TestTasksCommon {
     Vec3 south = new Vec3(0.0, 0, 1);
     doReturn(south).when(spyTask).getFlowVelocity(any(Level.class), any(BlockPos.class), any(BlockState.class));
     when(world.getBlockState(pos.below().south())).thenReturn(sand);
-    Assertions.assertTrue(spyTask.maybeDecayUnder(stateWater, world, pos, rand,
+    Assertions.assertTrue(spyTask.maybeDecayUnder(world, stateWater, pos, rand,
         FluidLevel.FLOW1));
 
   }

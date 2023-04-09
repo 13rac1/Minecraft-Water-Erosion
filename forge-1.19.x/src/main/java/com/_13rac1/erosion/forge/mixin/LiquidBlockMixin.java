@@ -31,6 +31,6 @@ public class LiquidBlockMixin extends Block {
 
   @Inject(method = "randomTick", at = @At("HEAD"), require = 1)
   public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rand, CallbackInfo info) {
-    tasks.run(state, world, new BlockPos(pos), rand);
+    tasks.run(world, state, pos, rand);
   }
 }

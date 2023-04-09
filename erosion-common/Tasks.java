@@ -70,11 +70,11 @@ public class Tasks {
       new Vec3i(0, 1, 1));
 
   // Primary run function
-  public void run(BlockState state, Level world, BlockPos pos, RandomSource rand) {
+  public void run(Level world, BlockState state, BlockPos pos, RandomSource rand) {
 
     Integer level = state.getValue(LiquidBlock.LEVEL);
 
-    maybeSourceBreak(state, world, pos, rand, level);
+    maybeSourceBreak(world, state, pos, rand, level);
 
     if (maybeAddMoss(world, pos, rand)) {
       // Return if moss is added.
@@ -85,13 +85,13 @@ public class Tasks {
       return;
     }
 
-    if (maybeFlowingWall(state, world, pos, rand, level)) {
+    if (maybeFlowingWall(world, state, pos, rand, level)) {
       // Return if the flow breaks a wall.
       return;
     }
 
-    maybeErodeEdge(state, world, pos, rand, level);
-    maybeDecayUnder(state, world, pos, rand, level);
+    maybeErodeEdge(world, state, pos, rand, level);
+    maybeDecayUnder(world, state, pos, rand, level);
   }
 
   /**
@@ -119,7 +119,7 @@ public class Tasks {
     return bs.getBlock();
   }
 
-  private void maybeErodeEdge(BlockState state, Level world, BlockPos pos, RandomSource rand, Integer level) {
+  private boolean maybeErodeEdge(Level world, BlockState state, BlockPos pos, RandomSource rand, Integer level) {
     // Get the block under us.
     BlockPos underPos = pos.below();
     Block underBlock = getBlock(world, underPos);
@@ -128,16 +128,16 @@ public class Tasks {
     // TODO: Technically this call is redundant now.
     if (!ErodableBlocks.canErode(underBlock)) {
       // System.out.println(underBlock.getName().asFormattedString());
-      return;
+      return false;
     }
     if (!ErodableBlocks.maybeErode(rand, underBlock)) {
-      return;
+      return false;
     }
 
     // Return if we are not a water edge block and not level 7. Level 7, the
     // last one, is allowed to dig down to extend the water flow.
     if (!isEdge(world, pos) && level != FluidLevel.FLOW7) {
-      return;
+      return false;
     }
 
     // System.out.println("pos x:" + pos.getX() + " y:" + pos.getY() + " z:" +
@@ -154,16 +154,15 @@ public class Tasks {
     } else {
       // Decay the block and do nothing else.
       world.setBlockAndUpdate(underPos, decayBlock.defaultBlockState());
-      return;
+      return true;
     }
     // Don't delete source blocks
     if (state.getValue(LiquidBlock.LEVEL) == FluidLevel.SOURCE) {
       // Technically this should never happen.
-      return;
+      return false;
     }
 
     // Delete the water block
-    // TODO: Maybe the water block itself shouldn't be deleted?
     world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 
     // Delete upwards until there's no water, a water source is found, or three
@@ -182,13 +181,11 @@ public class Tasks {
       if (world.getBlockState(posUp).getValue(LiquidBlock.LEVEL) == FluidLevel.SOURCE) {
         break;
       }
-      // TODO: Go up until finding the last water block and delete that. The
-      // rest are fine.
       world.setBlockAndUpdate(posUp, Blocks.AIR.defaultBlockState());
       posUp = posUp.above();
     }
-    // TODO: Anything further to do since we are deleting ourself? Cancel the
-    // callback?
+    // TODO: Anything further to do since we are deleting ourself?
+    return true;
   }
 
   protected boolean isEdge(Level world, BlockPos pos) {
@@ -249,7 +246,7 @@ public class Tasks {
     Integer distance;
   }
 
-  private boolean maybeFlowingWall(BlockState state, Level world, BlockPos pos, RandomSource rand, Integer level) {
+  private boolean maybeFlowingWall(Level world, BlockState state, BlockPos pos, RandomSource rand, Integer level) {
 
     if (!wallBreakers.contains(level)) {
       // level Flow7 goes down, never to the side.
@@ -391,7 +388,7 @@ public class Tasks {
     return true;
   }
 
-  private void maybeSourceBreak(BlockState state, Level world, BlockPos pos, RandomSource rand, Integer level) {
+  private void maybeSourceBreak(Level world, BlockState state, BlockPos pos, RandomSource rand, Integer level) {
     // Source blocks only.
     if (level != FluidLevel.SOURCE) {
       return;
@@ -562,7 +559,7 @@ public class Tasks {
     return AIR_WATER_NOT_FOUND;
   }
 
-  protected boolean maybeDecayUnder(BlockState state, Level world, BlockPos pos, RandomSource rand, Integer level) {
+  protected boolean maybeDecayUnder(Level world, BlockState state, BlockPos pos, RandomSource rand, Integer level) {
     // TODO: Should we be using rand?
     // return if water is source or falling or FLOW7
     if (level == FluidLevel.SOURCE || level > FluidLevel.FLOW7) {
