@@ -2,6 +2,8 @@ package com._13rac1.erosion.common;
 
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.MapCodec;
 
@@ -22,6 +24,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.FluidState;
@@ -52,9 +56,25 @@ public class TestTasks {
       .strictness(Strictness.STRICT_STUBS)
       .invocationListeners(new levelMockListener());
 
-  // Helper to reduce code clutter.
+  // Helper to reduce code clutter while creating MutableBlockPos
   private BlockPos.MutableBlockPos newMutableBP(BlockPos pos) {
     return new BlockPos.MutableBlockPos(pos.getX(), pos.getY(), pos.getZ());
+  }
+
+  // Helper to reduce clutter while describing blocks in a mock world.
+  void whenBlock(Level world, int x, int y, int z, Block block) {
+    final BlockPos pos = new BlockPos(x, y, z);
+    when(world.getBlockState(pos)).thenReturn(block.defaultBlockState());
+  }
+
+  void whenBlock(Level world, BlockPos pos, Block block) {
+    when(world.getBlockState(pos)).thenReturn(block.defaultBlockState());
+  }
+
+  // Helper to reduce clutter to confirm access of blocks in a mock world.
+  void verifyBlock(Level world, int x, int y, int z) {
+    final BlockPos pos = new BlockPos(x, y, z);
+    verify(world).getBlockState(pos);
   }
 
   @BeforeAll
@@ -104,8 +124,7 @@ public class TestTasks {
   @Test
   void testIsEdgeNorth() {
     // isEdge() checks north first, so this is just a test of the first return.
-    // TODO: Check failure cases.
-    final Level world = mock(Level.class);
+    final Level world = mock(Level.class, levelSettings);
     final BlockPos pos = new BlockPos(0, 0, 0);
     final BlockState water = Blocks.WATER.defaultBlockState();
 
@@ -113,19 +132,9 @@ public class TestTasks {
     Assertions.assertTrue(tasks.isEdge(world, pos));
   }
 
-  void whenBlock(Level world, int x, int y, int z, Block block) {
-    final BlockPos pos = new BlockPos(x, y, z);
-    when(world.getBlockState(pos)).thenReturn(block.defaultBlockState());
-  }
-
-  void verifyBlock(Level world, int x, int y, int z) {
-    final BlockPos pos = new BlockPos(x, y, z);
-    verify(world).getBlockState(pos);
-  }
-
   @Test
   void testDistanceToAirWaterInFlowPath() {
-    final Level world = mock(Level.class);
+    final Level world = mock(Level.class, levelSettings);
     final BlockPos startPos = new BlockPos(0, 0, 0);
     final Vec3i flowDir = new Vec3i(1, 0, 0); // South is positive
 
@@ -262,7 +271,7 @@ public class TestTasks {
 
   @Test
   void testMaybeDecayUnder() {
-    final Level world = mock(Level.class);
+    final Level world = mock(Level.class, levelSettings);
     final BlockPos pos = new BlockPos(0, 0, 0);
     final BlockState stateWater = getWaterState(FluidLevel.FLOW1);
     final RandomSource rand = RandomSource.create(); // unused, in tests but required
@@ -317,7 +326,7 @@ public class TestTasks {
 
   @Test
   void testMaybeAddMoss() {
-    final Level world = mock(Level.class);
+    final Level world = mock(Level.class, levelSettings);
     final BlockPos pos = new BlockPos(0, 0, 0);
     final RandomSource rand = RandomSource.create(); // unused, in tests but required
     final BlockState water = Blocks.WATER.defaultBlockState();
@@ -332,4 +341,40 @@ public class TestTasks {
     Assertions.assertTrue(tasks.maybeAddMoss(world, pos, rand));
     verify(world).setBlockAndUpdate(any(BlockPos.class), eq(Blocks.MOSSY_COBBLESTONE.defaultBlockState()));
   }
+
+  @Test
+  void testTreeInColumn() {
+    final Level world = mock(Level.class, levelSettings);
+    final BlockPos pos = new BlockPos(10, 0, 0);
+
+    // Test assumption: Are Oak logs tagged as logs?
+    // No... because the registries aren't initialized.
+    // Testing assumptions in case registries are enabled later
+    Assertions.assertFalse(Blocks.OAK_LOG.defaultBlockState().is(BlockTags.LOGS));
+    // So add it for the tests
+    ArrayList<TagKey<Block>> tags = new ArrayList<TagKey<Block>>();
+    tags.add(BlockTags.LOGS);
+    // TODO: builtInRegistryHolder() is deprecated, what's the new method?
+    Blocks.OAK_LOG.builtInRegistryHolder().bindTags(tags);
+    // Now this works
+    Assertions.assertTrue(Blocks.OAK_LOG.defaultBlockState().is(BlockTags.LOGS));
+    // Blocks.OAK_LOG.defaultBlockState().getTags().toList() =>
+    // [TagKey[minecraft:block / minecraft:logs]]
+
+    whenBlock(world, pos, Blocks.DIRT);
+    whenBlock(world, 10, 1, 0, Blocks.OAK_LOG);
+    Assertions.assertTrue(tasks.treeInColumn(world, pos));
+
+    whenBlock(world, 10, 1, 0, Blocks.AIR);
+    Assertions.assertFalse(tasks.treeInColumn(world, pos));
+
+    whenBlock(world, 10, 1, 0, Blocks.DIRT);
+    whenBlock(world, 10, 2, 0, Blocks.DIRT);
+    whenBlock(world, 10, 3, 0, Blocks.DIRT);
+    whenBlock(world, 10, 4, 0, Blocks.DIRT);
+    whenBlock(world, 10, 5, 0, Blocks.DIRT);
+    Assertions.assertFalse(tasks.treeInColumn(world, pos));
+
+  }
+
 }

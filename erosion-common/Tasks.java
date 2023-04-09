@@ -223,15 +223,16 @@ public class Tasks {
     return in.cross(VECTOR_UP);
   }
 
+  // Search upward for a stack of logs to avoid eroding under trees
   protected boolean treeInColumn(Level world, BlockPos pos) {
     final Integer MAX_UP = 5;
     Integer count = 0;
     BlockPos currentPos = pos.above();
     while (count < MAX_UP) {
-      Block currentBlock = getBlock(world, currentPos);
-      BlockState currentBlockState = world.getBlockState(currentPos);
+      BlockState bs = world.getBlockState(currentPos);
+      Block currentBlock = bs.getBlock();
 
-      if (currentBlockState.is(BlockTags.LOGS)) {
+      if (bs.is(BlockTags.LOGS)) {
         return true;
       }
       if (isAir(currentBlock)) {
