@@ -1,4 +1,4 @@
-# Water Erosion for Minecraft
+# Water Erosion Mod for Minecraft Java Edition
 
 **Water Erosion makes the world evolve with streams and waterfalls.**
 
