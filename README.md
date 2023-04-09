@@ -24,23 +24,29 @@ more dynamic. It should not break existing gameplay or enable cheating.
   rarely, cobblestone.
 * Erodable blocks have differing resistances to erosion depending on their
   density, but all erode over time.
-* 1.1.0+ - Blocks decay during erosion to weaker blocks before disappearing.
-* 1.1.0+ - Blocks decay upstream in stream beds.
-* 1.1.0+ - Cobblestone and Stone Bricks grow moss near water.
+* Blocks decay during erosion to weaker blocks before disappearing.
+* Blocks decay upstream in stream beds.
+* Cobblestone and Stone Bricks grow moss near water.
 
 Decay hierarchy:
 
 * Cobblestone -> Mossy Cobblestone -> Gravel
 * Stone Bricks -> Mossy Stone Bricks -> Gravel
 * Grass Path -> Grass -> Dirt -> Coarse Dirt -> Gravel
-* Gravel -> Sand -> Clay(rarely) -> Air/Water.
+* Gravel -> Sand -> Clay(rarely) -> Air/Water
 
-## Videos
+## Media
 
+[![Water Erosion Mod Playlist](https://i.imgur.com/azPKFFY.png)](https://www.youtube.com/watch?v=ZQbcPGYTRvA&list=PLFgkjwcnVWJXh0zbaWK0F6OyW_pZOFS9d)
+
+* **[Screenshots](https://www.curseforge.com/minecraft/mc-mods/water-erosion/screenshots)**
+* [Real Time Waterfall Erosion - High Speed Video](https://www.youtube.com/watch?v=ZQbcPGYTRvA)
 * [Taiga Forest Creeks - High Speed Erosion](https://www.youtube.com/watch?v=N29mWO8NTOU)
-* [Tour of Three Savanna Waterfalls - Erosion Complete](https://www.youtube.com/watch?v=Gi73OZ0hbqE)
+* [Three Savanna Waterfalls - Erosion Complete](https://www.youtube.com/watch?v=Gi73OZ0hbqE)
 
-## Installation
+## Install
+
+Download from: https://www.curseforge.com/minecraft/mc-mods/water-erosion
 
 Supported versions:
 
@@ -58,15 +64,15 @@ Previously Supported Versions:
 
 ## TODO features
 
+* [1.17+ world removed hill/mountain aquifers, add them back](https://github.com/13rac1/Minecraft-Water-Erosion/issues/28)
 * [Optionally drop items of eroded blocks](https://github.com/13rac1/Minecraft-Water-Erosion/issues/3)
-* [Degrade blocks to lesser blocks before disappearing:](https://github.com/13rac1/Minecraft-Water-Erosion/issues/2)
 * [Configurable Erosion odds and types - Slow, Medium(default), Fast, Custom](https://github.com/13rac1/Minecraft-Water-Erosion/issues/1)
 
 ## Technical Notes
 
 This "core mod" adds code to the Water block `randomTick()` functions using the
 [Mixin framework][MixinFramework]. The code and functionality is structured to
-use the least possible system CPU, but a CPU increase may still be noticed.
+reduce system CPU use, but a CPU increase may still be noticed.
 
 The Minecraft in-game UI shows the opposite water level value than the true block
 metadata. Data `level==1` is displayed as Targeted Fluid level:7. Data `level==7`
