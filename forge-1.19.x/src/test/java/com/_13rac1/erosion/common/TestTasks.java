@@ -10,10 +10,6 @@ import com.mojang.serialization.MapCodec;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockSettings;
-import org.mockito.listeners.InvocationListener;
-import org.mockito.listeners.MethodInvocationReport;
-import org.mockito.quality.Strictness;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -32,35 +28,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.util.RandomSource;
 
-public class TestTasks {
-  private static Tasks tasks = new Tasks();
-
-  // levelMockListener reports when returned values will be null
-  class levelMockListener implements InvocationListener {
-    @Override
-    public void reportInvocation(MethodInvocationReport methodInvocationReport) {
-      if (methodInvocationReport.getInvocation().getLocation().getSourceFile() == "TestTasks.java") {
-        // Ignore self invocations such as using when()
-        return;
-      }
-
-      if (methodInvocationReport.getReturnedValue() == null) {
-        throw new UnsupportedOperationException("Unstubbed access: " +
-            methodInvocationReport.getInvocation());
-      }
-    }
-  }
-
-  private MockSettings levelSettings = withSettings()
-      .verboseLogging()
-      .strictness(Strictness.STRICT_STUBS)
-      .invocationListeners(new levelMockListener());
-
-  // Helper to reduce code clutter while creating MutableBlockPos
-  private BlockPos.MutableBlockPos newMutableBP(BlockPos pos) {
-    return new BlockPos.MutableBlockPos(pos.getX(), pos.getY(), pos.getZ());
-  }
-
+public class TestTasks extends TestTasksCommon {
   // Helper to reduce clutter while describing blocks in a mock world.
   void whenBlock(Level world, int x, int y, int z, Block block) {
     final BlockPos pos = new BlockPos(x, y, z);
@@ -261,14 +229,6 @@ public class TestTasks {
     // testUpstreamGetFlow().
   }
 
-  private BlockState getWaterState(int level) {
-    final BlockState bs = Blocks.WATER.defaultBlockState().setValue(LiquidBlock.LEVEL, level);
-    // IMPORTANT: BlockStates must have initCache() run to correctly set the private
-    // fluidstate after the LEVEL value has been set.
-    bs.initCache();
-    return bs;
-  }
-
   @Test
   void testMaybeDecayUnder() {
     final Level world = mock(Level.class, levelSettings);
@@ -374,7 +334,6 @@ public class TestTasks {
     whenBlock(world, 10, 4, 0, Blocks.DIRT);
     whenBlock(world, 10, 5, 0, Blocks.DIRT);
     Assertions.assertFalse(tasks.treeInColumn(world, pos));
-
   }
 
 }

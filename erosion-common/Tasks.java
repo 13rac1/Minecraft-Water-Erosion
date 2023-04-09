@@ -116,9 +116,6 @@ public class Tasks {
 
   public Block getBlock(Level world, BlockPos pos) {
     BlockState bs = world.getBlockState(pos);
-    if (bs == null) {
-      throw new NullPointerException("Blockstate is null at pos:" + pos.toShortString());
-    }
     return bs.getBlock();
   }
 
