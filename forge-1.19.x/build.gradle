@@ -13,6 +13,7 @@ plugins {
     id 'eclipse'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'jacoco'
 }
 
 apply plugin: 'org.spongepowered.mixin'
@@ -165,6 +166,23 @@ dependencies {
 
     // https://github.com/SpongePowered/Mixin/wiki/Mixins-on-Minecraft-Forge#step-2---adding-the-mixin-annotation-processor
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    // Tests
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.2'    
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.4.2'
+    testImplementation 'org.mockito:mockito-core:4.7+'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        exceptionFormat = 'full'
+    }
+    maxHeapSize = '1G'
+    failFast = false
+    workingDir = './run_tests'
+    mkdir './run_tests'
 }
 
 // Example for how to get properties into the manifest for reading by the runtime.

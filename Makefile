@@ -5,17 +5,16 @@ export JAVA_HOME
 build:
 	cd fabric-1.19.x;./gradlew build
 	cd forge-1.19.x;./gradlew build
-	rm -rf dist
 	mkdir -p dist
 	cp fabric-*/build/libs/*.jar dist/
 	cp forge-*/build/libs/*.jar dist/
 
 # Fix/upgrade tests
-#.PHONY: test
-#test:
-#	cd forge-1.14.4;./gradlew test jacocoTestReport
+.PHONY: test
+test:
+	cd forge-1.19.x;./gradlew test jacocoTestReport
 	# Test Coverage Report location:
-#	xdg-open ${PWD}/forge-1.14.4/build/reports/jacoco/test/html/index.html
+	xdg-open ${PWD}/forge-1.19.x/build/reports/jacoco/test/html/index.html
 
 .PHONY: screenshots
 screenshots:

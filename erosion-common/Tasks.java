@@ -105,7 +105,7 @@ public class Tasks {
   // (0.7071067613036184, 0.0, -0.7071067613036184)
   // (0.9999999664723898, 0.0, 0.0)
   // (0.3162277853996985, 0.0, -0.9486833137896449) - Rare
-  public Vec3 getFlowVelocity(Level world, BlockState state, BlockPos pos) {
+  public Vec3 getFlowVelocity(Level world, BlockPos pos, BlockState state) {
     FluidState fluidState = state.getFluidState();
     return fluidState.getFlow(world, pos);
   }
@@ -115,7 +115,11 @@ public class Tasks {
   }
 
   public Block getBlock(Level world, BlockPos pos) {
-    return world.getBlockState(pos).getBlock();
+    BlockState bs = world.getBlockState(pos);
+    if (bs == null) {
+      throw new NullPointerException("Blockstate is null at pos:" + pos.toShortString());
+    }
+    return bs.getBlock();
   }
 
   private void maybeErodeEdge(BlockState state, Level world, BlockPos pos, RandomSource rand, Integer level) {
@@ -256,7 +260,7 @@ public class Tasks {
 
     // Find flow direction: Velocity is a 3D vector normalized to 1 pointing the
     // direction the water is flowing.
-    Vec3 velocity = getFlowVelocity(world, state, pos);
+    Vec3 velocity = getFlowVelocity(world, pos, state);
     // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
     // with a more definitive direction such as 0, 90, or 22.5.
     if (Math.abs(velocity.x) < 0.8 && Math.abs(velocity.z) < 0.8) {
@@ -412,7 +416,7 @@ public class Tasks {
     }
 
     // Skip blocks already flowing
-    Vec3 velocity = getFlowVelocity(world, state, pos);
+    Vec3 velocity = getFlowVelocity(world, pos, state);
     if (velocity.length() > 0) {
       return;
     }
@@ -492,30 +496,13 @@ public class Tasks {
     return block == Blocks.AIR || block == Blocks.CAVE_AIR;
   }
 
-  // Start from the provided BlockPos and trace
-  protected boolean airInFlowPath(Level world, BlockPos pos, Vec3i dir) {
-    int yDeeper = 0;
-    for (int airMultipler : Arrays.asList(7, 14)) {
-      Vec3i airDirection = new Vec3i(dir.getX() * airMultipler, dir.getY() - yDeeper, dir.getZ() * airMultipler);
-      // Go deeper each iteration
-      yDeeper++;
-      BlockPos maybeAirPos = pos.offset(airDirection);
-      Block maybeAirBlock = getBlock(world, maybeAirPos);
-      BlockState maybeAirBlockState = world.getBlockState(pos);
-
-      if (isAir(maybeAirBlock) || maybeAirBlockState.is(BlockTags.LEAVES)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
+  public final int AIR_WATER_NOT_FOUND = 128;
 
   // Trace the flow path from the current position given the flow level to find
   // the distance to the closest open space: air, cave air, water, or leaves.
   protected Integer distanceToAirWaterInFlowPath(Level world, BlockPos pos, Vec3i dir, Integer level) {
     if (level > FluidLevel.FLOW7) {
-      return 128;
+      return AIR_WATER_NOT_FOUND;
     }
     // level is now [0,1,2,3,4,5,6,7]
     Integer distanceToAirWater = 0;
@@ -535,36 +522,46 @@ public class Tasks {
       distanceToAirWater += 1;
 
       posCurrent = posCurrent.offset(dir);
-      blockCurrent = getBlock(world, posCurrent);
       blockstateCurrent = world.getBlockState(posCurrent);
+      if (blockstateCurrent == null) {
+        throw new NullPointerException("Blockstate is null at pos:" + posCurrent.toShortString());
+      }
+      blockCurrent = blockstateCurrent.getBlock();
 
       if (isAir(blockCurrent) || blockstateCurrent.is(BlockTags.LEAVES) || blockCurrent == Blocks.WATER) {
         return distanceToAirWater;
       }
       if (!ErodableBlocks.canErode(blockCurrent)) {
         // Fail if unerodable block is found in path before air/water.
-        return 128;
+        return AIR_WATER_NOT_FOUND;
       }
-
     }
 
     // Still here? Dig down and search up to 14 blocks
     posCurrent = posCurrent.below();
-    flowDistanceRemaining = 7;
+    flowDistanceRemaining = 8; // Because the first is falling an is effectively a source block
     while (flowDistanceRemaining > 0) {
-      flowDistanceRemaining -= 1;
-      distanceToAirWater += 1;
-
-      posCurrent = posCurrent.offset(dir);
-      blockCurrent = getBlock(world, posCurrent);
+      // Check the falling aka "source" block first at same position as above.
       blockstateCurrent = world.getBlockState(posCurrent);
-      // TODO: Check for Water
-      if (isAir(blockCurrent) || blockstateCurrent.is(BlockTags.LEAVES)) {
+      if (blockstateCurrent == null) {
+        throw new NullPointerException("Blockstate is null at pos:" + posCurrent.toShortString());
+      }
+      blockCurrent = blockstateCurrent.getBlock();
+
+      if (isAir(blockCurrent) || blockstateCurrent.is(BlockTags.LEAVES) || blockCurrent == Blocks.WATER) {
         return distanceToAirWater;
       }
+      if (!ErodableBlocks.canErode(blockCurrent)) {
+        // Fail if unerodable block is found in path before air/water.
+        return AIR_WATER_NOT_FOUND;
+      }
+
+      flowDistanceRemaining -= 1;
+      distanceToAirWater += 1;
+      posCurrent = posCurrent.offset(dir);
     }
 
-    return 128; // Meaningless high value
+    return AIR_WATER_NOT_FOUND;
   }
 
   protected boolean maybeDecayUnder(BlockState state, Level world, BlockPos pos, RandomSource rand, Integer level) {
@@ -589,7 +586,7 @@ public class Tasks {
       return false;
     }
 
-    Vec3 velocity = getFlowVelocity(world, state, pos);
+    Vec3 velocity = getFlowVelocity(world, pos, state);
     // 0.8 is a good number to ignore 45 degree angle flows, but allow anything else
     // with a more definitive direction such as 0, 90, or 22.5.
     if (Math.abs(velocity.x) < 0.8 && Math.abs(velocity.z) < 0.8) {
