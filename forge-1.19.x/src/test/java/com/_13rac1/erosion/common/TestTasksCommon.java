@@ -2,6 +2,9 @@ package com._13rac1.erosion.common;
 
 import static org.mockito.Mockito.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.mockito.MockSettings;
 import org.mockito.listeners.InvocationListener;
 import org.mockito.listeners.MethodInvocationReport;
@@ -17,15 +20,18 @@ public class TestTasksCommon {
 
     // levelMockListener reports when returned values will be null
     class levelMockListener implements InvocationListener {
+        private List<String> allowedCallers = Arrays.asList("TestTasks.java", "TestMaybeErodeEdge.java");
+
         @Override
         public void reportInvocation(MethodInvocationReport methodInvocationReport) {
-            if (methodInvocationReport.getInvocation().getLocation().getSourceFile() == "TestTasks.java") {
+            final String caller = methodInvocationReport.getInvocation().getLocation().getSourceFile();
+            if (allowedCallers.contains(caller)) {
                 // Ignore self invocations such as using when()
                 return;
             }
 
             if (methodInvocationReport.getReturnedValue() == null) {
-                throw new UnsupportedOperationException("Unstubbed access: " +
+                throw new UnsupportedOperationException(" Unstubbed access by " + caller + ": " +
                         methodInvocationReport.getInvocation());
             }
         }
@@ -48,5 +54,4 @@ public class TestTasksCommon {
         bs.initCache();
         return bs;
     }
-
 }

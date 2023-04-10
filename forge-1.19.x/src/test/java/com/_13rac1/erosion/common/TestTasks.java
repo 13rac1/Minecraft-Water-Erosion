@@ -32,11 +32,15 @@ public class TestTasks extends TestTasksCommon {
   // Helper to reduce clutter while describing blocks in a mock world.
   private void whenBlock(Level world, int x, int y, int z, Block block) {
     final BlockPos pos = new BlockPos(x, y, z);
-    when(world.getBlockState(pos)).thenReturn(block.defaultBlockState());
+    final BlockState bs = block.defaultBlockState();
+    bs.initCache();
+    when(world.getBlockState(pos)).thenReturn(bs);
   }
 
   private void whenBlock(Level world, BlockPos pos, Block block) {
-    when(world.getBlockState(pos)).thenReturn(block.defaultBlockState());
+    final BlockState bs = block.defaultBlockState();
+    bs.initCache();
+    when(world.getBlockState(pos)).thenReturn(bs);
   }
 
   // Helper to reduce clutter to confirm access of blocks in a mock world.
@@ -289,7 +293,7 @@ public class TestTasks extends TestTasksCommon {
     final Level world = mock(Level.class, levelSettings);
     final BlockPos pos = new BlockPos(0, 0, 0);
     final RandomSource rand = RandomSource.create(); // unused, in tests but required
-    final BlockState water = Blocks.WATER.defaultBlockState();
+    final BlockState water = getWaterState(FluidLevel.FLOW1);
     final BlockState cobblestone = Blocks.COBBLESTONE.defaultBlockState();
 
     // Found water
