@@ -34,13 +34,13 @@ public class TestTasks extends TestTasksCommon {
     final BlockPos pos = new BlockPos(x, y, z);
     final BlockState bs = block.defaultBlockState();
     bs.initCache();
-    when(world.getBlockState(pos)).thenReturn(bs);
+    doReturn(bs).when(world).getBlockState(pos);
   }
 
   private void whenBlock(Level world, BlockPos pos, Block block) {
     final BlockState bs = block.defaultBlockState();
     bs.initCache();
-    when(world.getBlockState(pos)).thenReturn(bs);
+    doReturn(bs).when(world).getBlockState(pos);
   }
 
   // Helper to reduce clutter to confirm access of blocks in a mock world.
@@ -105,7 +105,7 @@ public class TestTasks extends TestTasksCommon {
   }
 
   @Test
-  void testDistanceToAirWaterInFlowPath() {
+  void testDistanceToAirWaterInFlowPathSource() {
     final Level world = mock(Level.class, levelSettings);
     final BlockPos startPos = new BlockPos(0, 0, 0);
     final Vec3i flowDir = new Vec3i(1, 0, 0); // South is positive
@@ -113,7 +113,7 @@ public class TestTasks extends TestTasksCommon {
     // Check one block away in flow
     whenBlock(world, 0, 0, 0, Blocks.WATER);
     whenBlock(world, 1, 0, 0, Blocks.AIR);
-    Assertions.assertEquals(1, tasks.distanceToAirWaterInFlowPath(world, startPos, flowDir, FluidLevel.SOURCE), 1);
+    Assertions.assertEquals(1, tasks.distanceToAirWaterInFlowPath(world, startPos, flowDir, FluidLevel.SOURCE));
     verifyBlock(world, 1, 0, 0);
 
     // Check to the end of the flow
@@ -161,6 +161,21 @@ public class TestTasks extends TestTasksCommon {
     Assertions.assertEquals(tasks.AIR_WATER_NOT_FOUND,
         tasks.distanceToAirWaterInFlowPath(world, startPos, flowDir, FluidLevel.SOURCE));
 
+  }
+
+  @Test
+  void testDistanceToAirWaterInFlowPathFlow6() {
+    final Level world = mock(Level.class, levelSettings);
+    final BlockPos startPos = new BlockPos(0, 0, 0);
+    final Vec3i flowDir = new Vec3i(1, 0, 0); // South is positive
+
+    // Check one block away in flow
+    whenBlock(world, 0, 0, 0, Blocks.WATER);
+    whenBlock(world, 1, 0, 0, Blocks.DIRT);
+    whenBlock(world, 1, -1, 0, Blocks.AIR);
+    Assertions.assertEquals(1, tasks.distanceToAirWaterInFlowPath(world, startPos, flowDir, FluidLevel.FLOW6));
+    verifyBlock(world, 1, 0, 0);
+    verifyBlock(world, 1, -1, 0);
   }
 
   // Validate assumptions, does upstream FluidState.getFlow works as expected?

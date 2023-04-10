@@ -20,7 +20,10 @@ public class TestTasksCommon {
 
     // levelMockListener reports when returned values will be null
     class levelMockListener implements InvocationListener {
-        private List<String> allowedCallers = Arrays.asList("TestTasks.java", "TestMaybeErodeEdge.java");
+        private List<String> allowedCallers = Arrays.asList(
+                "TestTasks.java",
+                "TestMaybeErodeEdge.java",
+                "TestMaybeFlowingWall.java");
 
         @Override
         public void reportInvocation(MethodInvocationReport methodInvocationReport) {

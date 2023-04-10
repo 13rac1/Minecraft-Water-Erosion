@@ -17,7 +17,7 @@ public class TestMaybeErodeEdge extends TestTasksCommon {
     private void whenBlock(Level world, BlockPos pos, Block block) {
         final BlockState bs = block.defaultBlockState();
         bs.initCache();
-        when(world.getBlockState(pos)).thenReturn(bs);
+        doReturn(bs).when(world).getBlockState(pos);
     }
 
     @BeforeAll
