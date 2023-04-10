@@ -1,6 +1,6 @@
 # export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-JAVA_HOME ?= /usr/lib/jvm/java-8-openjdk-amd64
-export JAVA_HOME
+#JAVA_HOME ?= /usr/lib/jvm/java-8-openjdk-amd64
+#export JAVA_HOME
 
 build:
 	cd fabric-1.19.x;./gradlew build
