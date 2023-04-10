@@ -109,10 +109,6 @@ public class Tasks {
   }
 
   protected boolean maybeErodeEdge(Level world, BlockState state, BlockPos pos, RandomSource rand, Integer level) {
-    // Level 7, the last one, is allowed to dig down to extend the water flow.
-    if (level != FluidLevel.FLOW7) {
-      return false;
-    }
     // Get the block under us.
     BlockPos underPos = pos.below();
     Block underBlock = getBlock(world, underPos);
@@ -125,13 +121,13 @@ public class Tasks {
       return false;
     }
 
-    // Return if we are not a water edge block.
-    if (!isEdge(world, pos)) {
+    // Return if we are not a water edge block and not level 7. Level 7, the
+    // last one, is allowed to dig down to extend the water flow.
+    if (!isEdge(world, pos) && level != FluidLevel.FLOW7) {
       return false;
     }
+    // Remaining blocks are Edges of FLOW1-FLOW6 or any FLOW7
 
-    // System.out.println("pos x:" + pos.getX() + " y:" + pos.getY() + " z:" +
-    // pos.getZ() + " water level: " + level);
     // System.out.println("Removing block: " +
     // underBlock.getName().asFormattedString());
 
