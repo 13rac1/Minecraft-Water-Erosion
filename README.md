@@ -68,24 +68,6 @@ Previously Supported Versions:
 * [Optionally drop items of eroded blocks](https://github.com/13rac1/Minecraft-Water-Erosion/issues/3)
 * [Configurable Erosion odds and types - Slow, Medium(default), Fast, Custom](https://github.com/13rac1/Minecraft-Water-Erosion/issues/1)
 
-## Technical Notes
-
-This "core mod" adds code to the Water block `randomTick()` functions using the
-[Mixin framework][MixinFramework]. The code and functionality is structured to
-reduce system CPU use, but a CPU increase may still be noticed.
-
-The Minecraft in-game UI shows the opposite water level value than the true block
-metadata. Data `level==1` is displayed as Targeted Fluid level:7. Data `level==7`
-is displayed as Targeted Fluid level:1.
-
-`randomTick()` is only called by the Minecraft runtime for a 128 block radius
-around the player, so the odds of erosion occuring are set fairly high. The odds
-should be reduced if random tick distance or speed is increased.
-
-Source water blocks at or below the world sea level are ignored to reduce CPU use.
-
-[MixinFramework]: https://github.com/SpongePowered/Mixin
-
 ## Test Areas
 
 Note: All test areas were found in pre-1.17 before the major world gen updates in
@@ -151,12 +133,34 @@ Forge dependency versions are specified in:
 * `build.gradle`
 * `src/main/resources/META-INF/mods.toml`
 
+Check versions at: https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json
+
 ### Fabric Dev
 
 Fabric dependency versions are specified in:
 
 * `gradle.properties`
 * `src/main/resources/fabric.mod.json`
+
+### Technical Notes
+
+This "core mod" adds code to the Water block `randomTick()` functions using the
+[Mixin framework][MixinFramework]. The code and functionality is structured to
+reduce system CPU use, but a CPU increase may still be noticed.
+
+The Minecraft in-game UI shows the opposite water level value than the true block
+metadata. Data `level==1` is displayed as Targeted Fluid level:7. Data `level==7`
+is displayed as Targeted Fluid level:1.
+
+`randomTick()` is only called by the Minecraft runtime for a 128 block radius
+around the player, so the odds of erosion occuring are set fairly high. The odds
+should be reduced if random tick distance or speed is increased.
+
+Source water blocks at or below the world sea level are ignored to reduce CPU use.
+
+[MixinFramework]: https://github.com/SpongePowered/Mixin
+
+
 
 ## License
 
