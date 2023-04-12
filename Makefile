@@ -1,31 +1,26 @@
-# export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-#JAVA_HOME ?= /usr/lib/jvm/java-8-openjdk-amd64
-#export JAVA_HOME
+# Expecting Java 17 in $PATH
 
 build:
-	cd fabric-1.19.x;./gradlew build
-	cd forge-1.19.x;./gradlew build
+	cd fabric;./gradlew build
+	cd forge;./gradlew build
 	mkdir -p dist
-	cp fabric-*/build/libs/*.jar dist/
-	cp forge-*/build/libs/*.jar dist/
+	cp fabric/build/libs/*.jar dist/
+	cp forge/build/libs/*.jar dist/
 
-# Fix/upgrade tests
 .PHONY: test
 test:
-	cd forge-1.19.x;./gradlew test jacocoTestReport
+	cd forge;./gradlew test jacocoTestReport
 	# Test Coverage Report location:
-	xdg-open ${PWD}/forge-1.19.x/build/reports/jacoco/test/html/index.html
+	# xdg-open ${PWD}/forge/build/reports/jacoco/test/html/index.html
 
 .PHONY: screenshots
 screenshots:
 	# Collect screenshots
 	mkdir -p screenshots
-	mv fabric*/run/screenshots/* screenshots/ || true
-	mv forge*/run/screenshots/* screenshots/ || true
+	mv fabric/run/screenshots/* screenshots/ || true
+	mv forge/run/screenshots/* screenshots/ || true
 
 .PHONY: clean
 clean:
-	cd fabric-1.19.x;./gradlew clean
-	cd forge-1.19.x;./gradlew clean
-	rm -rf dist
-
+	cd fabric;./gradlew clean
+	cd forge;./gradlew clean
