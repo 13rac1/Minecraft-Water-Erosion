@@ -1,6 +1,5 @@
 package com._13rac1.erosion.common;
 
-import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,7 +12,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.FluidState;
@@ -37,7 +35,7 @@ import net.minecraft.tags.BlockTags;
 
 public class Tasks {
 
-  // Copied from net.minecraft.util(.math).Direction to reduce imports
+  // Copied from net.minecraft.util(.math).Direction
   private static final Vec3i VECTOR_DOWN = new Vec3i(0, -1, 0);
   private static final Vec3i VECTOR_UP = new Vec3i(0, 1, 0);
   private static final Vec3i VECTOR_NORTH = new Vec3i(0, 0, -1);
@@ -351,48 +349,52 @@ public class Tasks {
     return shortestDir;
   }
 
-  private void maybeSourceBreak(Level world, BlockState state, BlockPos pos, RandomSource rand, Integer level) {
+  public enum msb {
+    NOT_SOURCE,
+    BELOW_SEA_LEVEL,
+    NOT_SURFACE_WATER,
+    ALREADY_FLOWING,
+    MAYBE_NOT_ERODE,
+    SUCCESS,
+    NOT_FOUND,
+  }
+
+  protected msb maybeSourceBreak(Level world, BlockState state, BlockPos pos, RandomSource rand, Integer level) {
     // Source blocks only.
     if (level != FluidLevel.SOURCE) {
-      return;
+      return msb.NOT_SOURCE;
     }
 
     // Skip blocks less than sea level+, because there are a lot of them.
     if (pos.getY() < world.getSeaLevel()) {
-      // System.out.println("Too Low" + pos.getY() + "sea:" +
-      // world.getSeaLevel());
-      return;
+      return msb.BELOW_SEA_LEVEL;
     }
 
     // Skip blocks without air above.
     Block upBlock = world.getBlockState(pos.above()).getBlock();
     if (!isAir(upBlock)) {
-      // System.out.println("Not Surface Water:" +
-      // world.getBlockState(pos.up()).getBlock().getName().asFormattedString());
-      // System.out.println("Y:" + pos.getY() + "sea:" + world.getSeaLevel());
-      return;
+      return msb.NOT_SURFACE_WATER;
     }
 
     // Skip blocks already flowing
     Vec3 velocity = getFlowVelocity(world, pos, state);
     if (velocity.length() > 0) {
-      return;
+      return msb.ALREADY_FLOWING;
     }
-    // System.out.println("length:" + velocity.length());
 
     // Blocks near an erodable surface only.
-    List<Vec3i> listDirection = Arrays.asList(new Vec3i(1, 0, 0), new Vec3i(-1, 0, 0), new Vec3i(0, 0, 1),
-        new Vec3i(0, 0, -1));
+    List<Vec3i> listDirection = Arrays.asList(VECTOR_NORTH, VECTOR_SOUTH, VECTOR_EAST, VECTOR_WEST);
     // Randomize the list each run.
-    Collections.shuffle(listDirection);
+    // TODO: Consider randomizing again
+    // Collections.shuffle(listDirection);
 
+    // TODO: break the inner loop out for more detailed tests
     for (Vec3i dir : listDirection) {
       BlockPos sidePos = pos.offset(dir);
 
       Block sideBlock = getBlock(world, sidePos);
       if (sideBlock == Blocks.WATER) {
-        // Short circuit water blocks. Should save CPU as this will be the most
-        // common result.
+        // Short circuit water blocks.
         continue;
       }
 
@@ -406,8 +408,12 @@ public class Tasks {
       }
       // Found a breakable block in the direction.
 
+      if (!ErodableBlocks.maybeErode(rand, sideBlock)) {
+        return msb.MAYBE_NOT_ERODE;
+      }
+
       Integer dist = distanceToAirWaterInFlowPath(world, pos, dir, level);
-      if (dist == 128) {
+      if (dist == AIR_WATER_NOT_FOUND) {
         // Skip if air was not found in the direction of breakage.
         continue;
       }
@@ -421,8 +427,6 @@ public class Tasks {
         // System.out.println("maybewaterdir:" + waterDirection);
         BlockPos maybeWaterPos = pos.offset(waterDirection);
         BlockState maybeWaterState = world.getBlockState(maybeWaterPos);
-        // System.out.println("maybe water:" +
-        // maybeWaterState.getBlock().getName().asFormattedString());
         if (maybeWaterState.getBlock() != Blocks.WATER) {
           // TODO: Must be source water block
           break;
@@ -436,18 +440,14 @@ public class Tasks {
       }
       // TODO: Better odds for waterFound > 1.
 
-      if (!ErodableBlocks.maybeErode(rand, sideBlock)) {
-        // TODO: Should this chance check occur earlier?
-        return;
-      }
-
       // System.out.println(
       // "Removing block to source side:" +
       // world.getBlockState(sidePos).getBlock().getName().asFormattedString());
       world.setBlockAndUpdate(sidePos, Blocks.AIR.defaultBlockState());
       // Only process the first erodable side found.
-      return;
+      return msb.SUCCESS;
     }
+    return msb.NOT_FOUND;
   }
 
   private boolean isAir(Block block) {

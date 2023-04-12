@@ -58,13 +58,15 @@ Previously Supported Versions:
 * Fabric 1.14.4
 * Fabric 1.15.2
 * Fabric 1.16.x
+* Fabric 1.18.x
 * Forge 1.14.4
 * Forge 1.15.2
 * Forge 1.16.x
+* Forge 1.18.x
 
 ## TODO features
 
-* [1.17+ world removed hill/mountain aquifers, add them back](https://github.com/13rac1/Minecraft-Water-Erosion/issues/28)
+* [1.17+ world gen removed hill/mountain aquifers, add them back](https://github.com/13rac1/Minecraft-Water-Erosion/issues/28)
 * [Optionally drop items of eroded blocks](https://github.com/13rac1/Minecraft-Water-Erosion/issues/3)
 * [Configurable Erosion odds and types - Slow, Medium(default), Fast, Custom](https://github.com/13rac1/Minecraft-Water-Erosion/issues/1)
 
@@ -122,11 +124,32 @@ Tested on Minecraft 1.15.1
 
 ## Inspiration
 
-Aquarela - Russian documentary about water
+* Reality
+* Aquarela - Russian documentary about water
 
 ## Development
 
-### Forge Dev
+### Code structure
+
+Common erosion code is in the `erosion-common` directory and symlinked into the Forge and Fabric codebases.
+
+### Build
+
+The `Makefile` will build both Forge and Fabric versions
+
+```bash
+make
+```
+
+### Unit tests
+
+Erosion functionality is unit tested within the Forge codebase, run the unit tests with:
+
+```bash
+make test
+```
+
+### Forge Dependencies
 
 Forge dependency versions are specified in:
 
@@ -135,12 +158,14 @@ Forge dependency versions are specified in:
 
 Check versions at: https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json
 
-### Fabric Dev
+### Fabric Dependencies
 
 Fabric dependency versions are specified in:
 
 * `gradle.properties`
 * `src/main/resources/fabric.mod.json`
+
+Check versions at: https://fabricmc.net/develop/
 
 ### Technical Notes
 
@@ -160,10 +185,6 @@ Source water blocks at or below the world sea level are ignored to reduce CPU us
 
 [MixinFramework]: https://github.com/SpongePowered/Mixin
 
-
-
 ## License
 
-### Water Erosion Mod for Minecraft
-
-Copyright 2023 by Brad Erickson. Licensed GPL.
+Copyright 2020-2023 by Brad Erickson. Licensed GPL.

@@ -23,7 +23,8 @@ public class TestTasksCommon {
         private List<String> allowedCallers = Arrays.asList(
                 "TestTasks.java",
                 "TestMaybeErodeEdge.java",
-                "TestMaybeFlowingWall.java");
+                "TestMaybeFlowingWall.java",
+                "TestMaybeSourceBreak.java");
 
         @Override
         public void reportInvocation(MethodInvocationReport methodInvocationReport) {
