@@ -50,7 +50,7 @@ Download from: https://www.curseforge.com/minecraft/mc-mods/water-erosion
 
 Supported versions:
 
-* Forge 1.19.x
+* Forge 1.20.x
 * Fabric 1.20.x
 
 Previously Supported Versions:
@@ -65,6 +65,7 @@ Previously Supported Versions:
 * Forge 1.15.2
 * Forge 1.16.x
 * Forge 1.18.x
+* Forge 1.19.x
 
 ## TODO features
 
