@@ -1,11 +1,20 @@
 # Expecting Java 17 in $PATH
 
-build:
-	cd fabric;./gradlew build
+.PHONY: build
+build: forge fabric
+
+.PHONY: forge
+forge: dist
 	cd forge;./gradlew build
-	mkdir -p dist
-	cp fabric/build/libs/*.jar dist/
 	cp forge/build/libs/*.jar dist/
+
+.PHONY: fabric
+fabric: dist
+	cd fabric;./gradlew build
+	cp fabric/build/libs/*.jar dist/
+
+dist:
+	mkdir -p dist
 
 .PHONY: test
 test:
