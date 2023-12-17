@@ -39,7 +39,7 @@ public class TestErodableBlocks {
   @Test
   void testDecayTo() {
     // Test an important decay hierarchy
-    Assertions.assertEquals(Blocks.DIRT, ErodableBlocks.decayTo(Blocks.GRASS));
+    Assertions.assertEquals(Blocks.DIRT, ErodableBlocks.decayTo(Blocks.SHORT_GRASS));
     Assertions.assertEquals(Blocks.COARSE_DIRT, ErodableBlocks.decayTo(Blocks.DIRT));
     Assertions.assertEquals(Blocks.GRAVEL, ErodableBlocks.decayTo(Blocks.COARSE_DIRT));
     Assertions.assertEquals(Blocks.SAND, ErodableBlocks.decayTo(Blocks.GRAVEL));
@@ -50,7 +50,7 @@ public class TestErodableBlocks {
   @Test
   void testCanSourceBreak() {
     // Test depends on current setting of SOURCE_BREAK_RESIST_ODDS
-    Assertions.assertTrue(ErodableBlocks.canSourceBreak(Blocks.GRASS));
+    Assertions.assertTrue(ErodableBlocks.canSourceBreak(Blocks.SHORT_GRASS));
     Assertions.assertFalse(ErodableBlocks.canSourceBreak(Blocks.COBBLESTONE));
   }
 
@@ -58,7 +58,7 @@ public class TestErodableBlocks {
   void testGetDecayList() {
     // Check the decayList for Grass is returned in the expected order.
     List<Block> expected = Arrays.asList(Blocks.DIRT, Blocks.COARSE_DIRT, Blocks.GRAVEL, Blocks.SAND, Blocks.CLAY);
-    List<Block> actual = ErodableBlocks.getDecayList(Blocks.GRASS);
+    List<Block> actual = ErodableBlocks.getDecayList(Blocks.SHORT_GRASS);
 
     System.out.println(expected);
     System.out.println(actual);
