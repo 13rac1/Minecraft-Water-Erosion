@@ -113,9 +113,9 @@ public class ErodableBlocks {
       erodables.put(Blocks.DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
       erodables.put(Blocks.PODZOL, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
       erodables.put(Blocks.GRASS_BLOCK, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
-      erodables.put(Blocks.GRASS, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
+      erodables.put(Blocks.SHORT_GRASS, new Erodable(GRASS_RESIST_ODDS, Blocks.DIRT));
       // Dirt Paths grow into Grass
-      erodables.put(Blocks.DIRT_PATH, new Erodable(GRASS_RESIST_ODDS, Blocks.GRASS));
+      erodables.put(Blocks.DIRT_PATH, new Erodable(GRASS_RESIST_ODDS, Blocks.SHORT_GRASS));
       erodables.put(Blocks.MOSSY_COBBLESTONE, new Erodable(COBBLE_RESIST_ODDS, Blocks.GRAVEL));
       // Directly to air because the gravel block is a larger volume than the original
       erodables.put(Blocks.MOSSY_COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
