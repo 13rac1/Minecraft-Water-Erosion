@@ -190,4 +190,4 @@ Source water blocks at or below the world sea level are ignored to reduce CPU us
 
 ## License
 
-Copyright 2020-2023 by Brad Erickson. Licensed GPL.
+Copyright 2020+ by Brad Erickson. Licensed GPL.

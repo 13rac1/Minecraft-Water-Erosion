@@ -24,7 +24,8 @@ public class TestTasksCommon {
                 "TestTasks.java",
                 "TestMaybeErodeEdge.java",
                 "TestMaybeFlowingWall.java",
-                "TestMaybeSourceBreak.java");
+                "TestMaybeSourceBreak.java",
+                "TestMaybeAddMoss.java");
 
         @Override
         public void reportInvocation(MethodInvocationReport methodInvocationReport) {
@@ -35,8 +36,8 @@ public class TestTasksCommon {
             }
 
             if (methodInvocationReport.getReturnedValue() == null) {
-                throw new UnsupportedOperationException(" Unstubbed access by " + caller + ": " +
-                        methodInvocationReport.getInvocation());
+                throw new UnsupportedOperationException("Unstubbed access by " + caller + ": " +
+                        methodInvocationReport.getInvocation() + " (Solution: add to allowedCallers?)");
             }
         }
     }

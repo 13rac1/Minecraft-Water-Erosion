@@ -5,11 +5,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -34,6 +38,7 @@ import net.minecraft.tags.BlockTags;
 // IDEA: Return "Reasons" for not eroding, which can be unit tested for the correct reason not just any.
 
 public class Tasks {
+  private static final Logger LOGGER = LogManager.getFormatterLogger(Tasks.class);
 
   // Copied from net.minecraft.util(.math).Direction
   private static final Vec3i VECTOR_DOWN = new Vec3i(0, -1, 0);
@@ -586,7 +591,14 @@ public class Tasks {
     Collections.shuffle(listDirection);
 
     for (Vec3i dir : listDirection) {
+      if (dir == null) {
+        throw new NullPointerException("dir cannot be null");
+      }
+
       BlockPos sidePos = pos.offset(dir);
+      if (sidePos == null) {
+        throw new NullPointerException("sidePos cannot be null");
+      }
       Block sideBlock = getBlock(world, sidePos);
 
       if (!isCobbleStone(sideBlock) && !isStoneBricks(sideBlock)) {
@@ -600,9 +612,42 @@ public class Tasks {
       if (mossBlock == Blocks.AIR) {
         return false; // Stop the loop
       }
-      world.setBlockAndUpdate(sidePos, mossBlock.defaultBlockState());
+
+      BlockState sideState = world.getBlockState(sidePos);
+      BlockState mossState = mossBlock.defaultBlockState();
+      mossState = copyProperties(sideState, mossState);
+      if (mossState == null) {
+        throw new NullPointerException("mossState cannot be null");
+      }
+      LOGGER.debug("Add moss '%s' => '%s'", sideBlock, mossBlock);
+
+      world.setBlockAndUpdate(sidePos, mossState);
       return true; // Stop the loop
     }
     return false;
   }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public BlockState copyProperties(BlockState source, BlockState target) {
+    // Warning: This drops some type safety to copy all properties
+    for (Property<?> rawProperty : source.getProperties()) {
+      Property property = rawProperty; // Use raw type
+      if (property == null) {
+        throw new NullPointerException("property cannot be null");
+      }
+      if (target.hasProperty(property)) {
+        Comparable value = source.getValue(property);
+        if (value == null) {
+          throw new NullPointerException("value cannot be null");
+        }
+        target = target.setValue(property, value);
+      } else {
+        throw new UnsupportedOperationException(
+            String.format("'%s' property '%s' is not available on '%s'", source.getBlock(),
+                property.getName(), target.getBlock()));
+      }
+    }
+    return target;
+  }
+
 }

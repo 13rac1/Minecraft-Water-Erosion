@@ -304,24 +304,6 @@ public class TestTasks extends TestTasksCommon {
   }
 
   @Test
-  void testMaybeAddMoss() {
-    final Level world = mock(Level.class, levelSettings);
-    final BlockPos pos = new BlockPos(0, 0, 0);
-    final RandomSource rand = RandomSource.create(); // unused, in tests but required
-    final BlockState water = getWaterState(FluidLevel.FLOW1);
-    final BlockState cobblestone = Blocks.COBBLESTONE.defaultBlockState();
-
-    // Found water
-    when(world.getBlockState(any(BlockPos.class))).thenReturn(water);
-    Assertions.assertFalse(tasks.maybeAddMoss(world, pos, rand));
-
-    // Found cobble, which is DECAY_ALWAYS_ODDS, adds moss
-    when(world.getBlockState(any(BlockPos.class))).thenReturn(cobblestone);
-    Assertions.assertTrue(tasks.maybeAddMoss(world, pos, rand));
-    verify(world).setBlockAndUpdate(any(BlockPos.class), eq(Blocks.MOSSY_COBBLESTONE.defaultBlockState()));
-  }
-
-  @Test
   void testTreeInColumn() {
     final Level world = mock(Level.class, levelSettings);
     final BlockPos pos = new BlockPos(10, 0, 0);

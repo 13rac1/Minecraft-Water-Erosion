@@ -37,14 +37,30 @@ public class TestErodableBlocks {
   }
 
   @Test
-  void testDecayTo() {
-    // Test an important decay hierarchy
-    Assertions.assertEquals(Blocks.DIRT, ErodableBlocks.decayTo(Blocks.SHORT_GRASS));
-    Assertions.assertEquals(Blocks.COARSE_DIRT, ErodableBlocks.decayTo(Blocks.DIRT));
-    Assertions.assertEquals(Blocks.GRAVEL, ErodableBlocks.decayTo(Blocks.COARSE_DIRT));
+  void testGravelDecayTo() {
+    // Test the gravel decay hierarchy
     Assertions.assertEquals(Blocks.SAND, ErodableBlocks.decayTo(Blocks.GRAVEL));
     Assertions.assertEquals(Blocks.CLAY, ErodableBlocks.decayTo(Blocks.SAND));
     Assertions.assertEquals(Blocks.AIR, ErodableBlocks.decayTo(Blocks.CLAY));
+  }
+
+  @Test
+  void testGrassDecayTo() {
+    // Test the grass decay hierarchy
+    Assertions.assertEquals(Blocks.DIRT, ErodableBlocks.decayTo(Blocks.SHORT_GRASS));
+    Assertions.assertEquals(Blocks.COARSE_DIRT, ErodableBlocks.decayTo(Blocks.DIRT));
+    Assertions.assertEquals(Blocks.GRAVEL, ErodableBlocks.decayTo(Blocks.COARSE_DIRT));
+  }
+
+  @Test
+  void testStoneDecayTo() {
+    // Test the stone decay hierarchy
+    // STONE_BRICKS -> MOSSY_STONE_BRICKS -> CRACKED_STONE_BRICKS -> COBBLESTONE -> MOSSY_COBBLESTONE -> GRAVEL
+    Assertions.assertEquals(Blocks.MOSSY_STONE_BRICKS, ErodableBlocks.decayTo(Blocks.STONE_BRICKS));
+    Assertions.assertEquals(Blocks.CRACKED_STONE_BRICKS, ErodableBlocks.decayTo(Blocks.MOSSY_STONE_BRICKS));
+    Assertions.assertEquals(Blocks.COBBLESTONE, ErodableBlocks.decayTo(Blocks.CRACKED_STONE_BRICKS));
+    Assertions.assertEquals(Blocks.MOSSY_COBBLESTONE, ErodableBlocks.decayTo(Blocks.COBBLESTONE));
+    Assertions.assertEquals(Blocks.GRAVEL, ErodableBlocks.decayTo(Blocks.MOSSY_COBBLESTONE));
   }
 
   @Test
