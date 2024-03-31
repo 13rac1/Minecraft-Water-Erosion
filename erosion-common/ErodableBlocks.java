@@ -99,6 +99,7 @@ public class ErodableBlocks {
   private static HashMap<Block, Erodable> getErodables() {
     // Note: Cannot be initialized during startup because the code runs before
     // Blocks is initialized.
+
     if (erodables == null) {
       erodables = new HashMap<Block, Erodable>();
       // Ordered weakest to strongest
@@ -118,6 +119,7 @@ public class ErodableBlocks {
       erodables.put(Blocks.DIRT_PATH, new Erodable(GRASS_RESIST_ODDS, Blocks.SHORT_GRASS));
       erodables.put(Blocks.MOSSY_COBBLESTONE, new Erodable(COBBLE_RESIST_ODDS, Blocks.GRAVEL));
       // Directly to air because the gravel block is a larger volume than the original
+      // block.
       erodables.put(Blocks.MOSSY_COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
       erodables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
       erodables.put(Blocks.MOSSY_COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
@@ -125,14 +127,15 @@ public class ErodableBlocks {
       erodables.put(Blocks.COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_SLAB));
       erodables.put(Blocks.COBBLESTONE_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_STAIRS));
       erodables.put(Blocks.COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_WALL));
-      erodables.put(Blocks.MOSSY_STONE_BRICKS, new Erodable(BRICK_RESIST_ODDS, Blocks.GRAVEL));
-      erodables.put(Blocks.MOSSY_STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
-      erodables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
-      erodables.put(Blocks.MOSSY_STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
-      erodables.put(Blocks.STONE_BRICKS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICKS));
-      erodables.put(Blocks.STONE_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_SLAB));
-      erodables.put(Blocks.STONE_BRICK_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_STAIRS));
-      erodables.put(Blocks.STONE_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_WALL));
+      erodables.put(Blocks.CRACKED_STONE_BRICKS, new Erodable(BRICK_RESIST_ODDS, Blocks.COBBLESTONE));
+      erodables.put(Blocks.MOSSY_STONE_BRICKS, new Erodable(BRICK_RESIST_ODDS, Blocks.CRACKED_STONE_BRICKS));
+      erodables.put(Blocks.MOSSY_STONE_BRICK_SLAB, new Erodable(BRICK_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_SLAB));
+      erodables.put(Blocks.MOSSY_STONE_BRICK_STAIRS, new Erodable(BRICK_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_STAIRS));
+      erodables.put(Blocks.MOSSY_STONE_BRICK_WALL, new Erodable(BRICK_RESIST_ODDS, Blocks.MOSSY_COBBLESTONE_WALL));
+      erodables.put(Blocks.STONE_BRICKS, new Erodable(BRICK_RESIST_ODDS, Blocks.MOSSY_STONE_BRICKS));
+      erodables.put(Blocks.STONE_BRICK_SLAB, new Erodable(BRICK_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_SLAB));
+      erodables.put(Blocks.STONE_BRICK_STAIRS, new Erodable(BRICK_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_STAIRS));
+      erodables.put(Blocks.STONE_BRICK_WALL, new Erodable(BRICK_RESIST_ODDS, Blocks.MOSSY_STONE_BRICK_WALL));
 
       erodables.forEach((block, erodable) -> {
         Erodable current = erodable;
@@ -149,6 +152,7 @@ public class ErodableBlocks {
 
   // Given a block, returns an Integer from 0->100 representing the erosion
   // resistance of the block.
+  @SuppressWarnings("null")
   public static Integer getResistance(Block block) {
 
     if (getErodables().containsKey(block)) {
@@ -156,7 +160,6 @@ public class ErodableBlocks {
     }
 
     // Check block tags to erode leaves, wool, and mod-provided blocks.
-    // TODO: Less CPU to fill the hashmap with all values once.
     BlockState bs = block.defaultBlockState();
     if (bs.is(BlockTags.LEAVES)) {
       return LEAF_RESIST_ODDS;
@@ -218,9 +221,8 @@ public class ErodableBlocks {
     return Blocks.AIR;
   }
 
-  // TODO: This is simple method to block the breakage of cobblestone by source
-  // blocks, but ideally it would still be allowed if there is enough "pressure"
-  // behind the current source block.
+  // Stop the breakage or erosion of cobblestone and other "strong" blocks by
+  // water sources.
   public static boolean canSourceBreak(Block block) {
     return getResistance(block) < SOURCE_BREAK_RESIST_ODDS;
   }
