@@ -1,5 +1,6 @@
 package com._13rac1.erosion.common;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import org.mockito.quality.Strictness;
 
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.LiquidBlock;
 
@@ -53,7 +55,9 @@ public class TestTasksCommon {
     }
 
     protected BlockState getWaterState(int level) {
-        final BlockState bs = Blocks.WATER.defaultBlockState().setValue(LiquidBlock.LEVEL, level);
+        Property<Integer> prop = LiquidBlock.LEVEL;
+        assertNotNull(prop);
+        final BlockState bs = Blocks.WATER.defaultBlockState().setValue(prop, level);
         // IMPORTANT: BlockStates must have initCache() run to correctly set the private
         // fluidstate after the LEVEL value has been set.
         bs.initCache();

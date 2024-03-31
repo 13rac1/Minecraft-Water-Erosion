@@ -1,5 +1,7 @@
 package com._13rac1.erosion.common;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Assertions;
@@ -17,6 +19,7 @@ public class TestMaybeErodeEdge extends TestTasksCommon {
     private void whenBlock(Level world, BlockPos pos, Block block) {
         final BlockState bs = block.defaultBlockState();
         bs.initCache();
+        assertNotNull(pos);
         doReturn(bs).when(world).getBlockState(pos);
     }
 
@@ -93,6 +96,7 @@ public class TestMaybeErodeEdge extends TestTasksCommon {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testToAirWithWater() {
         final Level world = mock(Level.class, levelSettings);
         final BlockPos pos = new BlockPos(10, 0, 0);

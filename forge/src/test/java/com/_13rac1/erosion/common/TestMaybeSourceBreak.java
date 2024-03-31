@@ -1,5 +1,6 @@
 package com._13rac1.erosion.common;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Assertions;
@@ -20,6 +21,7 @@ public class TestMaybeSourceBreak extends TestTasksCommon {
     private void whenBlock(Level world, BlockPos pos, Block block) {
         final BlockState bs = block.defaultBlockState();
         bs.initCache();
+        assertNotNull(pos);
         doReturn(bs).when(world).getBlockState(pos);
     }
 

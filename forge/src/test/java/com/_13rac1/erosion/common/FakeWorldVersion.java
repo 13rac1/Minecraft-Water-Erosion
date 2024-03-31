@@ -2,6 +2,8 @@ package com._13rac1.erosion.common;
 
 import java.util.Date;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.WorldVersion;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.storage.DataVersion;
@@ -45,7 +47,7 @@ public class FakeWorldVersion implements WorldVersion {
     }
 
     @Override
-    public int getPackVersion(PackType p_265245_) {
+    public int getPackVersion(@Nonnull PackType p_265245_) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getPackVersion'");
     }

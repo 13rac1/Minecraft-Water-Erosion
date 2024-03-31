@@ -11,10 +11,12 @@ public class EWorld {
     this.world = world;
   }
 
+  @SuppressWarnings("null")
   public BlockState getBlockState(BlockPos pos) {
     return this.world.getBlockState(pos);
   }
 
+  @SuppressWarnings("null")
   public Boolean setBlockAndUpdate(BlockPos pos, BlockState newState) {
     return this.world.setBlockAndUpdate(pos, newState);
   }

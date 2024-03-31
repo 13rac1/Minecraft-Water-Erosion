@@ -8,6 +8,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.LiquidBlock;
 
+import javax.annotation.Nonnull;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,7 +26,7 @@ public class LiquidBlockMixin extends Block {
   }
 
   @Override
-  public boolean isRandomlyTicking(BlockState state) {
+  public boolean isRandomlyTicking(@Nonnull BlockState state) {
     // Water only, not Lava.
     return state.getBlock() == Blocks.WATER;
   }

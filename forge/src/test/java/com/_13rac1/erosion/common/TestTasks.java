@@ -28,6 +28,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.util.RandomSource;
 
+@SuppressWarnings("null")
 public class TestTasks extends TestTasksCommon {
   // Helper to reduce clutter while describing blocks in a mock world.
   private void whenBlock(Level world, int x, int y, int z, Block block) {
@@ -303,6 +304,7 @@ public class TestTasks extends TestTasksCommon {
 
   }
 
+  @SuppressWarnings("deprecation")
   @Test
   void testTreeInColumn() {
     final Level world = mock(Level.class, levelSettings);

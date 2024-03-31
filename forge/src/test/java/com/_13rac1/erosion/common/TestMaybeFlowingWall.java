@@ -1,5 +1,6 @@
 package com._13rac1.erosion.common;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.Assertions;
@@ -21,6 +22,7 @@ public class TestMaybeFlowingWall extends TestTasksCommon {
     private void whenBlock(Level world, BlockPos pos, Block block) {
         final BlockState bs = block.defaultBlockState();
         bs.initCache();
+        assertNotNull(pos);
         doReturn(bs).when(world).getBlockState(pos);
     }
 
@@ -59,6 +61,7 @@ public class TestMaybeFlowingWall extends TestTasksCommon {
         final BlockPos pos = new BlockPos(10, 0, 0);
 
         Vec3i dirForward = Direction.WEST.getNormal();
+        assertNotNull(dirForward);
         whenBlock(world, pos.offset(dirForward), Blocks.AIR);
         Assertions.assertEquals(null,
                 tasks.findShortestDirectionToAirOrWater(world, pos, FluidLevel.FALLING7, dirForward));
@@ -131,6 +134,7 @@ public class TestMaybeFlowingWall extends TestTasksCommon {
     }
 
     @Test
+
     void testBreakWall() {
         final Level world = mock(Level.class, levelSettings);
         final BlockPos pos = new BlockPos(10, 0, 0);
@@ -138,7 +142,9 @@ public class TestMaybeFlowingWall extends TestTasksCommon {
         final BlockState bsWater = getWaterState(FluidLevel.FLOW1);
         final Tasks spyTask = spy(tasks);
 
-        Vec3 west = Vec3.atLowerCornerOf(Direction.WEST.getNormal());
+        Vec3i dirForward = Direction.WEST.getNormal();
+        assertNotNull(dirForward);
+        Vec3 west = Vec3.atLowerCornerOf(dirForward);
         doReturn(west).when(spyTask).getFlowVelocity(any(Level.class), any(BlockPos.class),
                 any(BlockState.class));
         // Forward
