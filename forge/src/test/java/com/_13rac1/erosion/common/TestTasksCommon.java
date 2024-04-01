@@ -27,6 +27,7 @@ public class TestTasksCommon {
                 "TestMaybeErodeEdge.java",
                 "TestMaybeFlowingWall.java",
                 "TestMaybeSourceBreak.java",
+                "TestMaybeDecayUnder.java",
                 "TestMaybeAddMoss.java");
 
         @Override
@@ -39,7 +40,7 @@ public class TestTasksCommon {
 
             if (methodInvocationReport.getReturnedValue() == null) {
                 throw new UnsupportedOperationException("Unstubbed access by " + caller + ": " +
-                        methodInvocationReport.getInvocation() + " (Solution: add to allowedCallers?)");
+                        methodInvocationReport.getInvocation() + " possible solution: add to allowedCallers?");
             }
         }
     }
