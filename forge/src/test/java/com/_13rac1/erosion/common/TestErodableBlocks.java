@@ -49,13 +49,13 @@ public class TestErodableBlocks {
     // Test the grass decay hierarchy
     Assertions.assertEquals(Blocks.DIRT, ErodableBlocks.decayTo(Blocks.SHORT_GRASS));
     Assertions.assertEquals(Blocks.COARSE_DIRT, ErodableBlocks.decayTo(Blocks.DIRT));
-    Assertions.assertEquals(Blocks.GRAVEL, ErodableBlocks.decayTo(Blocks.COARSE_DIRT));
+    Assertions.assertEquals(Blocks.MUD, ErodableBlocks.decayTo(Blocks.COARSE_DIRT));
+    Assertions.assertEquals(Blocks.GRAVEL, ErodableBlocks.decayTo(Blocks.MUD));
   }
 
   @Test
   void testStoneDecayTo() {
     // Test the stone decay hierarchy
-    // STONE_BRICKS -> MOSSY_STONE_BRICKS -> CRACKED_STONE_BRICKS -> COBBLESTONE -> MOSSY_COBBLESTONE -> GRAVEL
     Assertions.assertEquals(Blocks.MOSSY_STONE_BRICKS, ErodableBlocks.decayTo(Blocks.STONE_BRICKS));
     Assertions.assertEquals(Blocks.CRACKED_STONE_BRICKS, ErodableBlocks.decayTo(Blocks.MOSSY_STONE_BRICKS));
     Assertions.assertEquals(Blocks.COBBLESTONE, ErodableBlocks.decayTo(Blocks.CRACKED_STONE_BRICKS));
@@ -73,11 +73,9 @@ public class TestErodableBlocks {
   @Test
   void testGetDecayList() {
     // Check the decayList for Grass is returned in the expected order.
-    List<Block> expected = Arrays.asList(Blocks.DIRT, Blocks.COARSE_DIRT, Blocks.GRAVEL, Blocks.SAND, Blocks.CLAY);
+    List<Block> expected = Arrays.asList(Blocks.DIRT, Blocks.COARSE_DIRT, Blocks.MUD, Blocks.GRAVEL, Blocks.SAND,
+        Blocks.CLAY);
     List<Block> actual = ErodableBlocks.getDecayList(Blocks.SHORT_GRASS);
-
-    System.out.println(expected);
-    System.out.println(actual);
 
     Assertions.assertArrayEquals(expected.toArray(), actual.toArray());
   }

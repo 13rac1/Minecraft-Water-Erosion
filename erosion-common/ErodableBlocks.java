@@ -78,6 +78,7 @@ public class ErodableBlocks {
       decayables.put(Blocks.CLAY, DECAY_TO_CLAY_ODDS);
       decayables.put(Blocks.SAND, DECAY_TO_SAND_ODDS);
       decayables.put(Blocks.GRAVEL, DECAY_TO_GRAVEL_ODDS);
+      decayables.put(Blocks.MUD, DECAY_TO_DIRT_ODDS);
       decayables.put(Blocks.DIRT, DECAY_TO_DIRT_ODDS);
       decayables.put(Blocks.COARSE_DIRT, DECAY_TO_COARSE_DIRT_ODDS);
       decayables.put(Blocks.MOSSY_COBBLESTONE, DECAY_TO_MOSSY_COBBLE_ODDS);
@@ -107,7 +108,8 @@ public class ErodableBlocks {
       erodables.put(Blocks.RED_SAND, new Erodable(SAND_RESIST_ODDS, Blocks.CLAY));
       erodables.put(Blocks.SAND, new Erodable(SAND_RESIST_ODDS, Blocks.CLAY));
       erodables.put(Blocks.GRAVEL, new Erodable(GRAVEL_RESIST_ODDS, Blocks.SAND));
-      erodables.put(Blocks.COARSE_DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.GRAVEL));
+      erodables.put(Blocks.MUD, new Erodable(DIRT_RESIST_ODDS, Blocks.GRAVEL));
+      erodables.put(Blocks.COARSE_DIRT, new Erodable(DIRT_RESIST_ODDS, Blocks.MUD));
       if (Config.GetErodeFarmLand()) {
         erodables.put(Blocks.FARMLAND, new Erodable(DIRT_RESIST_ODDS, Blocks.COARSE_DIRT));
       }
@@ -120,6 +122,10 @@ public class ErodableBlocks {
       erodables.put(Blocks.MOSSY_COBBLESTONE, new Erodable(COBBLE_RESIST_ODDS, Blocks.GRAVEL));
       // Directly to air because the gravel block is a larger volume than the original
       // block.
+      erodables.put(Blocks.MUD_BRICKS, new Erodable(COBBLE_RESIST_ODDS, Blocks.MUD));
+      erodables.put(Blocks.MUD_BRICK_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
+      erodables.put(Blocks.MUD_BRICK_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
+      erodables.put(Blocks.MUD_BRICK_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
       erodables.put(Blocks.MOSSY_COBBLESTONE_SLAB, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
       erodables.put(Blocks.MOSSY_COBBLESTONE_STAIRS, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));
       erodables.put(Blocks.MOSSY_COBBLESTONE_WALL, new Erodable(COBBLE_RESIST_ODDS, Blocks.AIR));

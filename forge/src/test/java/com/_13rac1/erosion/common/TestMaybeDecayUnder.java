@@ -26,6 +26,7 @@ public class TestMaybeDecayUnder extends TestTasksCommon {
     }
 
     @Test
+    @SuppressWarnings("null")
     void testMaybeDecayUnder() {
         final Level world = mock(Level.class, levelSettings);
         final BlockPos pos = new BlockPos(0, 0, 0);
