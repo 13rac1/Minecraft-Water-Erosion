@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -114,7 +116,8 @@ public class Tasks {
   protected boolean maybeErodeEdge(Level world, BlockState state, BlockPos pos, RandomSource rand, Integer level) {
     // Get the block under us.
     BlockPos underPos = pos.below();
-    Block underBlock = getBlock(world, underPos);
+    BlockState underState = world.getBlockState(underPos);
+    Block underBlock = underState.getBlock();
 
     // Return if the block below us is not erodable.
     if (!ErodableBlocks.canErode(underBlock)) {
@@ -131,18 +134,25 @@ public class Tasks {
     }
     // Remaining blocks are Edges of FLOW1-FLOW6 or any FLOW7
 
-    // System.out.println("Removing block: " +
-    // underBlock.getName().asFormattedString());
-
     Block decayBlock = ErodableBlocks.maybeDecay(rand, underBlock);
     if (decayBlock == Blocks.AIR) {
       // Removing the block under the water block.
       Integer underBlocklevel = level < FluidLevel.FALLING7 ? level + 1 : FluidLevel.FALLING7;
 
-      world.setBlockAndUpdate(underPos, Blocks.WATER.defaultBlockState().setValue(LiquidBlock.LEVEL, underBlocklevel));
+      BlockState water = Blocks.WATER.defaultBlockState().setValue(LiquidBlock.LEVEL, underBlocklevel);
+      world.setBlockAndUpdate(underPos, water);
+      LOGGER.debug("ErodeEdge '%s' => water", underBlock);
     } else {
       // Decay the block and do nothing else.
-      world.setBlockAndUpdate(underPos, decayBlock.defaultBlockState());
+      BlockState newState = decayBlock.defaultBlockState();
+      Boolean propertiesCopied = false;
+      if (isCobbleStone(underBlock) || isStoneBrick(underBlock) || isMossyStoneBrick(underBlock)) {
+        // NOTE: Not MossyCobbleStone, because it decays to air throwing an exception.
+        newState = copyProperties(underState, newState);
+        propertiesCopied = true;
+      }
+      world.setBlockAndUpdate(underPos, newState);
+      LOGGER.debug("ErodeEdge '%s' => '%s', copied properties: %s", underBlock, decayBlock, propertiesCopied);
       return true;
     }
     // Don't delete source blocks
@@ -173,7 +183,6 @@ public class Tasks {
       world.setBlockAndUpdate(posUp, Blocks.AIR.defaultBlockState());
       posUp = posUp.above();
     }
-    // TODO: Anything further to do since we are deleting ourself?
     return true;
   }
 
@@ -529,7 +538,8 @@ public class Tasks {
     }
     // Get the block under us.
     BlockPos underPos = pos.below();
-    Block underBlock = getBlock(world, underPos);
+    BlockState underState = world.getBlockState(underPos);
+    Block underBlock = underState.getBlock();
 
     if (!ErodableBlocks.canErode(underBlock)) {
       return false;
@@ -537,8 +547,8 @@ public class Tasks {
     // TODO: return if is edge?
 
     // calculate decayto for block below
-    Block decayTo = ErodableBlocks.decayTo(underBlock);
-    if (decayTo == Blocks.AIR) {
+    Block decayBlock = ErodableBlocks.decayTo(underBlock);
+    if (decayBlock == Blocks.AIR) {
       // Nothing to do if block will become air.
       return false;
     }
@@ -564,8 +574,16 @@ public class Tasks {
     if (!ErodableBlocks.getDecayList(underBlock).contains(flowBlock)) {
       return false;
     }
-    world.setBlockAndUpdate(underPos, decayTo.defaultBlockState());
-    // System.out.println("maybeDecayUnder!");
+
+    BlockState newState = decayBlock.defaultBlockState();
+    Boolean propertiesCopied = false;
+    if (isCobbleStone(underBlock) || isStoneBrick(underBlock) || isMossyStoneBrick(underBlock)) {
+      // NOTE: Not MossyCobbleStone, because it decays to air throwing an exception.
+      newState = copyProperties(underState, newState);
+      propertiesCopied = true;
+    }
+    LOGGER.debug("DecayUnder '%s' => '%s', copied properties: %s", underBlock, decayBlock, propertiesCopied);
+    world.setBlockAndUpdate(underPos, newState);
     return true;
   }
 
@@ -574,20 +592,30 @@ public class Tasks {
         || block == Blocks.COBBLESTONE_WALL;
   }
 
-  protected boolean isStoneBricks(Block block) {
+  protected boolean isStoneBrick(Block block) {
     return block == Blocks.STONE_BRICKS || block == Blocks.STONE_BRICK_WALL || block == Blocks.STONE_BRICK_STAIRS
         || block == Blocks.STONE_BRICK_WALL;
+  }
+
+  protected boolean isMossyStoneBrick(Block block) {
+    return block == Blocks.MOSSY_STONE_BRICKS || block == Blocks.MOSSY_STONE_BRICK_WALL
+        || block == Blocks.MOSSY_STONE_BRICK_STAIRS
+        || block == Blocks.MOSSY_STONE_BRICK_WALL;
   }
 
   // Cobblestone and Stone Bricks grow moss near water, check every block around.
   // Returns true when a change is made.
   protected boolean maybeAddMoss(Level world, BlockPos pos, RandomSource rand) {
     List<Vec3i> listDirection = posEightAround;
-    // TODO: Add one level above the water line
+    // TODO: Add one level above the water line?
     // listDirection.addAll(posEightAroundUp);
+    // TODO: Add Moss Carpet in low light levels near water?
+    // https://minecraft.fandom.com/wiki/Moss_Carpet
+    // TODO: Should some dirt blocks turn into moss blocks in low light levels?
+    // https://minecraft.fandom.com/wiki/Moss_Block
 
     // Randomize the list each run.
-    // TODO: Just pick a random number since everything returns now.
+    // TODO: Just pick a random number since every path returns now.
     Collections.shuffle(listDirection);
 
     for (Vec3i dir : listDirection) {
@@ -601,7 +629,7 @@ public class Tasks {
       }
       Block sideBlock = getBlock(world, sidePos);
 
-      if (!isCobbleStone(sideBlock) && !isStoneBricks(sideBlock)) {
+      if (!isCobbleStone(sideBlock) && !isStoneBrick(sideBlock)) {
         // Stop the loop. Randomized, means 1:16 odds.
         return false;
       }
@@ -619,7 +647,7 @@ public class Tasks {
       if (mossState == null) {
         throw new NullPointerException("mossState cannot be null");
       }
-      LOGGER.debug("Add moss '%s' => '%s'", sideBlock, mossBlock);
+      LOGGER.debug("AddMoss '%s' => '%s'", sideBlock, mossBlock);
 
       world.setBlockAndUpdate(sidePos, mossState);
       return true; // Stop the loop
