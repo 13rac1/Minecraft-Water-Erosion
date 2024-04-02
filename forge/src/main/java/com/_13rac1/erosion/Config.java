@@ -1,4 +1,4 @@
-package com._13rac1.erosion.forge;
+package com._13rac1.erosion;
 
 import java.nio.file.Path;
 

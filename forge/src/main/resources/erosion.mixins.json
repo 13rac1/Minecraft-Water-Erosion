@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8.0",
-  "package": "com._13rac1.erosion.forge.mixin",
+  "package": "com._13rac1.erosion.mixin",
   "refmap": "erosion.refmap.json",
   "compatibilityLevel": "JAVA_17",
   "mixins": [

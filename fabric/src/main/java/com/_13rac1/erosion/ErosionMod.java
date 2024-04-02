@@ -1,4 +1,4 @@
-package com._13rac1.erosion.fabric;
+package com._13rac1.erosion;
 
 import net.fabricmc.api.ModInitializer;
 

@@ -1,4 +1,4 @@
-package com._13rac1.erosion.forge;
+package com._13rac1.erosion;
 
 import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.connect.IMixinConnector;

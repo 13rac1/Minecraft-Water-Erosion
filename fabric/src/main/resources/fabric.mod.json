@@ -16,7 +16,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com._13rac1.erosion.fabric.ErosionMod"
+      "com._13rac1.erosion.ErosionMod"
     ]
   },
   "mixins": [

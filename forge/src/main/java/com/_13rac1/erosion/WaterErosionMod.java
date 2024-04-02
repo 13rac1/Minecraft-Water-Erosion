@@ -1,4 +1,4 @@
-package com._13rac1.erosion.forge;
+package com._13rac1.erosion;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModLoadingContext;

@@ -1,4 +1,4 @@
-package com._13rac1.erosion.forge.mixin;
+package com._13rac1.erosion.mixin;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
