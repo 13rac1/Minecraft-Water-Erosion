@@ -38,7 +38,7 @@ import net.minecraft.tags.BlockTags;
 // IDEA: Return "Reasons" for not eroding, which can be unit tested for the correct reason not just any.
 
 public class Tasks {
-  private static final Logger LOGGER = LogManager.getFormatterLogger(Tasks.class);
+  private static final Logger LOGGER = LogManager.getFormatterLogger();
 
   // Copied from net.minecraft.util(.math).Direction
   private static final Vec3i VECTOR_DOWN = new Vec3i(0, -1, 0);
@@ -150,7 +150,8 @@ public class Tasks {
         propertiesCopied = true;
       }
       world.setBlockAndUpdate(underPos, newState);
-      LOGGER.debug("ErodeEdge '%s' => '%s', copied properties: %s", underBlock, decayBlock, propertiesCopied);
+      // LOGGER.debug("ErodeEdge '%s' => '%s', copied properties: %s", underBlock,
+      // decayBlock, propertiesCopied);
       return true;
     }
     // Don't delete source blocks
@@ -378,9 +379,9 @@ public class Tasks {
     }
 
     // Skip blocks less than sea level+, because there are a lot of them.
-    if (pos.getY() < world.getSeaLevel()) {
-      return msb.BELOW_SEA_LEVEL;
-    }
+    // if (pos.getY() < world.getSeaLevel()) {
+    // return msb.BELOW_SEA_LEVEL;
+    // }
 
     // Skip blocks without air above.
     Block upBlock = world.getBlockState(pos.above()).getBlock();
@@ -580,7 +581,8 @@ public class Tasks {
       newState = copyProperties(underState, newState);
       propertiesCopied = true;
     }
-    LOGGER.debug("DecayUnder '%s' => '%s', copied properties: %s", underBlock, decayBlock, propertiesCopied);
+    // LOGGER.debug("DecayUnder '%s' => '%s', copied properties: %s", underBlock,
+    // decayBlock, propertiesCopied);
     world.setBlockAndUpdate(underPos, newState);
     return true;
   }
@@ -645,7 +647,7 @@ public class Tasks {
       if (mossState == null) {
         throw new NullPointerException("mossState cannot be null");
       }
-      LOGGER.debug("AddMoss '%s' => '%s'", sideBlock, mossBlock);
+      // LOGGER.debug("AddMoss '%s' => '%s'", sideBlock, mossBlock);
 
       world.setBlockAndUpdate(sidePos, mossState);
       return true; // Stop the loop

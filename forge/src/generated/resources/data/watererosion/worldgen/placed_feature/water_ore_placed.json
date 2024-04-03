@@ -1,0 +1,21 @@
+{
+  "feature": "watererosion:water_ore",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 1
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:trapezoid",
+        "max_inclusive": {
+          "absolute": 123
+        },
+        "min_inclusive": {
+          "absolute": 63
+        }
+      }
+    }
+  ]
+}

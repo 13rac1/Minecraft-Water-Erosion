@@ -13,9 +13,10 @@ import org.apache.logging.log4j.Logger;
 
 import com._13rac1.erosion.common.ErodableBlocks;
 
-@Mod("watererosion")
+@Mod(WaterErosionMod.MOD_ID)
 public class WaterErosionMod {
-  private static final Logger LOGGER = LogManager.getLogger();
+  public static final String MOD_ID = "watererosion";
+  public static final Logger LOGGER = LogManager.getFormatterLogger();
 
   public WaterErosionMod() {
     FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);

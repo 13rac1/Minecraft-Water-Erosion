@@ -5,6 +5,8 @@ build: forge neoforge fabric
 
 .PHONY: forge
 forge: dist
+	# runData generates JSON worldgen configurations
+	#cd forge;./gradlew runData
 	cd forge;./gradlew build
 	cp forge/build/libs/*.jar dist/
 
