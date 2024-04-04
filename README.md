@@ -20,8 +20,8 @@ more dynamic. It should not break existing gameplay or enable cheating.
 * Water flow ends (level 7) dissolve the block below them to dig holes deeper
   and potentially continue the flow.
 * Water Sources dissolve blocks to the sides in the direction of air spaces.
-* Erodable blocks include sand, gravel, clay, farmland, dirt, grass, and,
-  rarely, cobblestone.
+* Erodable blocks include sand, gravel, clay, farmland, dirt, grass, mud, mud bricks, and,
+  rarely, cobblestone and stone bricks.
 * Erodable blocks have differing resistances to erosion depending on their
   density, but all erode over time.
 * Blocks decay during erosion to weaker blocks before disappearing.
@@ -32,7 +32,7 @@ Decay hierarchy:
 
 * Cobblestone -> Mossy Cobblestone -> Gravel
 * Stone Bricks -> Mossy Stone Bricks -> Gravel
-* Grass Path -> Grass -> Dirt -> Coarse Dirt -> Gravel
+* Grass Path -> Grass -> Dirt -> Coarse Dirt -> Mud -> Gravel
 * Gravel -> Sand -> Clay(rarely) -> Air/Water
 
 ## Media
@@ -51,6 +51,7 @@ Download from: https://www.curseforge.com/minecraft/mc-mods/water-erosion
 Supported versions:
 
 * Forge 1.20.x
+* NeoForge 1.20.x
 * Fabric 1.20.x
 
 Previously Supported Versions:
@@ -75,55 +76,21 @@ Previously Supported Versions:
 
 ## Test Areas
 
-Note: All test areas were found in pre-1.17 before the major world gen updates in
-Caves & Cliffs, so new ones need to be located.
-
 Create each world, teleport to the specified location, and, optionally, change
 the `randomTickSpeed` setting to speed up the process.
 
 ```script
 /teleport X Y Z
-/gamerule randomTickSpeed NUMBER # Suggest 100
+/gamerule randomTickSpeed NUMBER # Suggest 150
 ```
 
-### Seed -1988839586448825536
+### Seed 4465334863609190468
 
-Tested on Minecraft 1.15.1
+Tested on Minecraft 1.20.1
 
-* `1052 79 229` - A Savanna stream near a town flows into a crevasse.
-* `1103 102 467` - A Savanna hilltop lake creates multiple waterfalls, which may
-  change direction or dry up.
-* `1303 80 579` - A Savanna underground lake breaks through the hillside to
-  create a waterfall.
-* `1309 89 753` - A Savanna source block flows through tunnel, then creates a
-  small steam through trees to a pond.
-
-### Seed 837828468367153798
-
-Tested on Minecraft 1.15.1
-
-* `683 92 163` - A Giant Tree Tiaga hilltop lake creates multiple creeks
-  around a Pillager Outpost.
-* `1424 89 7` - A Giant Tree Tiaga hilltop lake flows into an underground lake and to seaside wetlands.
-* `1973 93 634` - A Mountain lake creates a 30 block tall set of waterfalls into a cave and a forest.
-* `4378 70 2779` - A Tiaga underground lake flows out of both sides of a hill creating three waterfalls.
-* `4406 75 2105` - Multiple Mountain arch waterfalls flow to the river.
-* `3908 79 3276` - A Forest lake creates a 40 block creek to a river. BUG: May get blocked when a level7 block doesn't dig down in front.
-* `4300 77 3511` - Three Plains lakes create a short river of rapids.
-
-### Seed -103432684796306269
-
-Tested on Minecraft 1.14.4
-
-* `178 63 -22` - Creeks run through a dense Dark Forest
-
-### Seed -4513252684046391402
-
-Tested on Minecraft 1.15.1
-
-* `1243 96 -520` - A naturally generated Savanna/Desert village spread across a
-  sand dune and the top of a mountain full of monsters is surrounded by
-  waterfalls
+* `-388 73 258` - A massive waterfall covers the side of a mountain peak in a swamp
+* `-538 85 1133` - A waterfall fills the floor of a narrow forest crevice 
+* `-638 72 1459` - A stream finds multiple routes through the trees in a forest
 
 ## Inspiration
 
@@ -134,11 +101,11 @@ Tested on Minecraft 1.15.1
 
 ### Code structure
 
-Common erosion code is in the `erosion-common` directory and symlinked into the Forge and Fabric codebases.
+Common erosion code is in the `erosion-common` directory and symlinked into the Forge, NeoForge, and Fabric codebases.
 
 ### Build
 
-The `Makefile` will build both Forge and Fabric versions
+The `Makefile` will build Forge, NeoForge, and Fabric versions
 
 ```bash
 make
@@ -190,4 +157,4 @@ Source water blocks at or below the world sea level are ignored to reduce CPU us
 
 ## License
 
-Copyright 2020+ by Brad Erickson. Licensed GPL.
+Copyright 2020+ by Brad Erickson. Licensed GPLv3.
