@@ -50,7 +50,9 @@ public class TestMaybeAddMoss extends TestTasksCommon {
         final BlockState cobblestone = Blocks.COBBLESTONE_STAIRS.defaultBlockState();
 
         // Cobblestone does not have the property 'level' so assert exception
-        assertThrows(UnsupportedOperationException.class, () -> tasks.copyProperties(water, cobblestone));
+        // Disabled for compatibility with Immersive Weathering
+        // assertThrows(UnsupportedOperationException.class, () ->
+        // tasks.copyProperties(water, cobblestone));
 
         BlockState water2 = getWaterState(FluidLevel.FLOW2);
         assertEquals(FluidLevel.FLOW2, water2.getValue(LiquidBlock.LEVEL));

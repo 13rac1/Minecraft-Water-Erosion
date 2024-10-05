@@ -668,9 +668,15 @@ public class Tasks {
         }
         target = target.setValue(property, value);
       } else {
-        throw new UnsupportedOperationException(
-            String.format("'%s' property '%s' is not available on '%s'", source.getBlock(),
-                property.getName(), target.getBlock()));
+        // Skip missing properties
+
+        // Immersive Weathering creates a new property named "weathering" on
+        // Cobblestone, but doesn't apply it to Mossy Cobblestone. Is this an oversight?
+        // See: https://github.com/13rac1/Minecraft-Water-Erosion/issues/32
+        // throw new UnsupportedOperationException(
+        // String.format("'%s' property '%s' is not available on '%s'",
+        // source.getBlock(),
+        // property.getName(), target.getBlock()));
       }
     }
     return target;
