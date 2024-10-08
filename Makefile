@@ -1,7 +1,8 @@
 # Expecting Java 17 in $PATH
 
 .PHONY: build
-build: forge neoforge fabric
+# Skipping Neoforge
+build: forge fabric
 
 .PHONY: forge
 forge: dist
