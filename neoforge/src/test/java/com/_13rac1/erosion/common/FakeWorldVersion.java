@@ -18,8 +18,8 @@ public class FakeWorldVersion implements WorldVersion {
         }
         once = false;
 
-        WorldVersion version = new FakeWorldVersion();
-        net.minecraft.SharedConstants.setVersion(version);
+        //WorldVersion version = new FakeWorldVersion();
+        //net.minecraft.SharedConstants.setVersion(version);
         net.minecraft.server.Bootstrap.bootStrap();
     }
 
