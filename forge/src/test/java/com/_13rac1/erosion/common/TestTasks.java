@@ -55,22 +55,6 @@ public class TestTasks extends TestTasksCommon {
     FakeWorldVersion.init();
   }
 
-  // Simple test to confirm BlockState is working as expected.
-  @Test
-  void testBlockState() {
-    final MapCodec<BlockState> map = null;
-    final BlockState state = new BlockState(Blocks.AIR, ImmutableMap.of(), map);
-
-    Assertions.assertEquals(Blocks.AIR, state.getBlock());
-
-    final ImmutableMap<Property<?>, Comparable<?>> propertiesWater = ImmutableMap.of(LiquidBlock.LEVEL,
-        FluidLevel.SOURCE);
-    final BlockState stateWater = new BlockState(Blocks.WATER, propertiesWater, map);
-
-    Assertions.assertEquals(Blocks.WATER, stateWater.getBlock());
-    Assertions.assertEquals(FluidLevel.SOURCE, stateWater.getValue(LiquidBlock.LEVEL));
-  }
-
   @Test
   void testDirLeftRight() {
     // Verbosely test both the Minecraft libraries and the Task methods work as

@@ -5,9 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import org.slf4j.Logger;
+import com.mojang.logging.LogUtils;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -38,7 +37,8 @@ import net.minecraft.tags.BlockTags;
 // IDEA: Return "Reasons" for not eroding, which can be unit tested for the correct reason not just any.
 
 public class Tasks {
-  private static final Logger LOGGER = LogManager.getFormatterLogger(Tasks.class);
+  // Directly reference a slf4j logger
+  private static final Logger LOGGER = LogUtils.getLogger();
 
   // Copied from net.minecraft.util(.math).Direction
   private static final Vec3i VECTOR_DOWN = new Vec3i(0, -1, 0);
